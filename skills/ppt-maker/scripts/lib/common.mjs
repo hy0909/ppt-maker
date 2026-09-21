@@ -32,8 +32,8 @@ export function luminance(hex) {
 
 /** Derive the full token set from brand primary (+ optional secondary). */
 export function derivePalette(brand = {}) {
-  const primary = (brand.primary || '#2F0CC5').toUpperCase();  // 기본 포인트 컬러(보라 계열)
-  const accent = (brand.secondary || '#0EA5E9').toUpperCase();
+  const primary = (brand.primary || TOKENS.color.primary).toUpperCase();  // 기본값은 design-tokens.json 의 메인 컬러
+  const accent = (brand.secondary || TOKENS.color.secondary).toUpperCase();
   // dark slide background: darken toward navy, but never near-black
   let dark = mix(primary, '#0B1020', 0.55);
   if (luminance(dark) < 0.012) dark = mix(primary, '#0B1020', 0.35);
@@ -49,7 +49,9 @@ export function derivePalette(brand = {}) {
     }
     return primary;
   };
-  const sec = brand.secondary && /^#?[0-9a-f]{6}$/i.test(brand.secondary) ? brand.secondary.toUpperCase() : '';
+  // 덱에 보조 컬러가 없으면 design-tokens.json 의 보조 컬러를 쓴다. 디자인 시스템 화면에 보이는 그대로 나오게.
+  const secRaw = brand.secondary || TOKENS.color.secondary || '';
+  const sec = /^#?[0-9a-f]{6}$/i.test(secRaw) ? secRaw.toUpperCase() : '';
   const primary2 = sec && luminance(sec) > luminance(primary) ? readable(sec) : mix(primary, '#4E8DF5', 0.55);
   return {
     primary,
@@ -85,7 +87,7 @@ export function derivePalette(brand = {}) {
 // 값의 원본은 design-tokens.json 한 곳이다. 웹 디자인 시스템 화면에서 저장하면 그 파일이 바뀐다.
 // 아래 기본값은 파일이 없거나 칸이 빠졌을 때만 쓴다.
 const DEFAULT_TOKENS = {
-  color:   { primary: '#2F0CC5', secondary: '#1E5BB8' },
+  color:   { primary: '#2B0CDD', secondary: '#CBD5E1' },
   type:    { h0: { size: 48, line: 58.6, spc: -1 }, h1: { size: 40, line: 48, spc: -1 },
              h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
   head:    { eyebrow: 15, pgno: 13, stitle: 42, lead: 16, ruleColor: '#CFD4DC' },
@@ -126,7 +128,7 @@ export function loadOutline(file) {
     agenda: true, dividers: 'auto', pageNumbers: true, footer: '',
     coverBg: 'cube',             // 표지 배경 이미지. 목록은 assets/cover-bg/index.json
   }, raw.meta || {});
-  meta.brand = Object.assign({ primary: '#2F0CC5' }, meta.brand);   // 기본 포인트 컬러
+  meta.brand = Object.assign({ primary: TOKENS.color.primary }, meta.brand);   // 기본값은 design-tokens.json
   // 기본 로고가 있고, `logo: { light:'', dark:'' }` 로 비우면 그 자리를 비워 둔다.
   meta.logo = Object.assign({ light: 'assets/logo_v_blue.png', dark: 'assets/logo_h_white.png' }, meta.logo);
   const sections = (raw.sections || []).map((s, i) => Object.assign({ no: i + 1, title: '', subtitle: '', slides: [] }, s));
