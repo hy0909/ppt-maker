@@ -1,5 +1,7 @@
+// Copyright (c) 2026 SafeAI. All rights reserved. Originally from safeai-deck-template.
+// See COPYRIGHT.md — 복제·수정·재배포는 허락 없이 할 수 없습니다.
 /* ══════════════════════════════════════════════════════════════════════
-   deck-editor.js — SafeAI Deck 직접 편집 모드 (bolt-on)
+   deck-editor.js — Slide WYSIWYG 편집 모드 (bolt-on)
    deck-stage.js 를 수정하지 않고 그 위에 얹는 WYSIWYG 편집 레이어.
 
    - light-DOM <section> 슬라이드를 직접 조작

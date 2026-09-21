@@ -20,6 +20,8 @@ import { parseOutlineText } from './outline_parse.mjs';
 import { TYPE, COVER_BOX, COVER_SCRIM, COVER_BG_KEYS, COVER_BG_LABEL, coverBgFile, dividerBgFile, derivePalette } from '../scripts/lib/common.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+const TOKEN_FILE = path.join(here, '..', 'design-tokens.json');
+const TOKEN_STATE = path.join(here, 'workspace', '.design-state.json');
 const SKILL = path.resolve(here, '..');
 const SCRIPTS = path.join(SKILL, 'scripts');
 const REFS = path.join(SKILL, 'references');
@@ -430,6 +432,23 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/') {
       res.writeHead(200, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-store' });
       return res.end(fs.readFileSync(path.join(here, 'index.html')));
+    }
+    /* 디자인 시스템 화면. 값을 고쳐 저장하면 design-tokens.json 이 바뀌고,
+       다음 빌드부터 HTML·PPTX 에 그대로 반영된다. */
+    if (req.method === 'GET' && url.pathname === '/design') {
+      res.writeHead(200, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-store' });
+      return res.end(fs.readFileSync(path.join(here, 'design-system.html')));
+    }
+    if (req.method === 'GET' && url.pathname === '/api/tokens') {
+      try { return json(res, 200, JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8'))); }
+      catch { return json(res, 200, {}); }
+    }
+    if (req.method === 'POST' && url.pathname === '/api/tokens') {
+      const body = await readBody(req);
+      if (!body || !body.tokens) return json(res, 400, { error: '보낼 값이 없습니다' });
+      fs.writeFileSync(TOKEN_FILE, JSON.stringify(body.tokens, null, 2) + '\n');
+      if (body.state) fs.writeFileSync(TOKEN_STATE, JSON.stringify(body.state, null, 2) + '\n');
+      return json(res, 200, { ok: true, file: TOKEN_FILE });
     }
     if (req.method === 'GET' && url.pathname === '/api/status') {
       const projects = fs.readdirSync(WS).filter(d => fs.existsSync(path.join(WS, d, 'outline.json'))).map(d => ({ name: d, mtime: fs.statSync(path.join(WS, d, 'outline.json')).mtimeMs, built: fs.existsSync(path.join(WS, d, 'out', 'deck.pptx')) })).sort((a, b) => b.mtime - a.mtime);

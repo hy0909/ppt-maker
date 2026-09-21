@@ -1,3 +1,5 @@
+// Copyright (c) 2026 SafeAI. All rights reserved. Originally from safeai-deck-template.
+// See COPYRIGHT.md — 복제·수정·재배포는 허락 없이 할 수 없습니다.
 // @ds-adherence-ignore -- omelette starter scaffold (raw elements/hex/px by design)
 /* BEGIN USAGE */
 /**

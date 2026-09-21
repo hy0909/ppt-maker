@@ -47,6 +47,8 @@ body{
 header{height:56px;background:hsl(var(--background)/.9);backdrop-filter:blur(8px);border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;position:relative;z-index:20}
 header .logo{font-weight:600;letter-spacing:-.02em;font-size:15px;color:hsl(var(--foreground));display:flex;align-items:center;gap:8px}
 header .logo::before{content:'';width:22px;height:22px;border-radius:6px;background:hsl(var(--primary));box-shadow:var(--shadow-sm)}
+header .dslink{font-size:13px;font-weight:500;color:hsl(var(--muted-foreground));text-decoration:none;padding:0 10px;height:var(--h-s);display:inline-flex;align-items:center;border:1px solid hsl(var(--border));border-radius:calc(var(--radius) - 2px)}
+header .dslink:hover{color:hsl(var(--foreground));background:hsl(var(--muted))}
 /* 스텝 = shadcn Tabs (muted 컨테이너 + 선택 항목만 흰 배경) */
 header .steps{display:inline-flex;align-items:center;gap:2px;margin-left:8px;background:hsl(var(--muted));padding:4px;border-radius:var(--radius)}
 header .steps button{border:0;background:transparent;height:var(--h-s);padding:0 12px;border-radius:calc(var(--radius) - 2px);font:inherit;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground));cursor:pointer;white-space:nowrap;transition:color .15s,background .15s}
@@ -234,6 +236,7 @@ details[open]>summary::before{content:'▾ '}
     <button data-step="1" class="on">1 설정</button><button data-step="2">2 입력</button><button data-step="3">3 장표 구성</button><button data-step="4">4 결과</button>
   </nav>
   <div class="sp"></div>
+  <a class="dslink" href="design/" target="_blank">디자인 시스템</a>
   <div class="status" id="status">연결 중…</div>
 </header>
 <main>
