@@ -40,6 +40,7 @@ pip install python-pptx pymupdf
 표지·목차의 글자 크기·줄 간격(pt 고정)·자간·좌표는 `references/design-system.md` 의 "표지·목차 글자 규격" 표에 있고, 값은 `scripts/lib/common.mjs` 의 `TYPE`·`COVER_BOX`·`AGENDA_BOX` 한 곳에만 둔다.
 표지 배경 그림은 `meta.coverBg` 로 고른다(기본 `cube`). 목록은 `assets/cover-bg/index.json`.
 배경에 짝이 되는 간지 그림이 달려 있으면 간지 배경도 같이 바뀐다(지금은 `haze`). 마무리 장표는 늘 브랜드 그라데이션이다.
+표지 왼쪽에는 제목이 읽히게 어두운 그라데이션을 한 겹 깔지만, 왼쪽이 이미 어두운 배경은 `--no-scrim` 으로 끈다(지금은 `retail`).
 배경을 새로 넣거나 바꿀 때는 원본을 그대로 쓰지 말고 `scripts/prepare_cover_bg.py` 로 2560×1440 고화질 처리를 거친다.
 글자·로고가 얹힌 완성 장표를 배경으로 받았으면 `scripts/strip_cover_text.py` 로 글자를 먼저 지운다. 자세한 건 `references/design-system.md`.
 

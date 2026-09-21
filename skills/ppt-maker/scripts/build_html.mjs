@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel,
-         TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, COVER_SCRIM,
+         TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME } from './lib/common.mjs';
 
@@ -186,7 +186,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .cbg{position:absolute;inset:0;overflow:hidden;z-index:0;background:#000 center center / cover no-repeat;}
 .cv .cbg{background-image:url('${coverBgFile(meta.coverBg)}');}
 /* 제목이 놓이는 왼쪽을 살짝 눌러 글씨가 밝은 부분에 걸쳐도 읽히게 한다 */
-.cv .scrim{position:absolute;inset:0;z-index:1;background:${COVER_SCRIM};}
+.cv .scrim{position:absolute;inset:0;z-index:1;background:${coverScrim(meta.coverBg)};}
 .closing .cbg{background:${closingBgCss(P)};}
 /* 표지 본문 — 원본 PPTX 좌표·여백 그대로 */
 .cover .clead{position:absolute;left:${C.lead.x}px;top:${C.lead.y}px;width:${C.lead.w}px;height:${C.lead.h}px;${typeCss(TYPE.body2)}color:#E7E6E6;z-index:2;word-break:keep-all;}

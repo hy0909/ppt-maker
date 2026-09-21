@@ -315,6 +315,12 @@ export function dividerBgFile(design) {
 }
 /** 표지 제목 자리를 살짝 눌러 주는 그라데이션 — HTML 과 PPTX 가 같은 값을 쓴다 */
 export const COVER_SCRIM = 'linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)';
+/** 이 표지에 쓸 그라데이션. 목록에서 `scrim: false` 인 배경은 덮지 않는다.
+ *  왼쪽이 이미 어둡고 고른 배경은 한 겹 더 깔면 색만 탁해지고 얻는 게 없다. */
+export function coverScrim(design) {
+  const b = BG_LIST.find(x => x.key === design) || BG_LIST[0];
+  return b && b.scrim === false ? 'none' : COVER_SCRIM;
+}
 /** 간지 글씨는 왼쪽에 몰려 있다 — 왼쪽만 눌러 주고 오른쪽 그림은 살린다 */
 export const DIVIDER_SCRIM = 'linear-gradient(90deg,rgba(5,3,18,.74) 0%,rgba(5,3,18,.62) 40%,rgba(5,3,18,.26) 70%,rgba(5,3,18,.06) 100%)';
 /** 마무리 장표 배경 — 표지와 따로 간다(브랜드 그라디언트) */

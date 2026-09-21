@@ -65,43 +65,50 @@
       "key": "cube",
       "label": "유리 큐브",
       "src": "assets/cover-bg/cube.jpg",
-      "divider": null
+      "divider": null,
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "stripe",
       "label": "스캔라인",
       "src": "assets/cover-bg/stripe.png",
-      "divider": null
+      "divider": null,
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "haze",
       "label": "양옆 파란 빛",
       "src": "assets/cover-bg/haze.png",
-      "divider": "assets/cover-bg/haze-divider.png"
+      "divider": "assets/cover-bg/haze-divider.png",
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "cctv",
       "label": "감시 카메라 도트",
       "src": "assets/cover-bg/cctv.jpg",
-      "divider": null
+      "divider": null,
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "wave",
       "label": "보라 물결",
       "src": "assets/cover-bg/wave.png",
-      "divider": null
+      "divider": null,
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "cube-mono",
       "label": "큐브 흑백",
       "src": "assets/cover-bg/cube-mono.png",
-      "divider": null
+      "divider": null,
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "retail",
       "label": "매장 사람 인식",
       "src": "assets/cover-bg/retail.png",
-      "divider": null
+      "divider": null,
+      "scrim": "none"
     }
   ],
   "logo": "assets/logo_h_white.png"

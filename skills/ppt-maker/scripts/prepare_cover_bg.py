@@ -296,6 +296,11 @@ def main():
                     help='표지 목록에 새로 넣지 않고, 이 표지 키의 간지 배경으로 단다')
     ap.add_argument('--kind', default=None, choices=['stripe-h', 'stripe-v', 'dither', 'graphic', 'photo'],
                     help='자동 판별이 틀렸을 때 방법을 직접 지정한다')
+    g = ap.add_mutually_exclusive_group()
+    g.add_argument('--no-scrim', dest='no_scrim', action='store_true',
+                   help='표지 왼쪽을 눌러 주는 그라데이션을 덮지 않는다 (왼쪽이 이미 어둡고 고른 배경)')
+    g.add_argument('--scrim', dest='scrim', action='store_true',
+                   help='--no-scrim 으로 꺼 뒀던 것을 다시 덮는다')
     a = ap.parse_args()
 
     src = Image.open(a.source).convert('RGB')
@@ -353,8 +358,14 @@ def main():
         json.dump(m, open(MANIFEST, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
         print(f'간지      {tgt["label"]}({tgt["key"]}) 표지를 고르면 간지 배경으로 {fname} 을 쓴다')
         return
+    prev = next((b for b in m['backgrounds'] if b['key'] == a.key), None)
     bgs = [b for b in m['backgrounds'] if b['key'] != a.key and b['key'] != (a.replace or '')]
     entry = {'key': a.key, 'label': a.label or a.key, 'file': fname}
+    # 그라데이션 여부는 그림 성질이라 같은 키로 다시 넣을 때만 이어받는다.
+    # --replace 는 다른 그림으로 갈아 끼우는 것이라 이어받지 않는다.
+    if a.no_scrim or (prev and prev.get('scrim') is False and not a.scrim):
+        entry['scrim'] = False
+        print('덮개      표지 왼쪽 그라데이션을 덮지 않는다')
     if a.replace:                                   # 자리를 그대로 이어받는다
         idx = next((i for i, b in enumerate(m['backgrounds']) if b['key'] == a.replace), len(bgs))
         old = next((b for b in m['backgrounds'] if b['key'] == a.replace), None)

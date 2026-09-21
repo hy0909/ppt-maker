@@ -507,7 +507,7 @@ function drawCover(){
   const C = COVERSPEC.box, T = COVERSPEC.type, st = $('#cvStage');
   const bg = COVERSPEC.backgrounds.find(b=>b.key===S.coverBg) || COVERSPEC.backgrounds[0];
   st.querySelector('.bg').style.backgroundImage = `url('${bg.src}')`;
-  st.querySelector('.sc').style.background = COVERSPEC.scrim;
+  st.querySelector('.sc').style.background = bg.scrim || COVERSPEC.scrim;
 
   const lead = st.querySelector('.lead');
   lead.style.cssText = boxCss(C.lead) + faceCss(T.body2);

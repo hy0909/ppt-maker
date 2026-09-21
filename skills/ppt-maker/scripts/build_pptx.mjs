@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import pptxgen from 'pptxgenjs';
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
-         TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, COVER_SCRIM,
+         TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -190,7 +190,7 @@ async function renderBackgrounds() {
     fs.unlinkSync(tmp);
     return true;
   };
-  await composite(BG_COVER_SRC, BG_COVER, COVER_SCRIM, COVER_LOSSLESS);
+  await composite(BG_COVER_SRC, BG_COVER, coverScrim(meta.coverBg), COVER_LOSSLESS);
   if (BG_DIV_SRC && !await composite(BG_DIV_SRC, BG_DIVIDER_IMG, DIVIDER_SCRIM, DIV_LOSSLESS)) {
     console.warn(`간지 배경 이미지를 못 찾았다: ${BG_DIV_SRC} — build_html.mjs 를 먼저 돌려야 한다`);
   }

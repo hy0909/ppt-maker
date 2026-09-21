@@ -98,22 +98,25 @@ Paperlogy·Pretendard 는 굵기마다 패밀리 이름이 따로 있다(`Paperl
 
 목록은 `assets/cover-bg/index.json` 한 곳에만 있다. 지금 들어 있는 것:
 
-| 값 | 그림 | 파일 | 짝이 되는 간지 배경 |
-| --- | --- | --- | --- |
-| `cube`(기본) | 반사 있는 유리 큐브 | `cube.jpg` | 없음 |
-| `stripe` | 가로 스캔라인 그라데이션 | `stripe.png` | 없음 |
-| `haze` | 양옆 파란 빛 | `haze.png` | `haze-divider.png` (보라 점 그라데이션) |
-| `cctv` | 감시 카메라, 도트로 덮인 | `cctv.jpg` | 없음 |
-| `wave` | 보라 물결 | `wave.png` | 없음 |
-| `cube-mono` | 큐브 흑백 하프톤 | `cube-mono.png` | 없음 |
-| `retail` | 파란 바탕에 매장 사람 인식 그림 | `retail.png` | 없음 |
+| 값 | 그림 | 파일 | 짝이 되는 간지 배경 | 왼쪽 그라데이션 |
+| --- | --- | --- | --- | --- |
+| `cube`(기본) | 반사 있는 유리 큐브 | `cube.jpg` | 없음 | 덮음 |
+| `stripe` | 가로 스캔라인 그라데이션 | `stripe.png` | 없음 | 덮음 |
+| `haze` | 양옆 파란 빛 | `haze.png` | `haze-divider.png` (보라 점 그라데이션) | 덮음 |
+| `cctv` | 감시 카메라, 도트로 덮인 | `cctv.jpg` | 없음 | 덮음 |
+| `wave` | 보라 물결 | `wave.png` | 없음 | 덮음 |
+| `cube-mono` | 큐브 흑백 하프톤 | `cube-mono.png` | 없음 | 덮음 |
+| `retail` | 파란 바탕에 매장 사람 인식 그림 | `retail.png` | 없음 | 안 덮음 |
 
 - 표지에 짝이 되는 간지 그림(`divider`)이 있으면 **간지 배경도 그 그림으로 바뀐다**. 짝이 없으면 간지는 지금처럼 포인트 컬러 그라데이션이다.
   마무리 장표는 표지와 무관하게 늘 브랜드 그라데이션(`closingBgCss`).
 - 간지 그림을 쓰면 오른쪽 아래 로고 워터마크는 넣지 않는다 — 그림이 이미 그 자리를 채운다.
 - 간지 글씨는 왼쪽에 몰려 있어 `DIVIDER_SCRIM` 은 왼쪽 74% → 오른쪽 6% 로 눕힌다. 표지용 `COVER_SCRIM` 보다 왼쪽이 진하다.
-- 그림 위에 제목 자리를 눌러 주는 그라데이션(`COVER_SCRIM`)을 한 겹 깐다 — 왼쪽 48% → 74% 에서 사라진다.
+- 그림 위에 제목 자리를 눌러 주는 그라데이션(`COVER_SCRIM`)을 한 겹 깐다. 왼쪽 48% 에서 시작해 74% 에서 사라진다.
   제목이 길어 밝은 데 걸쳐도 흰 글씨가 읽힌다. 바탕이 검정인 그림에서는 보이지 않는다.
+- 왼쪽이 이미 어둡고 색이 고른 배경은 목록에 `"scrim": false` 를 적어 이 그라데이션을 끈다(지금은 `retail`).
+  한 겹 더 깔아 봐야 글씨가 더 읽히지도 않으면서 바탕색만 탁해지기 때문이다.
+  코드에서는 `coverScrim(키)` 하나로 읽는다. HTML·PPTX·웹 화면 미리보기가 모두 이 값을 쓴다.
 - HTML 은 그림 + CSS 그라데이션, PPTX 는 둘을 합쳐 한 장(`_bg_cover`)으로 캡처해 깐다.
   **원본이 PNG 면 합친 것도 PNG** 로 저장한다 — 줄무늬·경계가 뚜렷한 그림은 JPEG 에서 링잉이 생긴다.
 - 작업 폴더 `out/assets/cover-bg/` 에 같은 이름 파일이 있으면 그쪽을 쓴다(그림 교체용).
@@ -122,6 +125,9 @@ Paperlogy·Pretendard 는 굵기마다 패밀리 이름이 따로 있다(`Paperl
 
 ```bash
 python3 skills/ppt-maker/scripts/prepare_cover_bg.py <원본이미지> <키> --label "화면에 보일 이름" [--replace 바꿀키]
+
+# 왼쪽이 이미 어두워 제목 자리를 누를 필요가 없는 배경
+python3 skills/ppt-maker/scripts/prepare_cover_bg.py <원본이미지> <키> --label "이름" --no-scrim
 
 # 표지 목록에 새로 넣지 않고, 그 표지를 골랐을 때 쓸 간지 배경으로 달 때
 python3 skills/ppt-maker/scripts/prepare_cover_bg.py <원본이미지> <키> --divider-of <표지키>

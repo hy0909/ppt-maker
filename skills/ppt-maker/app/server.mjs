@@ -17,7 +17,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { parseOutlineText } from './outline_parse.mjs';
-import { TYPE, COVER_BOX, COVER_SCRIM, COVER_BG_KEYS, COVER_BG_LABEL, coverBgFile, dividerBgFile, derivePalette } from '../scripts/lib/common.mjs';
+import { TYPE, COVER_BOX, COVER_SCRIM, coverScrim, COVER_BG_KEYS, COVER_BG_LABEL, coverBgFile, dividerBgFile, derivePalette } from '../scripts/lib/common.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const TOKEN_FILE = path.join(here, '..', 'design-tokens.json');
@@ -546,7 +546,8 @@ const server = http.createServer(async (req, res) => {
         backgrounds: COVER_BG_KEYS.map(k => {
           const div = dividerBgFile(k);
           return { key: k, label: COVER_BG_LABEL[k], src: '/asset/' + coverBgFile(k).replace(/^assets\//, ''),
-                   divider: div ? '/asset/' + div.replace(/^assets\//, '') : null };
+                   divider: div ? '/asset/' + div.replace(/^assets\//, '') : null,
+                   scrim: coverScrim(k) };   // 배경마다 다르다 — 덮지 않는 배경은 'none'
         }),
         logo: '/asset/logo_h_white.png',
       });
