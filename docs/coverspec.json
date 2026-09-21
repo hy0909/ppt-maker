@@ -1,0 +1,102 @@
+{
+  "type": {
+    "h0": {
+      "size": 48,
+      "line": 58.6,
+      "spc": -1,
+      "face": "Paperlogy 7 Bold"
+    },
+    "h1": {
+      "size": 40,
+      "line": 48,
+      "spc": -1,
+      "face": "Paperlogy 7 Bold"
+    },
+    "h2": {
+      "size": 24,
+      "line": 31.8,
+      "spc": -0.2,
+      "face": "Paperlogy 5 Medium"
+    },
+    "body2": {
+      "size": 18,
+      "line": 26.6,
+      "spc": -0.8,
+      "face": "Pretendard Light"
+    }
+  },
+  "box": {
+    "lead": {
+      "x": 61.5,
+      "y": 56,
+      "w": 530.2,
+      "h": 83.6
+    },
+    "title": {
+      "x": 59.4,
+      "y": 117,
+      "w": 720,
+      "h": 172.1
+    },
+    "logo": {
+      "x": 60.4,
+      "y": 613.4,
+      "w": 202.5,
+      "h": 50.6
+    },
+    "badge": {
+      "x": 986.1,
+      "y": 636.9,
+      "w": 246.6,
+      "h": 39.6
+    },
+    "badgeText": {
+      "x": 947.6,
+      "y": 641.6,
+      "w": 266.7,
+      "h": 26,
+      "size": 14,
+      "spc": -0.8
+    }
+  },
+  "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)",
+  "backgrounds": [
+    {
+      "key": "cube",
+      "label": "유리 큐브",
+      "src": "assets/cover-bg/cube.jpg",
+      "divider": null
+    },
+    {
+      "key": "stripe",
+      "label": "스캔라인",
+      "src": "assets/cover-bg/stripe.png",
+      "divider": null
+    },
+    {
+      "key": "haze",
+      "label": "양옆 파란 빛",
+      "src": "assets/cover-bg/haze.png",
+      "divider": "assets/cover-bg/haze-divider.png"
+    },
+    {
+      "key": "cctv",
+      "label": "감시 카메라 도트",
+      "src": "assets/cover-bg/cctv.jpg",
+      "divider": null
+    },
+    {
+      "key": "wave",
+      "label": "보라 물결",
+      "src": "assets/cover-bg/wave.png",
+      "divider": null
+    },
+    {
+      "key": "cube-mono",
+      "label": "큐브 흑백",
+      "src": "assets/cover-bg/cube-mono.png",
+      "divider": null
+    }
+  ],
+  "logo": "assets/logo_h_white.png"
+}

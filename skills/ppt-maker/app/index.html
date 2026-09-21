@@ -539,7 +539,9 @@ function sync(){
   drawCover();
   $('#inNew').style.display = S.mode==='new'?'':'none'; $('#inImprove').style.display = S.mode==='improve'?'':'none';
   $('#inTitle').textContent = S.mode==='new' ? '원문을 붙여 넣으세요' : '개선할 PPTX를 올려 주세요';
-  $('#typeHints').innerHTML = `<b>${S.type} 유형에서 있으면 좋은 정보</b><br>${HINTS[S.type]}`;
+  // 화면에는 키(gov-proposal) 대신 우리말 이름(정부 과제 제안서)을 쓴다
+  const tName = (TYPES.find(t=>t[0]===S.type)||[])[2] || S.type;
+  $('#typeHints').innerHTML = `<b>${tName} 유형에서 있으면 좋은 정보</b><br>${HINTS[S.type]||''}`;
   $('#genLabel').textContent = S.mode==='new' ? 'AI로 장표 구성 만들기' : 'PPTX 추출 → AI로 다시 구성';
   $('#logoInfo').textContent = [S.logo.light&&'밝은 배경: '+S.logo.light, S.logo.dark&&'어두운 배경: '+S.logo.dark].filter(Boolean).join(' · ');
   save();
