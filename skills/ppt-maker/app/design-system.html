@@ -1153,7 +1153,9 @@ function loadCoverSpec(){
     : ['../coverspec.json','coverspec.json','/api/coverspec'];
   (function next(i){
     if(i>=tries.length)return;
-    fetch(tries[i]).then(function(r){
+    /* no-cache 로 물어본다 — 배경 목록이 바뀌었는데 브라우저가 열 분쯤 옛 파일을
+       들고 있는 일을 막는다. 안 바뀌었으면 304 라 값은 거의 안 든다. */
+    fetch(tries[i],{cache:'no-cache'}).then(function(r){
       if(!r.ok)throw 0;
       var at=r.url||new URL(tries[i],location.href).href;
       return r.json().then(function(j){return {j:j,at:at}});

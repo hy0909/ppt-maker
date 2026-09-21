@@ -52,7 +52,8 @@
     if (p === '/api/status')    return ok({ hasCreds: false, backend: 'none',
                                             projects: [{ name: DEMO, built: true }] });
     if (p === '/api/projects')  return ok({ projects: [{ name: DEMO, built: true }] });
-    if (p === '/api/coverspec') return REAL(at('coverspec.json'));
+    // no-cache: 배경 목록이 바뀌었는데 브라우저가 옛 파일을 들고 있는 일을 막는다
+    if (p === '/api/coverspec') return REAL(at('coverspec.json'), { cache: 'no-cache' });
     if (p === '/api/prompt')    return REAL(at('prompt.txt'));
 
     if (p === '/api/estimate') {
