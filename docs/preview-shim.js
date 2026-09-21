@@ -11,6 +11,8 @@
   const REPO = 'https://github.com/hy0909/ppt-maker';
   const RAW  = 'https://github.com/hy0909/ppt-maker/raw/main/examples/breezehome/out';
   const DEMO = 'breezehome';
+  /* 장표 디자인 값. 사본을 두면 엇갈리므로 저장소의 원본을 그대로 읽는다. */
+  const TOKENS = 'https://raw.githubusercontent.com/hy0909/ppt-maker/main/skills/ppt-maker/design-tokens.json';
 
   const at = p => new URL(p, BASE).href;
   const ok = body => new Response(
@@ -52,8 +54,9 @@
     if (p === '/api/status')    return ok({ hasCreds: false, backend: 'none',
                                             projects: [{ name: DEMO, built: true }] });
     if (p === '/api/projects')  return ok({ projects: [{ name: DEMO, built: true }] });
-    // no-cache: 배경 목록이 바뀌었는데 브라우저가 옛 파일을 들고 있는 일을 막는다
+    // no-cache: 목록이나 값이 바뀌었는데 브라우저가 옛 파일을 들고 있는 일을 막는다
     if (p === '/api/coverspec') return REAL(at('coverspec.json'), { cache: 'no-cache' });
+    if (p === '/api/tokens')    return REAL(TOKENS, { cache: 'no-cache' });
     if (p === '/api/prompt')    return REAL(at('prompt.txt'));
 
     if (p === '/api/estimate') {
