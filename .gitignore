@@ -5,6 +5,7 @@ examples/*/out/png/
 examples/*/out/png_pptx/
 examples/*/out/*.pptx.pdf
 examples/*/out/fit.json
+examples/*/out/audit.json
 examples/*/extracted_assets/
 skills/ppt-maker/app/workspace/
 __pycache__/
