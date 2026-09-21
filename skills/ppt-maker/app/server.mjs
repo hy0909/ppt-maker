@@ -43,8 +43,29 @@ import { execSync } from 'node:child_process';
 const hasApiKey = () => Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN || fs.existsSync(path.join(process.env.HOME || '', '.config/anthropic')));
 let CLAUDE_BIN = null;
 try { CLAUDE_BIN = execSync('command -v claude', { encoding: 'utf8', shell: '/bin/zsh' }).trim() || null; } catch { CLAUDE_BIN = fs.existsSync(path.join(process.env.HOME || '', '.local/bin/claude')) ? path.join(process.env.HOME, '.local/bin/claude') : null; }
-const backend = () => hasApiKey() ? 'api' : CLAUDE_BIN ? 'cli' : 'none';
+
+// OpenAI 방식으로 말하는 서비스(GPT, 그리고 같은 규격을 따르는 다른 곳)
+const OPENAI_KEY    = () => process.env.OPENAI_API_KEY || '';
+const OPENAI_BASE   = () => (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
+const OPENAI_MODEL  = () => process.env.PPT_MAKER_OPENAI_MODEL || 'gpt-5';
+const OPENAI_MAXTOK = () => Number(process.env.PPT_MAKER_OPENAI_MAXTOK || 32000);
+
+/* 무엇으로 돌릴지 고른다. PPT_MAKER_BACKEND 로 못박을 수 있고(api·openai·cli),
+   비워 두면 준비된 것 중에서 고른다. 고른 것이 준비돼 있지 않으면 none 이다. */
+const backend = () => {
+  const want = (process.env.PPT_MAKER_BACKEND || '').trim().toLowerCase();
+  if (want === 'api')    return hasApiKey()   ? 'api'    : 'none';
+  if (want === 'openai') return OPENAI_KEY()  ? 'openai' : 'none';
+  if (want === 'cli')    return CLAUDE_BIN    ? 'cli'    : 'none';
+  return hasApiKey() ? 'api' : OPENAI_KEY() ? 'openai' : CLAUDE_BIN ? 'cli' : 'none';
+};
 const hasCreds = () => backend() !== 'none';
+const NO_BACKEND = 'AI 를 아직 연결하지 않았습니다. 셋 중 하나를 고르세요.\n'
+  + '1) Claude Code CLI: claude 를 깔고 claude auth login\n'
+  + '2) Claude API 키: ANTHROPIC_API_KEY=sk-ant-... ./start.sh\n'
+  + '3) GPT API 키: OPENAI_API_KEY=sk-... ./start.sh\n'
+  + '자세한 방법은 docs/AI-연결하기.md 에 있습니다.';
+
 const slug = s => String(s || 'deck').trim().replace(/[^\w가-힣-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'deck';
 const json = (res, code, obj) => { res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(obj)); };
 const readBody = req => new Promise((ok, err) => { const c = []; req.on('data', d => c.push(d)); req.on('end', () => { try { ok(c.length ? JSON.parse(Buffer.concat(c).toString('utf8')) : {}); } catch (e) { err(e); } }); req.on('error', err); });
@@ -91,6 +112,70 @@ ${schema}
 
 # 문서 유형별 목차 템플릿
 ${templates}`;
+}
+
+
+/** OpenAI 방식의 /chat/completions 를 부른다. stream 이면 onDelta 로 글자를 흘려 준다.
+ *  서비스마다 받아 주는 항목이 조금씩 달라서, 400 이 오면 선택 항목을 빼고 한 번 더 보낸다. */
+async function openaiChat(user, { stream = false, onDelta, signal } = {}) {
+  const msgs = [{ role: 'system', content: systemPrompt() }, { role: 'user', content: user }];
+  const rich = { model: OPENAI_MODEL(), messages: msgs, stream,
+                 max_completion_tokens: OPENAI_MAXTOK(), response_format: { type: 'json_object' },
+                 ...(stream ? { stream_options: { include_usage: true } } : {}) };
+  const plain = { model: OPENAI_MODEL(), messages: msgs, stream, max_tokens: OPENAI_MAXTOK() };
+  const post = b => fetch(OPENAI_BASE() + '/chat/completions', {
+    method: 'POST', signal,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + OPENAI_KEY() },
+    body: JSON.stringify(b),
+  });
+
+  let r = await post(rich);
+  if (r.status === 400) {
+    const why = await r.text().catch(() => '');
+    if (/max_completion_tokens|response_format|stream_options|unsupported|unknown|unrecognized/i.test(why)) r = await post(plain);
+    else throw new Error('GPT 쪽에서 요청을 거절했습니다 (400): ' + why.slice(0, 300));
+  }
+  if (!r.ok) {
+    const why = await r.text().catch(() => '');
+    if (r.status === 401 || r.status === 403) throw new Error('OPENAI_API_KEY 가 올바르지 않습니다. 키를 다시 확인하세요.');
+    if (r.status === 404) throw new Error(`모델 이름이나 주소가 틀렸습니다. 모델 ${OPENAI_MODEL()}, 주소 ${OPENAI_BASE()} 를 확인하세요.`);
+    if (r.status === 429) throw new Error('요청 한도를 넘었습니다. 잠시 뒤 다시 시도하세요.');
+    throw new Error(`GPT 오류 (${r.status}): ` + why.slice(0, 300));
+  }
+
+  const asUsage = u => u ? { input_tokens: u.prompt_tokens, output_tokens: u.completion_tokens } : null;
+  if (!stream) {
+    const j = await r.json();
+    return { text: j.choices?.[0]?.message?.content || '', usage: asUsage(j.usage) };
+  }
+  let text = '', usage = null, buf = '';
+  const dec = new TextDecoder();
+  for await (const chunk of r.body) {
+    buf += dec.decode(chunk, { stream: true });
+    let i;
+    while ((i = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+      if (!line.startsWith('data:')) continue;
+      const p = line.slice(5).trim();
+      if (!p || p === '[DONE]') continue;
+      let e; try { e = JSON.parse(p); } catch { continue; }
+      const d = e.choices?.[0]?.delta?.content;
+      if (d) { text += d; onDelta?.(text); }
+      if (e.usage) usage = asUsage(e.usage);
+    }
+  }
+  return { text, usage };
+}
+
+/** 같은 프롬프트를 GPT 쪽으로 보낸다(한 번에 받는 방식). */
+async function generateOutlineViaOpenAI({ meta, text, notes }) {
+  const user = `## 설정\n${JSON.stringify(meta, null, 2)}\n\n## 추가 메모 (유형별 질문 답변)\n${notes || '(없음)'}\n\n## 원문\n${text}`;
+  const { text: out, usage } = await openaiChat(user);
+  if (!out.trim()) throw new Error('GPT 가 빈 응답을 보냈습니다.');
+  saveRaw(out);
+  const { outline } = parseOutlineText(out);
+  outline.meta = Object.assign({}, outline.meta || {}, pickMeta(meta));
+  return { outline, usage };
 }
 
 async function generateOutline({ meta, text, notes }) {
@@ -308,8 +393,24 @@ function startJob(body) {
         j.error = e instanceof Anthropic.AuthenticationError ? 'API 키가 유효하지 않습니다.' : e instanceof Anthropic.RateLimitError ? '요청 한도 초과. 잠시 후 다시 시도하세요.' : (e.message || String(e));
       }
     })();
+  } else if (be === 'openai') {
+    (async () => {
+      const ac = new AbortController();
+      j.abort = () => ac.abort();
+      try {
+        const { text, usage } = await openaiChat(user, { stream: true, signal: ac.signal,
+          onDelta: t => { j.outputChars = t.length; } });
+        if (j.state === 'cancelled') return;
+        if (!text.trim()) { j.state = 'error'; j.endedAt = Date.now(); j.error = 'GPT 가 빈 응답을 보냈습니다.'; return; }
+        if (usage?.output_tokens) j.outputTokensLive = usage.output_tokens;
+        finishJob(j, text, usage, null, body.meta);
+      } catch (e) {
+        if (j.state === 'cancelled') return;
+        j.state = 'error'; j.endedAt = Date.now(); j.error = e.message || String(e);
+      }
+    })();
   } else {
-    j.state = 'error'; j.endedAt = Date.now(); j.error = 'AI 백엔드가 없습니다. Claude Code CLI 로그인 또는 ANTHROPIC_API_KEY 가 필요합니다.';
+    j.state = 'error'; j.endedAt = Date.now(); j.error = NO_BACKEND;
   }
   return j;
 }
@@ -332,7 +433,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'GET' && url.pathname === '/api/status') {
       const projects = fs.readdirSync(WS).filter(d => fs.existsSync(path.join(WS, d, 'outline.json'))).map(d => ({ name: d, mtime: fs.statSync(path.join(WS, d, 'outline.json')).mtimeMs, built: fs.existsSync(path.join(WS, d, 'out', 'deck.pptx')) })).sort((a, b) => b.mtime - a.mtime);
-      return json(res, 200, { hasCreds: hasCreds(), backend: backend(), model: backend() === 'cli' ? 'Claude Code CLI (opus)' : MODEL, projects });
+      return json(res, 200, { hasCreds: hasCreds(), backend: backend(), model: backend() === 'cli' ? 'Claude Code CLI (opus)' : backend() === 'openai' ? OPENAI_MODEL() : MODEL, projects });
     }
     if (req.method === 'GET' && url.pathname.startsWith('/api/project/')) {
       const p = slug(decodeURIComponent(url.pathname.split('/')[3]));
@@ -350,7 +451,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/outline/start') {
       const body = await readBody(req);
       if (!body.text || body.text.trim().length < 20) return json(res, 400, { error: '원문 텍스트가 너무 짧습니다.' });
-      if (backend() === 'none') return json(res, 400, { error: 'AI 백엔드가 없습니다. Claude Code CLI(claude auth login) 또는 ANTHROPIC_API_KEY 가 필요합니다.' });
+      if (backend() === 'none') return json(res, 400, { error: NO_BACKEND });
       const j = startJob(body);
       return json(res, 200, jobSnapshot(j));
     }
@@ -370,11 +471,13 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && url.pathname === '/api/outline') {
       const be = backend();
-      if (be === 'none') return json(res, 400, { error: 'AI 백엔드가 없습니다. Claude Code CLI(claude)를 설치·로그인하거나, 서버를 `ANTHROPIC_API_KEY=... node server.mjs` 로 실행하세요. 또는 프롬프트 복사 → Claude 에서 생성 → JSON 붙여넣기.' });
+      if (be === 'none') return json(res, 400, { error: NO_BACKEND + '\n또는 프롬프트 복사 → 내 AI 에 붙여 생성 → JSON 붙여넣기.' });
       const body = await readBody(req);
       if (!body.text || body.text.trim().length < 20) return json(res, 400, { error: '원문 텍스트가 너무 짧습니다.' });
       try {
-        const r = be === 'api' ? await generateOutline(body) : await generateOutlineViaCLI(body);
+        const r = be === 'api' ? await generateOutline(body)
+                : be === 'openai' ? await generateOutlineViaOpenAI(body)
+                : await generateOutlineViaCLI(body);
         return json(res, 200, r);
       } catch (e) {
         if (e.kind === 'auth') return json(res, 401, { error: e.message, kind: 'auth', cmd: e.cmd });

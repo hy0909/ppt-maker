@@ -40,6 +40,9 @@ themselves and are independent of this repository's terms.
 **Optional:**
 - LibreOffice (only for verifying PPTX rendering locally; not required for generation)
 
+**AI 연결:** Claude Code, Claude API 키, GPT API 키 중 하나를 고른다.
+자세한 방법은 [AI-연결하기.md](AI-연결하기.md) 에 있다.
+
 **Claude integration:**
 - Supply your own Claude login: `claude auth login` (Claude Code CLI), OR
 - Set `ANTHROPIC_API_KEY` environment variable with your Anthropic API key
@@ -138,7 +141,8 @@ The slide engine and visual design were informed by real-world presentation patt
 **Fonts:** Pretendard and Paperlogy are both licensed under the SIL Open Font License 1.1.
 The font files are not bundled here; `./install_fonts.sh` fetches them from the official sources.
 
-**Logo:** The bundled logo sample (`logo_*.png`) is SafeAI trademark. When you use this code, you must replace it with your own logo.
+**Logo:** The bundled logo (`logo_*.png`) is a SafeAI trademark and ships as the default.
+Swap it for your own in the app's logo field, or keep it while trying things out.
 
 ---
 
