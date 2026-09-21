@@ -1,172 +1,110 @@
-# ppt-maker — Presentation Slide Generation Skill
+# PPT MAKER
 
-Auto-generate presentation slides from text outlines or existing PPTX files. Produces consistent, well-structured decks in both PDF and PPTX formats, following a rule-based design system.
+텍스트 초안이나 기존 PPTX를 넣으면 회사 디자인 기준에 맞춘 발표자료를 만드는 도구입니다. 장표 구성을 AI와 정리하고, 결과를 HTML·PDF·편집 가능한 PPTX로 확인할 수 있습니다.
 
-Transform your outline into a polished presentation: structure follows a proven grammar for slide composition, text density matches your document type (dense for evaluation, airy for audience listening), and visual tokens (colors, typography, spacing) stay consistent throughout.
+기획자·개발자가 내용을 장표로 구성하고 배치하는 시간, 디자이너가 요소를 만들고 장표를 다시 배치하는 시간을 줄이려고 만들었습니다. 각자 자료를 완성하고 디자이너는 UXUI 작업에 집중할 수 있도록 하는 것이 목표입니다.
 
----
+[화면 둘러보기](https://hy0909.github.io/ppt-maker/) · [AI 연결 안내](AI-연결하기.md)
 
-## What You Need
+## 이용 조건을 먼저 확인해 주세요
 
-**Node.js & Python:**
+코드와 문서를 읽는 것은 자유입니다. 복제·수정·재배포·상업적 이용에는 허락이 필요합니다. 자세한 조건은 [COPYRIGHT.md](COPYRIGHT.md), 문의는 [Issues](https://github.com/hy0909/ppt-maker/issues)를 참고해 주세요.
+
+포함된 SafeAI 로고는 회사 자산입니다. 글꼴과 참고한 외부 자료의 이용 조건은 [NOTICE.md](NOTICE.md)에 따로 적어 두었습니다.
+
+## 이런 작업을 할 수 있습니다
+
+| 작업 | 제공하는 것 |
+| --- | --- |
+| 텍스트로 새 자료 만들기 | 내용을 장표로 나누고 제목·본문·표·카드·이미지 배치 구성 |
+| 기존 PPTX 손보기 | 원본에서 내용을 추출해 장표 구성과 디자인 재정리 |
+| 회사 디자인 적용하기 | 색상·로고 설정, 공통 글꼴과 레이아웃 적용 |
+| 구성 확인하고 수정하기 | 장표 제목·내용·순서 검토, 미리보기 확인 |
+| 파일로 내보내기 | 확인용 HTML, 공유용 PDF, 편집용 PPTX |
+
+## 문서 목적에 맞춰 시작합니다
+
+현재 화면에서 선택할 수 있는 문서 유형입니다. 각 유형의 기본 구성을 불러온 뒤 내용에 맞게 고칩니다.
+
+| 문서 유형 | 주로 담는 내용 |
+| --- | --- |
+| 정부 과제 제안서 | 배경, 요구사항, 해결방안, 세부 기술, 기대효과 |
+| 고객사 제안서 | 솔루션, 구축 방안, 수행 사례, 일정, 비용, 운영 |
+| 연차보고서 | 과제 개요, 추진 현황, 개발 결과, 사업화, 향후 계획 |
+| 내부 진행보고 | 과제 범위, 일정, 진행 상황, 필요한 결정과 지원 |
+| 회사 소개서 | 회사 현황, 제품, 연혁, 실적, 특허, 팀 |
+| IR | 핵심 기술, 성장 실적, 사업 계획, 투자 관련 자료 |
+
+발표용과 제출·열람용을 구분하고, 지정 양식이 있으면 목차와 분량 제한을 입력합니다. 세부 구성은 [문서별 구성 안내](skills/ppt-maker/references/outline-templates.md)를 참고해 주세요.
+
+## 내 컴퓨터에서 실행합니다
+
+[웹 화면](https://hy0909.github.io/ppt-maker/)은 설치 전에 둘러보는 용도입니다. AI 직접 연결과 파일 생성은 내 컴퓨터에서 실행하는 앱을 사용합니다.
+
+아래 설치 예시는 저장소 이용 허락을 받은 사용자를 위한 macOS 기준입니다. Node.js 18 이상과 Python 3.8 이상을 먼저 준비합니다.
+
+<details>
+<summary>처음 설치하는 방법</summary>
+
+터미널에서 순서대로 실행합니다.
+
 ```bash
-node --version    # Node 18+ required
-python --version  # Python 3.8+ required
-```
+git clone https://github.com/hy0909/ppt-maker.git
+cd ppt-maker
 
-**Install dependencies:**
-```bash
-# Fonts (Pretendard + Paperlogy, both SIL OFL)
+# Python 실행 환경과 파일 처리 도구
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install python-pptx pymupdf
+
+# 글꼴과 장표 생성 도구
 ./install_fonts.sh
-
-# Slide rendering and PDF generation
-cd skills/ppt-maker/scripts && npm install
-npx playwright install chromium
-
-# PPTX generation and verification
-cd ../app && npm install
-
-# Python libraries for PPTX and PDF handling
-pip install python-pptx pymupdf
+npm --prefix skills/ppt-maker/scripts install
+(cd skills/ppt-maker/scripts && npx playwright install chromium)
+npm --prefix skills/ppt-maker/app install
 ```
 
-**Fonts:** `./install_fonts.sh` downloads and installs both (macOS and Linux).
-- **Pretendard** (body text) — SIL OFL 1.1, https://github.com/orioncactus/pretendard
-- **Paperlogy** (cover and section titles) — SIL OFL 1.1, https://github.com/Freesentation/paperlogy
+글꼴 설치 스크립트는 macOS·Linux용입니다. Pretendard와 Paperlogy를 공식 배포처에서 내려받습니다. Windows 설치 방법은 별도로 제공하지 않습니다.
 
-Both are free for personal and commercial use. Their OFL terms cover the font files
-themselves and are independent of this repository's terms.
+</details>
 
-**Optional:**
-- LibreOffice (only for verifying PPTX rendering locally; not required for generation)
+설치를 마쳤으면 저장소 폴더에서 실행합니다. 새 터미널을 열었다면 Python 실행 환경도 다시 켭니다.
 
-**AI 연결:** Claude Code, Claude API 키, GPT API 키 중 하나를 고른다.
-자세한 방법은 [AI-연결하기.md](AI-연결하기.md) 에 있다.
-
-**Claude integration:**
-- Supply your own Claude login: `claude auth login` (Claude Code CLI), OR
-- Set `ANTHROPIC_API_KEY` environment variable with your Anthropic API key
-- No API key ships with this repo; costs are on your account only
-
----
-
-## Quick Start
-
-Run a local dev server:
 ```bash
+source .venv/bin/activate
 ./start.sh
 ```
 
-Open http://localhost:3891 in your browser. You'll see:
-1. **Settings**: Choose document type, brand colors, logo
-2. **Input**: Paste text outline or upload an existing PPTX
-3. **Compose**: AI generates slide structure; you edit and refine
-4. **Output**: Download PDF or PPTX
+브라우저에서 [내 컴퓨터의 PPT MAKER](http://localhost:3790)를 엽니다. 터미널을 닫거나 `Ctrl+C`를 누르면 앱이 종료됩니다.
 
-The server stops when you close the terminal. For a persistent background service (macOS only):
-```bash
-./install_service.sh       # Start service (runs on login, auto-restarts)
-./install_service.sh restart   # After code changes
-./install_service.sh remove    # Uninstall
-```
+## AI는 내 계정으로 연결합니다
 
-Log file (if using service): `skills/ppt-maker/app/workspace/server.log`
+아래 방법 중 하나를 고르면 됩니다. 계정이나 API 키는 포함되어 있지 않으며, 사용량과 요금은 각자 연결한 계정에 적용됩니다.
 
----
+| 연결 방법 | 준비할 것 | 실행 방법 |
+| --- | --- | --- |
+| Claude Code | Claude Code 설치와 로그인 | `claude auth login` 후 `./start.sh` |
+| Claude API | 본인의 API 키 | `ANTHROPIC_API_KEY=내_API_키 ./start.sh` |
+| OpenAI API | 본인의 API 키 | `OPENAI_API_KEY=내_API_키 ./start.sh` |
+| 직접 연결 없이 사용 | 평소 사용하는 AI | 화면에서 프롬프트 복사 → AI에 붙여넣기 → 받은 JSON 붙여넣기 |
 
-## How It Works
+키는 README나 저장소 파일에 적지 않습니다. 모델 변경, 연결 방법 선택, 오류 해결은 [AI 연결 안내](AI-연결하기.md)에 정리되어 있습니다.
 
-**Source of truth:** `outline.json` — the structured data describing your presentation. Everything else (HTML, PPTX, PDF) is regenerated from this.
+## 입력부터 출력까지 이렇게 진행됩니다
 
-**Pipeline:**
-1. Build HTML: `outline.json` → `deck.html` (slide templates rendered as HTML)
-2. Check layout: Verify no text overflows or gets cut off
-3. Export PDF: Chromium headless → `deck.pdf` (1 slide = 1 page)
-4. Build PPTX: HTML → native PPTX (editable in PowerPoint)
-5. Verify PPTX: Check for out-of-bounds shapes
+1. 문서 유형과 읽는 방식, 회사 색상·로고를 정합니다.
+2. 텍스트를 붙여 넣거나 기존 PPTX를 올립니다.
+3. AI가 정리한 장표 구성을 확인하고 내용을 고칩니다.
+4. 미리보기에서 배치와 글자 잘림을 확인합니다.
+5. 필요한 파일을 내보내고, PPTX는 PowerPoint에서 최종 확인합니다.
 
-**Never edit** `deck.html`, `deck.pptx`, or `deck.pdf` directly. They regenerate on every build. Edit the input `outline.json` instead, or use the browser editor to change it visually.
+장표 내용과 구성은 `outline.json`에 저장합니다. 이 원본으로 HTML과 PPTX를 만들고, HTML에서 PDF를 출력합니다. 생성 과정에서 글자 넘침과 장표 밖으로 벗어난 요소를 검사합니다.
 
----
+## 수정하고 공유할 때 확인해 주세요
 
-## Slide Grammar & Rules
+- **재생성할 자료는 원본에서 수정합니다.** 앱이나 `outline.json`을 고쳐야 다음 생성에도 반영됩니다. 내보낸 PPTX를 PowerPoint에서 고친 내용은 원본에 자동 반영되지 않으므로 최종 편집본은 별도 파일로 보관합니다.
+- **내용과 출력물을 확인합니다.** 원문에 없는 수치·회사 정보는 임의로 채우지 않습니다. 생성 후에는 출처와 수치, 글꼴·줄바꿈을 확인합니다. HTML에서 만든 PDF와 PowerPoint의 표시 결과는 다를 수 있습니다.
+- **파일 저장과 AI 전송을 구분합니다.** 작업 파일은 내 컴퓨터의 `skills/ppt-maker/app/workspace/`에 저장되며 Git 추적에서 제외됩니다. 외부 AI를 연결하면 구성 요청에 담긴 내용은 해당 서비스로 전송됩니다.
+- **앱은 기본적으로 내 컴퓨터에서만 접속합니다.** `HOST=0.0.0.0`으로 실행하면 다른 기기에서도 접근할 수 있습니다. 앱에 로그인 기능이 없으므로 공개 서버로 운영하지 않습니다.
 
-All slides follow a structure that's effective for both reading and listening:
-
-```
-Header          "N. Section name – subtitle"
-Lead message    1–2 sentences summarizing the slide's conclusion
-Body            2–3 columns with cards, diagrams, tables, or images
-Optional banner Bottom callout or highlight
-```
-
-**Two density modes:**
-- **Dense** (default for proposals, reports, evaluations): 12–14pt text, many shapes, information-packed. Readers study the slide in detail.
-- **Airy** (for presentations, investor pitches, internal updates): 16pt+, whitespace, one message per slide. Audience listens while glancing at visuals.
-
-See `skills/ppt-maker/references/deck-rules.md` for the complete rule set: how to structure each slide, text length limits, color and typography rules, and layout guidelines.
-
----
-
-## Document Types
-
-Choose a template for your document purpose:
-
-| Type | Use when | Density | Sections |
-| --- | --- | --- | --- |
-| **A. Technical Presentation** | Pitching technology or a PoC to evaluators | Dense | Background → Requirements → Solution → Demo → Technical details → Expected impact |
-| **B. Project Progress Report** | Reporting R&D or funded project status (annual, stage, or final) | Dense | Overview → Performance → Development content → Commercialization / Next steps |
-| **C. Technical Proposal** | Responding to an RFP or grant call | Dense | Problem → Objectives → Approach → Timeline / Budget → Team / Credentials |
-| **D. Investor Pitch (IR)** | Raising investment | Airy | Problem → Solution → Market → Competitive advantage → Business model → Traction → Team → Funding request |
-| **E. Company Overview (B2B)** | Introducing your company to sales prospects | Airy | Company overview → Technology → Products → Case studies → Customer logos → How to start |
-| **F. Customer Proposal** | Proposing a solution tailored to one customer | Dense or Airy | Customer situation → Your solution → Implementation → Expected benefits → Timeline / Cost → Support |
-| **G. Internal Status Update** | Reporting progress to leadership | Airy | What we'll do → When → Current status → Risks / blockers |
-
-See `docs/02_outline-templates.md` for the full section-by-section breakdown of each type, with required inputs and variation patterns.
-
----
-
-## 이용 조건
-
-읽는 것은 자유합니다. 복제·수정·재배포·상업적 이용은 허락이 필요합니다.
-
-자세한 내용은 `COPYRIGHT.md`를 참고하세요. 질문이 있으면 이 저장소의 Issues를 통해 문의해 주세요.
-
----
-
-## Design Conventions
-
-The slide engine and visual design were informed by real-world presentation patterns used internally at SafeAI. The rule set—including slide structure, text density modes, typography hierarchy, and spatial composition—has been distilled into reusable guidelines so any user can produce consistent, professional output.
-
-**Fonts:** Pretendard and Paperlogy are both licensed under the SIL Open Font License 1.1.
-The font files are not bundled here; `./install_fonts.sh` fetches them from the official sources.
-
-**Logo:** The bundled logo (`logo_*.png`) is a SafeAI trademark and ships as the default.
-Swap it for your own in the app's logo field, or keep it while trying things out.
-
----
-
-## 개인정보와 계정
-
-### AI는 쓰는 사람 계정으로 돕니다
-
-AI가 필요하면 Claude Code CLI에 로그인하거나 API 키를 환경변수로 넘겨야 합니다. 원본 코드에는 API 키가 없습니다. 로그인 정보는 모두 당신의 홈 폴더에 저장되고, 웹 화면과 스크립트는 당신의 환경에서만 당신 계정으로 AI를 씁니다.
-
-### 만든 파일은 이 컴퓨터에만 있습니다
-
-웹 화면과 스크립트가 만드는 PPT, PDF, JSON 파일은 모두 workspace 폴더에만 저장됩니다. 이 폴더는 git에 올라가지 않고, 어디로도 전송되지 않습니다. 쓴 토큰 개수 같은 기록도 이 컴퓨터 파일에만 남습니다.
-
-**주의:** 웹 서버를 `HOST=0.0.0.0`으로 실행하면 같은 네트워크의 모든 사용자가 접근할 수 있습니다. 로그인이 없으므로 신뢰할 수 있는 환경에서만 사용하세요.
-
----
-
-## Next Steps
-
-- Start with `./start.sh` to see the interface
-- Read `docs/01_reference-analysis.md` for the grammar behind slide structure
-- Check `docs/02_outline-templates.md` for your document type
-- Consult `skills/ppt-maker/references/deck-rules.md` for style rules, length limits, and layout decisions
-- See `skills/ppt-maker/SKILL.md` for detailed feature documentation
-
-Questions or issues? Check the issues tracker or submit a pull request.
-
+제작 규칙은 [장표 작성 기준](skills/ppt-maker/references/deck-rules.md), 디자인 값은 [디자인 기준](skills/ppt-maker/references/design-system.md), AI 제작 절차는 [SKILL.md](skills/ppt-maker/SKILL.md)를 참고해 주세요.
