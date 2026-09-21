@@ -586,13 +586,13 @@ function buildSections(){
       fields:[{key:'b2',label:'크기',unit:'pt',step:0.5,min:8,max:60,alt:function(v){return '· '+(v*PT).toFixed(0)+'px'}},
               {key:'b2l',label:'줄 간격',unit:'pt',step:0.1,min:8,max:80},
               {key:'b2s',label:'자간',unit:'pt',step:0.1,min:-5,max:5}],
-      preview:pvType('센서 신뢰도 기반 판단','--h0b2','--deck-light','--h0b2s','var(--ink2)')}
+      preview:pvType('냉장 배송 온도 관리','--h0b2','--deck-light','--h0b2s','var(--ink2)')}
   ],'크기 · 줄 간격 · 자간');
   scaleStrip($('#s-type-fixed'),'표지·목차 실제 크기','표 안 미리보기는 30px 까지만 키운다. 진짜 크기는 여기서 본다.',[
     ['TYPE.h0','문서 제목','--h0','--deck-bold','--h0s','var(--ink)'],
     ['TYPE.h1','목차','--h1','--deck-bold','--h1s','var(--ink)'],
     ['TYPE.h2','배경 및 문제점','--h2','--deck-med','--h2s','var(--ink)'],
-    ['TYPE.body2','센서 신뢰도 기반 판단 체계','--h0b2','--deck-light','--h0b2s','var(--ink2)']
+    ['TYPE.body2','냉장 배송 온도 관리 체계','--h0b2','--deck-light','--h0b2s','var(--ink2)']
   ]);
 
   table($('#s-type-head'),[
@@ -609,12 +609,12 @@ function buildSections(){
       preview:pvBox(function(d){d.innerHTML='<div style="height:1px;background:#CFD4DC"></div>'})},
     {tok:'.slead', name:'리드', sub:'y143 · 한 줄 한글 74자',
       fields:[{key:'lead',unit:'px',min:8,max:40}],
-      preview:pvType('센서 신뢰도를 반영한 판단 체계','--lead','--deck-body',null,'#4A5568')}
+      preview:pvType('온도 기록을 반영한 관리 체계','--lead','--deck-body',null,'#4A5568')}
   ]);
   scaleStrip($('#s-type-head'),'본문 머리 실제 크기','이 네 덩어리가 y30 · y61 · y116 · y143 에 차례로 놓인다.',[
     ['.eyebrow','배경 및 문제점','--eyebrow','--deck-body',null,'#4A5568'],
     ['.stitle','현 체계는 세 곳에서 끊긴다','--stitle','--deck-semi',null,'#10141C'],
-    ['.slead','센서 신뢰도를 반영한 판단 체계','--lead','--deck-body',null,'#4A5568']
+    ['.slead','온도 기록을 반영한 관리 체계','--lead','--deck-body',null,'#4A5568']
   ]);
 
   buildBodyType();
@@ -638,7 +638,7 @@ function buildSections(){
       preview:pvBox(function(d){d.innerHTML='<div style="height:30px;background:var(--p-banner);border-radius:var(--r-banner)"></div>'})},
     {tok:'.slabel', name:'블록 라벨 모서리', sub:'블록 위 소제목 칩',
       fields:[{key:'rLabel',unit:'px',min:0,max:24}],
-      preview:pvBox(function(d){d.innerHTML='<span class="d-label">평가지표</span>'})},
+      preview:pvBox(function(d){d.innerHTML='<span class="d-label">평가 항목</span>'})},
     {tok:'--card-shadow', name:'카드 그림자', sub:'PDF 에서 안전한 단색 그림자 하나 · 색은 #142850 고정',
       fields:[{key:'shY',label:'아래로',unit:'px',min:0,max:30},
               {key:'shBlur',label:'번짐',unit:'px',min:0,max:60},
@@ -681,10 +681,10 @@ function buildBodyType(){
     {tok:'DENSITY.stat', name:'큰 수치', sub:'단위는 절반 크기',
       fields:[f('stat',{step:1,min:10,max:110})],
       preview:pvBox(function(d){d.innerHTML='<div class="d-stat" style="--fs-stat:min('+
-        'calc('+dens().stat+'px * var(--k)),'+PV_CAP+')"><div class="sv">98.2<small>%</small></div></div>'})},
+        'calc('+dens().stat+'px * var(--k)),'+PV_CAP+')"><div class="sv">97.6<small>%</small></div></div>'})},
     {tok:'DENSITY.table', name:'표 셀', sub:'가운데 맞춤 · 첫 열만 왼쪽',
       fields:[f('table',{step:0.5,min:6,max:32})],
-      preview:pvBox(function(d){d.innerHTML='<table class="d-tbl"><tr><td>탐지율</td><td class="em">98.2%</td></tr></table>'})},
+      preview:pvBox(function(d){d.innerHTML='<table class="d-tbl"><tr><td>정온 유지율</td><td class="em">97.6%</td></tr></table>'})},
     {tok:'DENSITY.tableH', name:'표 헤더', sub:'연회색 · 강조 열만 메인 컬러',
       fields:[f('tableH',{step:0.5,min:6,max:32})],
       preview:pvBox(function(d){d.innerHTML='<table class="d-tbl"><tr><th>지표</th><th class="em">결과</th></tr></table>'})},
@@ -734,31 +734,31 @@ var DEMOS=[
   ['카드','알약 제목 + 흰 박스 두 덩어리. 알약은 줄바꿈되지 않아 긴 제목은 밖으로 나간다.',
    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--gap)*var(--k)*1.6)">'+
    '<div class="d-card"><div class="cap">현 체계</div><div class="bd"><ul class="rl">'+
-   '<li>육안 감시에 기댄다</li><li><b>야간</b> 식별률이 떨어진다</li></ul></div></div>'+
+   '<li>사람 눈대중에 기댄다</li><li><b>여름</b> 반품률이 오른다</li></ul></div></div>'+
    '<div class="d-card tint"><div class="cap">제안 체계</div><div class="bd"><ul class="rl">'+
-   '<li>센서 신뢰도를 함께 본다</li><li>판단 근거가 남는다</li></ul></div></div></div>'],
+   '<li>온도 기록을 함께 본다</li><li>판단 근거가 남는다</li></ul></div></div></div>'],
   ['배너','맨 아래 한 줄 요약. 내용 높이만 차지하니 고정 높이로 그리면 안 된다.',
    '<div class="d-banner"><div class="lb">핵심 요약</div><div class="msg"><ul class="rl">'+
-   '<li>세 기능을 한 화면에서 묶는다</li><li>운용 인원을 늘리지 않는다</li></ul></div></div>'],
+   '<li>세 기능을 한 화면에서 묶는다</li><li>배송 인원을 늘리지 않는다</li></ul></div></div>'],
   ['표','헤더 행과 첫 열은 연회색, 강조 열만 메인 컬러. 마지막 행은 굵게.',
    '<table class="d-tbl"><thead><tr><th>지표</th><th>목표</th><th class="em">결과</th></tr></thead>'+
-   '<tbody><tr><td>탐지율</td><td>90%</td><td class="em">98.2%</td></tr>'+
-   '<tr><td>오탐</td><td>5건</td><td class="em">1건</td></tr>'+
+   '<tbody><tr><td>정온 유지율</td><td>90%</td><td class="em">97.6%</td></tr>'+
+   '<tr><td>상한 반품</td><td>5건</td><td class="em">1건</td></tr>'+
    '<tr><td>합계</td><td>—</td><td class="em">달성</td></tr></tbody></table>'],
   ['상태 배지','표 셀에 이 낱말이 오면 자동으로 배지가 된다. 색 네 가지는 고정이다.',
    '<div style="display:flex;gap:8px;flex-wrap:wrap;background:#fff;padding:14px;border-radius:var(--r-card)">'+
    '<span class="d-badge b-ok">달성</span><span class="d-badge b-up">초과달성</span>'+
    '<span class="d-badge b-prog">진행중</span><span class="d-badge b-n">미달</span></div>'],
   ['큰 수치','작은 지표명 → 큰 숫자 → 파란 보조 문장. 단위는 숫자 뒤 4글자 이하일 때만 작아진다.',
-   '<div class="d-card"><div class="cap">탐지 성능</div><div class="bd d-stat">'+
-   '<div class="sl">주야간 평균 탐지율</div><div class="sv">98.2<small>%</small></div>'+
-   '<div class="sn">직전 시험 91.4% · 6.8%p 향상</div></div></div>'],
+   '<div class="d-card"><div class="cap">배송 품질</div><div class="bd d-stat">'+
+   '<div class="sl">월평균 정온 유지율</div><div class="sv">97.6<small>%</small></div>'+
+   '<div class="sn">직전 분기 92.5% · 5.1%p 향상</div></div></div>'],
   ['불릿과 k:v','키워드는 굵게, 설명은 아랫줄 작은 회색. 항목이 늘면 줄 간격이 좁아진다.',
    '<div class="d-card"><div class="bd"><ul class="rl">'+
-   '<li><b>야간 식별</b><span class="v">적외선과 가시광을 함께 본다</span></li>'+
-   '<li><b>신뢰도 표시</b><span class="v">판단 근거를 함께 남긴다</span></li></ul></div></div>'],
+   '<li><b>여름 구간</b><span class="v">차량과 창고 값을 함께 본다</span></li>'+
+   '<li><b>위험도 표시</b><span class="v">판단 근거를 함께 남긴다</span></li></ul></div></div>'],
   ['블록 라벨','블록 위에 붙는 소제목. 모서리가 8px라 알약과 구분된다.',
-   '<div><span class="d-label">평가지표 대응</span></div>'],
+   '<div><span class="d-label">평가 항목 대응</span></div>'],
   ['그림 자리표시자','파일이 없으면 점선 상자로 그려지고 납품 전 교체 대상이다.',
    '<div class="d-ph">[ 시스템 구성도 ]</div>']
 ];
@@ -920,37 +920,37 @@ function buildTemplates(){
 var SLIDES={
   cover:{label:'표지', note:'배경 그림은 meta.coverBg 로 고른 파일 한 장에 왼쪽이 진한 그라데이션을 한 겹 덮는다. 여기서는 브랜드 그라데이션으로 대신했다.',
     html:function(){return '<div class="sl-cover"><div class="scrim"></div>'+
-      '<div class="clead">센서 신뢰도를 반영한 해안경계 판단 체계</div>'+
-      '<div class="ctitle">해안경계 AI<br>위협판단 지원체계</div>'+
+      '<div class="clead">온도 기록을 반영한 냉장 배송 관리 체계</div>'+
+      '<div class="ctitle">냉장 배송 AI<br>온도이상 감지체계</div>'+
       '<div class="clogo">로고 202.5 × 50.6</div>'+
-      '<div class="cbadge">인공지능 시제품 공모</div></div>'}},
+      '<div class="cbadge">물류 기술 공모전</div></div>'}},
   toc:{label:'목차', note:'섹션명이 274.5px(한글 9자)를 넘으면 두 줄이 되고 두 열의 다음 줄이 같이 내려간다.',
     html:function(){
       var items=['배경 및 문제점','요구사항','해결방안','시제품 시연','세부 기술','기대효과'];
       var nrow=Math.ceil(items.length/2);
       return '<div class="sl-toc"><div class="lb">목차</div><div class="items" style="--toc-rows:'+nrow+'">'+
         items.map(function(t,i){return '<div class="it"><span class="n">'+(i+1)+'</span><span class="t">'+esc(t)+'</span></div>'}).join('')+
-        '</div><div class="ft">해안경계 AI 위협판단 지원체계</div><div class="pn">2</div></div>'}},
+        '</div><div class="ft">냉장 배송 AI 온도이상 감지체계</div><div class="pn">2</div></div>'}},
   divider:{label:'간지', note:'표지 배경에 짝이 되는 그림이 달려 있으면 그라데이션 대신 그 그림이 깔리고 로고 워터마크는 빠진다.',
     html:function(){return '<div class="sl-div"><div class="wm">로고 워터마크 12%</div><div class="in">'+
       '<div class="eb">CHAPTER 03</div><h1>해결방안</h1>'+
-      '<div class="s">센서 신뢰도를 판단에 넣어 야간 오탐을 줄인다</div>'+
-      '<div class="ft"><span>해안경계 AI 위협판단 지원체계</span><span>9/24p</span></div></div></div>'}},
+      '<div class="s">온도 기록을 판단에 넣어 상한 반품을 줄인다</div>'+
+      '<div class="ft"><span>냉장 배송 AI 온도이상 감지체계</span><span>9/24p</span></div></div></div>'}},
   body:{label:'본문', note:'본문 19종이 이 머리를 똑같이 쓴다. 262px 아래 본문 영역만 판마다 다르다. 지금은 카드 3장 + 배너.',
     html:function(){return '<div class="sl-body">'+
       '<div class="top"><div class="eyebrow"><span>해결방안</span><span class="pg">9</span></div>'+
-      '<div class="stitle">센서 신뢰도를 판단에 넣어 <b>야간 오탐 1건</b>으로 축소</div>'+
+      '<div class="stitle">온도 기록을 판단에 넣어 <b>상한 반품 1건</b>으로 축소</div>'+
       '<div class="rule"></div>'+
-      '<div class="slead">2026년 8월 야간 시험 기준이다. 같은 장비에서 판단 규칙만 바꿔 재측정했다.</div></div>'+
+      '<div class="slead">2026년 8월 여름 시험 기준이다. 같은 차량에서 판단 규칙만 바꿔 재측정했다.</div></div>'+
       '<div class="bodyarea"><div class="grid3">'+
-      '<div class="d-card"><div class="cap">신호 수집</div><div class="bd"><ul class="rl">'+
-      '<li>적외선과 가시광을 함께 받는다</li><li><b>열화상</b>은 보조로 쓴다</li></ul></div></div>'+
-      '<div class="d-card"><div class="cap">신뢰도 산출</div><div class="bd"><ul class="rl">'+
-      '<li>센서별 상태를 점수로 남긴다</li><li>흐린 날은 가중치를 내린다</li></ul></div></div>'+
+      '<div class="d-card"><div class="cap">온도 수집</div><div class="bd"><ul class="rl">'+
+      '<li>차량과 창고 값을 함께 받는다</li><li><b>문 열림</b>은 보조로 쓴다</li></ul></div></div>'+
+      '<div class="d-card"><div class="cap">위험도 산출</div><div class="bd"><ul class="rl">'+
+      '<li>구간별 상태를 점수로 남긴다</li><li>더운 날은 가중치를 올린다</li></ul></div></div>'+
       '<div class="d-card tint"><div class="cap">판단</div><div class="bd"><ul class="rl">'+
       '<li>점수와 규칙을 함께 본다</li><li>근거를 화면에 남긴다</li></ul></div></div>'+
       '</div><div class="d-banner"><div class="lb">특이사항</div><div class="msg"><ul class="rl">'+
-      '<li>안개 낀 날 표본이 4회로 적다</li><li>겨울 시험에서 다시 잰다</li></ul></div></div>'+
+      '<li>장마철 표본이 4회로 적다</li><li>겨울 배송에서 다시 잰다</li></ul></div></div>'+
       '</div></div>'}},
   closing:{label:'마무리', note:'배경은 표지와 무관하게 늘 브랜드 그라데이션이다. 기관·연락처 칸이 1~4개로 움직인다.',
     html:function(){return '<div class="sl-close"><div class="logo">로고</div><div class="cin">'+
