@@ -97,6 +97,38 @@ a{color:inherit}
   font-family:var(--deck-body);letter-spacing:-1.067px;color:#1A2438}
 .stagenote{font-family:var(--mono);font-size:10.5px;color:var(--ink3);margin-top:8px;line-height:1.55}
 
+/* ── 표지 배경 고르기 ── */
+.bgpick{margin-top:11px}
+.bgpick .bl{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:6px}
+.bgrow{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px}
+.bgrow button{appearance:none;font:inherit;flex:0 0 auto;width:80px;padding:3px;cursor:pointer;
+  background:var(--pg);border:1px solid var(--line2);border-radius:7px;text-align:center}
+.bgrow button img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;background:var(--sunk)}
+.bgrow button .t{display:block;font-size:10px;color:var(--ink2);margin-top:3px;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bgrow button:hover{border-color:var(--ink3)}
+.bgrow button[aria-pressed="true"]{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.bgrow button[aria-pressed="true"] .t{color:var(--acc);font-weight:700}
+
+/* ── 템플릿 크게 보기 ── */
+.zoom{position:fixed;inset:0;z-index:100;padding:16px;gap:12px;
+  background:rgba(8,10,16,.88);backdrop-filter:blur(4px);display:flex;flex-direction:column}
+.zoom .zoom-bar{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;color:#fff}
+.zoom .zoom-t{font-size:14px;font-weight:700}
+.zoom .zoom-s{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.62)}
+.zoom .zoom-sp{flex:1 1 20px}
+.zoom button{appearance:none;font:inherit;font-size:12px;font-weight:600;color:#fff;cursor:pointer;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:5px 12px}
+.zoom button:hover{background:rgba(255,255,255,.24)}
+.zoom .zoom-stage{flex:1;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* 크기는 zoomFit() 이 잰다 — 남은 자리에 16:9 로 꽉 채운다 */
+.zoom .zoom-frame{flex:0 0 auto;position:relative;overflow:hidden;border-radius:8px;
+  background:#E9ECF0;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.zoom .zoom-slide{position:absolute;inset:0;width:1280px;height:720px;transform-origin:top left;overflow:hidden;
+  font-family:var(--deck-body);letter-spacing:-1.067px;color:#1A2438}
+@media (max-width:700px){.zoom .zoom-bar .zoom-s{flex-basis:100%}}
+
 /* ── spec sections ── */
 .specs{min-width:0;padding-top:26px}
 .lede{max-width:64ch;color:var(--ink2);font-size:14px;margin:0 0 30px}
@@ -148,7 +180,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 @media (max-width:1079px){.tt{table-layout:auto;min-width:var(--tt-min)}}
 
 /* 실제 크기 스트립 — 큰 글씨는 표 밖에서 진짜 크기로 본다 */
-.scale{border:1px solid var(--line);border-radius:10px;background:var(--pg2);margin-top:18px;overflow:hidden}
+.scale{border:1px solid var(--line);border-radius:10px;background:var(--pg);margin-top:18px;overflow:hidden}
 .scale .sh{display:flex;align-items:baseline;gap:9px;padding:9px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .scale .sh .t{font-size:12.5px;font-weight:700}
 .scale .sh .d{font-size:11.5px;color:var(--ink3)}
@@ -160,14 +192,14 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 
 /* ── swatches ── */
 .sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
-.swi{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--pg2)}
+.swi{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--pg)}
 .swi .chip{height:52px}
 .swi .meta{padding:7px 9px 9px}
 .swi .meta .n{font-size:11.5px;font-weight:700;line-height:1.3}
 .swi .meta .h{font-family:var(--mono);font-size:10.5px;color:var(--ink3);text-transform:uppercase}
 .swi .meta .w{font-size:10.5px;color:var(--ink3);margin-top:2px;line-height:1.4}
 .pick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;
-  background:var(--pg2);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  background:var(--pg);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
 .pick label{font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px}
 .pick input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line2);border-radius:6px;background:none;cursor:pointer}
 .pick .hx{font-family:var(--mono);font-size:11.5px;color:var(--ink2)}
@@ -175,10 +207,11 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 
 /* ── component demos ── */
 .demos{display:grid;gap:14px}
-.demo{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--pg2)}
+.demo{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--pg)}
 .demo .dh{display:flex;align-items:baseline;gap:9px;padding:9px 13px;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .demo .dh .t{font-size:12.5px;font-weight:700}
 .demo .dh .d{font-size:11.5px;color:var(--ink3);line-height:1.5}
+/* 이 바닥만 회색이다. 장표 바탕색(#E9ECF0)이라 흰 카드가 카드로 보인다 */
 .demo .db{background:#E9ECF0;padding:20px;display:flex;justify-content:center}
 .demo .db > *{width:100%;max-width:520px}
 
@@ -230,9 +263,10 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 
 /* ── slide interiors ── */
 .sl-cover,.sl-toc,.sl-div,.sl-body,.sl-close{position:absolute;inset:0;overflow:hidden}
-.sl-cover{background:linear-gradient(118deg,var(--p-deep) 0%,var(--p) 52%,var(--p2) 100%)}
+/* 배경 그림을 못 불러오면 브랜드 그라데이션으로 대신한다 */
+.sl-cover{background:#000 var(--cover-bg,linear-gradient(118deg,var(--p-deep) 0%,var(--p) 52%,var(--p2) 100%)) center center / cover no-repeat}
 .sl-cover .scrim{position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)}
+  background:var(--cover-scrim,linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%))}
 .sl-cover .clead{position:absolute;left:61.5px;top:56px;width:530.2px;font-family:var(--deck-light);font-weight:300;
   font-size:var(--h0b2);line-height:var(--h0b2l);letter-spacing:var(--h0b2s);color:#E7E6E6;word-break:keep-all}
 .sl-cover .ctitle{position:absolute;left:59.4px;top:117px;width:720px;font-family:var(--deck-bold);font-weight:400;
@@ -240,6 +274,9 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .sl-cover .clogo{position:absolute;left:60.4px;top:613.4px;width:202.5px;height:50.6px;
   border:1.5px dashed rgba(255,255,255,.42);border-radius:6px;display:flex;align-items:center;justify-content:center;
   color:rgba(255,255,255,.72);font-size:13px;letter-spacing:0}
+/* 로고 파일을 불러왔으면 점선 자리 대신 진짜 로고를 보여 준다 */
+:root[data-coverlogo] .sl-cover .clogo{border:0;border-radius:0;color:transparent;font-size:0;
+  background:var(--cover-logo) left center / contain no-repeat}
 .sl-cover .cbadge{position:absolute;right:47.3px;bottom:43.5px;height:39.6px;min-width:246.6px;
   display:flex;align-items:center;justify-content:flex-end;padding:0 18.4px;background:var(--p-badge);
   color:#fff;font-size:18.67px;font-weight:700;letter-spacing:-1.067px}
@@ -258,10 +295,13 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .sl-toc .ft{position:absolute;left:47.3px;top:658.1px;font-size:16px;letter-spacing:-.267px;color:#8B95A7}
 .sl-toc .pn{position:absolute;right:40px;top:658.1px;font-size:16px;letter-spacing:-.267px;color:#8B95A7}
 
-.sl-div{background:linear-gradient(118deg,var(--p-deep) 0%,var(--p) 54%,var(--p2) 100%);color:#fff}
-.sl-div .wm{position:absolute;right:40px;bottom:86px;width:620px;height:96px;opacity:.12;
+.sl-div{background:#000 var(--div-bg,linear-gradient(118deg,var(--p-deep) 0%,var(--p) 54%,var(--p2) 100%)) center center / cover no-repeat;color:#fff}
+/* 그림을 깔 때만 왼쪽을 눌러 준다. 짝이 없으면 아무것도 덮지 않는다 */
+.sl-div::before{content:'';position:absolute;inset:0;background:var(--div-scrim,transparent)}
+:root[data-divbg] .sl-div .wm{display:none}
+.sl-div .wm{position:absolute;right:40px;bottom:86px;width:620px;height:96px;opacity:.12;z-index:1;
   border:2px dashed #fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;letter-spacing:0}
-.sl-div .in{position:absolute;inset:0;padding:56px 40px 42px;display:flex;flex-direction:column}
+.sl-div .in{position:absolute;inset:0;padding:56px 40px 42px;display:flex;flex-direction:column;z-index:2}
 .sl-div .eb{font-size:15px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.62)}
 .sl-div h1{font-family:var(--deck-xbold);font-weight:400;font-size:60px;letter-spacing:-.04em;
   line-height:1.12;margin:26px 0 0;max-width:1000px;word-break:keep-all}
@@ -364,6 +404,10 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
       <div class="tabs" id="tabs" role="group" aria-label="장표 종류"></div>
     </div>
     <div class="frame" id="frame"><div class="slide" id="slide"></div></div>
+    <div class="bgpick" id="bgpick" hidden>
+      <span class="bl">표지 배경</span>
+      <div class="bgrow" id="bgrow" role="group" aria-label="표지 배경 고르기"></div>
+    </div>
     <p class="stagenote" id="stagenote"></p>
   </aside>
 
@@ -371,7 +415,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
     <p class="lede">
       <b>ppt-maker</b>가 실제로 그리는 값이다. 좌표·크기·색은 <span class="inl">scripts/lib/common.mjs</span>와
       <span class="inl">build_html.mjs</span>에서 그대로 가져왔다. 값을 고치면 오른쪽 장표가 바로 바뀐다.
-      배경 그림과 로고는 파일이라 점선 자리로 두었다.
+      표지 배경과 로고는 실제 파일을 가져와 보여 준다. 간지 워터마크처럼 문서마다 달라지는 그림만 점선 자리로 둔다.
     </p>
     <p class="lede" style="margin-top:-18px">
       고친 값을 남기는 길은 세 가지다. 내 컴퓨터의 ppt-maker 앱에서 열었으면 <b>저장</b>이
@@ -430,8 +474,9 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
     </section>
 
     <section class="blk"><h2>템플릿 12종</h2>
-      <p class="note">판형마다 그려야 할 상태를 다 펼쳐 놓았다. 위에서 값을 고치면 여기 30장이 한꺼번에 바뀐다.
-        본문 판형은 머리(아이브로우·헤드라인·구분선·리드)를 똑같이 쓰고 <span class="inl">본문 시작 y</span> 아래만 다르다.</p>
+      <p class="note">판형마다 그려야 할 상태를 다 펼쳐 놓았다. 위에서 값을 고치면 여기 29장이 한꺼번에 바뀐다.
+        본문 판형은 머리(아이브로우·헤드라인·구분선·리드)를 똑같이 쓰고 <span class="inl">본문 시작 y</span> 아래만 다르다.
+        <b>장표를 누르면 크게 열린다.</b> 열린 뒤에는 ← → 로 옮겨 다니고 Esc 로 닫는다.</p>
       <div id="s-templates"></div>
     </section>
 
@@ -440,6 +485,18 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
       <div class="demos" id="s-demos"></div>
     </section>
   </main>
+</div>
+
+<div class="zoom" id="zoom" hidden role="dialog" aria-modal="true" aria-label="템플릿 크게 보기">
+  <div class="zoom-bar">
+    <span class="zoom-t" id="zoomT"></span>
+    <span class="zoom-s" id="zoomS"></span>
+    <span class="zoom-sp"></span>
+    <button type="button" id="zoomPrev">← 이전</button>
+    <button type="button" id="zoomNext">다음 →</button>
+    <button type="button" id="zoomX">닫기 Esc</button>
+  </div>
+  <div class="zoom-stage"><div class="zoom-frame" id="zoomFrame"><div class="zoom-slide" id="zoomSlide"></div></div></div>
 </div>
 
 <script>
@@ -911,11 +968,14 @@ var TEMPLATES=[
    ]}
 ];
 
-var TEMPLATE_CSS='.tpl-host{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;padding:20px}.tpl-card{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--pg2)}.tpl-head{display:flex;align-items:baseline;gap:9px;padding:13px;border-bottom:1px solid var(--line);flex-wrap:wrap;background:#fff}.tpl-head .name{font-size:13px;font-weight:700}.tpl-head .grid{font-size:11px;color:var(--ink3)}.tpl-head .group{font-size:10px;color:var(--ink3);margin-left:auto;text-transform:uppercase;letter-spacing:.1em}.tpl-states{display:flex;overflow-x:auto;border-top:1px solid var(--line)}.tpl-state{flex:1;min-width:0;border-right:1px solid var(--line);display:flex;flex-direction:column}.tpl-state:last-child{border-right:0}.tpl-frame{width:100%;aspect-ratio:16/9;background:var(--sunk);position:relative;overflow:hidden;flex-shrink:0}.tpl-slide{position:absolute;inset:0;width:1280px;height:720px;transform-origin:top left;overflow:hidden;font-family:var(--deck-body);letter-spacing:-1.067px;color:#1A2438}.tpl-label{font-size:11px;color:var(--ink3);padding:8px 10px;text-align:center;flex:1;display:flex;align-items:center;justify-content:center}';
+var TEMPLATE_CSS='.tpl-host{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;padding:20px}.tpl-card{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--pg)}.tpl-head{display:flex;align-items:baseline;gap:9px;padding:13px;border-bottom:1px solid var(--line);flex-wrap:wrap}.tpl-head .name{font-size:13px;font-weight:700}.tpl-head .grid{font-size:11px;color:var(--ink3)}.tpl-head .group{font-size:10px;color:var(--ink3);margin-left:auto;text-transform:uppercase;letter-spacing:.1em}.tpl-states{display:flex;overflow-x:auto;border-top:1px solid var(--line)}.tpl-state{flex:1;min-width:0;border-right:1px solid var(--line);display:flex;flex-direction:column}.tpl-state:last-child{border-right:0}.tpl-frame{width:100%;aspect-ratio:16/9;background:var(--pg);position:relative;overflow:hidden;flex-shrink:0}.tpl-zoom{position:absolute;inset:0;z-index:2;appearance:none;border:0;margin:0;padding:0;cursor:zoom-in;background:transparent;color:transparent;font:inherit;font-size:0;letter-spacing:0;transition:background .12s}.tpl-zoom:hover,.tpl-zoom:focus-visible{background:rgba(8,10,16,.4);color:#fff;font-size:12px;font-weight:700}.tpl-slide{position:absolute;inset:0;width:1280px;height:720px;transform-origin:top left;overflow:hidden;font-family:var(--deck-body);letter-spacing:-1.067px;color:#1A2438}.tpl-label{font-size:11px;color:var(--ink3);padding:8px 10px;text-align:center;flex:1;display:flex;align-items:center;justify-content:center}';
+
+var FLAT=[];   /* 템플릿 29장을 한 줄로 편 목록. 크게 보기가 이 순서로 넘긴다 */
 
 function buildTemplates(){
   var h=document.querySelector('#s-templates');
   if(!h)return;
+  FLAT=[];
 
   var escapeHtml=function(text){
     var map={'&':'&amp;','<':'&lt;','>':'&gt;'};
@@ -965,6 +1025,18 @@ function buildTemplates(){
       slide.className='tpl-slide';
       slide.innerHTML=state.html();
       frame.appendChild(slide);
+
+      /* 크게 보기용 목록에 한 장씩 쌓는다 — 열린 뒤 화살표로 이 순서대로 넘긴다 */
+      var idx=FLAT.length;
+      FLAT.push({name:template.name,group:template.group,grid:template.grid,label:state.label,html:state.html});
+
+      var zoom=document.createElement('button');
+      zoom.type='button';
+      zoom.className='tpl-zoom';
+      zoom.textContent='크게 보기';
+      zoom.setAttribute('aria-label',template.name+' '+state.label+' 크게 보기');
+      zoom.addEventListener('click',function(){zoomOpen(idx)});
+      frame.appendChild(zoom);
       stateDiv.appendChild(frame);
 
       var label=document.createElement('div');
@@ -986,9 +1058,130 @@ function buildTemplates(){
 }
 
 
+/* ── 템플릿 크게 보기 ───────────────────────────────────────────
+   장표를 누르면 화면 가득 펼친다. 값은 CSS 변수로 물려 있어
+   열어 둔 채 왼쪽에서 숫자를 고쳐도 그대로 따라 바뀐다. */
+var ZM={on:false,i:0,back:null};
+function zoomOpen(i){
+  var box=$('#zoom'); if(!box||!FLAT.length)return;
+  ZM.on=true; ZM.i=i; ZM.back=document.activeElement;
+  box.hidden=false; document.body.style.overflow='hidden';
+  zoomPaint(); $('#zoomX').focus();
+}
+function zoomClose(){
+  var box=$('#zoom'); if(!box||!ZM.on)return;
+  ZM.on=false; box.hidden=true; document.body.style.overflow='';
+  $('#zoomSlide').innerHTML='';
+  if(ZM.back&&ZM.back.focus)ZM.back.focus();
+}
+function zoomStep(d){ if(!ZM.on||!FLAT.length)return; ZM.i=(ZM.i+d+FLAT.length)%FLAT.length; zoomPaint(); }
+function zoomPaint(){
+  var t=FLAT[ZM.i]; if(!t)return;
+  $('#zoomT').textContent=t.name+' · '+t.label;
+  $('#zoomS').textContent=t.group+' · '+t.grid+' · '+(ZM.i+1)+'/'+FLAT.length;
+  $('#zoomSlide').innerHTML=t.html();
+  zoomFit();
+}
+function zoomFit(){
+  if(!ZM.on)return;
+  var st=$('#zoom').querySelector('.zoom-stage'), f=$('#zoomFrame');
+  if(!st||!f)return;
+  var w=Math.max(200,Math.min(st.clientWidth,st.clientHeight*16/9));
+  f.style.width=w+'px'; f.style.height=(w*9/16)+'px';
+  $('#zoomSlide').style.transform='scale('+(w/1280)+')';
+}
+$('#zoomX').addEventListener('click',zoomClose);
+$('#zoomPrev').addEventListener('click',function(){zoomStep(-1)});
+$('#zoomNext').addEventListener('click',function(){zoomStep(1)});
+$('#zoom').addEventListener('click',function(e){
+  if(e.target===this||e.target.classList.contains('zoom-stage'))zoomClose();
+});
+document.addEventListener('keydown',function(e){
+  if(!ZM.on)return;
+  if(e.key==='Escape'){e.preventDefault();zoomClose()}
+  else if(e.key==='ArrowLeft'){e.preventDefault();zoomStep(-1)}
+  else if(e.key==='ArrowRight'){e.preventDefault();zoomStep(1)}
+});
+window.addEventListener('resize',zoomFit);
+
+/* ── 표지 배경 ──────────────────────────────────────────────────
+   그림 목록은 내 컴퓨터의 앱에서는 /api/coverspec 이, 웹에서는 coverspec.json 이 준다.
+   고른 그림 한 장이 이 화면의 표지 전부에 한꺼번에 걸린다.
+   짝이 되는 간지 그림이 달린 표지를 고르면 간지도 같이 바뀐다. */
+var COVERBG=[], BG='', COVERLOGO='', SPEC_SCRIM='';
+var DIV_SCRIM='linear-gradient(90deg,rgba(5,3,18,.74) 0%,rgba(5,3,18,.62) 40%,rgba(5,3,18,.26) 70%,rgba(5,3,18,.06) 100%)';
+function curBg(){ for(var i=0;i<COVERBG.length;i++)if(COVERBG[i].key===BG)return COVERBG[i]; return null }
+function applyCoverBg(){
+  var r=document.documentElement, st=r.style, b=curBg();
+  if(b){
+    st.setProperty('--cover-bg',"url('"+b.src+"')");
+    /* 그라데이션은 배경마다 다르다 — 덮지 않는 배경은 'none' 이 온다 */
+    st.setProperty('--cover-scrim',b.scrim||SPEC_SCRIM||'none');
+  }else{
+    st.removeProperty('--cover-bg'); st.removeProperty('--cover-scrim');
+  }
+  if(b&&b.divider){
+    st.setProperty('--div-bg',"url('"+b.divider+"')");
+    st.setProperty('--div-scrim',DIV_SCRIM);
+    r.setAttribute('data-divbg','');
+  }else{
+    st.removeProperty('--div-bg'); st.removeProperty('--div-scrim'); r.removeAttribute('data-divbg');
+  }
+  var row=$('#bgrow');
+  if(row)Array.prototype.forEach.call(row.children,function(el){
+    el.setAttribute('aria-pressed',String(el.getAttribute('data-k')===BG));
+  });
+}
+function buildBgPick(){
+  var box=$('#bgpick'), row=$('#bgrow'); if(!box||!row)return;
+  row.innerHTML='';
+  COVERBG.forEach(function(b){
+    var el=document.createElement('button');
+    el.type='button'; el.setAttribute('data-k',b.key);
+    el.setAttribute('aria-pressed',String(b.key===BG));
+    el.title=b.label+(b.divider?' · 간지도 같이 바뀐다':'');
+    el.innerHTML='<img src="'+b.src+'" alt="" loading="lazy"><span class="t">'+esc(b.label)+'</span>';
+    el.addEventListener('click',function(){ BG=b.key; applyCoverBg(); render(); if(ZM.on)zoomPaint(); });
+    row.appendChild(el);
+  });
+  box.hidden=false;
+}
+function loadCoverSpec(){
+  /* 앱(/design)이면 서버에 먼저 묻고, 웹이면 옆에 놓인 파일을 먼저 본다 */
+  var tries=location.pathname==='/design'
+    ? ['/api/coverspec','../coverspec.json','coverspec.json']
+    : ['../coverspec.json','coverspec.json','/api/coverspec'];
+  (function next(i){
+    if(i>=tries.length)return;
+    fetch(tries[i]).then(function(r){
+      if(!r.ok)throw 0;
+      var at=r.url||new URL(tries[i],location.href).href;
+      return r.json().then(function(j){return {j:j,at:at}});
+    }).then(function(o){
+      var list=(o.j&&o.j.backgrounds)||[];
+      if(!list.length)throw 0;
+      var abs=function(x){ return x?new URL(x,o.at).href:null };
+      COVERBG=list.map(function(b){
+        return {key:b.key,label:b.label,src:abs(b.src),divider:abs(b.divider),scrim:b.scrim||''};
+      });
+      COVERLOGO=abs(o.j.logo);
+      SPEC_SCRIM=o.j.scrim||'';
+      if(COVERLOGO){
+        document.documentElement.style.setProperty('--cover-logo',"url('"+COVERLOGO+"')");
+        document.documentElement.setAttribute('data-coverlogo','');
+      }
+      BG=COVERBG[0].key;
+      buildBgPick(); applyCoverBg(); render();
+    }).catch(function(){ next(i+1) });
+  })(0);
+}
+
 /* ── slides ── */
 var SLIDES={
-  cover:{label:'표지', note:'배경 그림은 meta.coverBg 로 고른 파일 한 장에 왼쪽이 진한 그라데이션을 한 겹 덮는다. 여기서는 브랜드 그라데이션으로 대신했다.',
+  cover:{label:'표지',
+    note:function(){var b=curBg();
+      return b ? '배경은 «'+b.label+'» 한 장에 왼쪽이 진한 그라데이션을 한 겹 덮는다. 아래에서 다른 그림으로 바꿔 본다.'
+               : '배경 그림은 meta.coverBg 로 고른 파일 한 장에 왼쪽이 진한 그라데이션을 한 겹 덮는다. 그림을 못 불러와 브랜드 그라데이션으로 대신했다.'},
     html:function(){return '<div class="sl-cover"><div class="scrim"></div>'+
       '<div class="clead">온도 기록을 반영한 냉장 배송 관리 체계</div>'+
       '<div class="ctitle">냉장 배송 AI<br>온도이상 감지체계</div>'+
@@ -1001,7 +1194,10 @@ var SLIDES={
       return '<div class="sl-toc"><div class="lb">목차</div><div class="items" style="--toc-rows:'+nrow+'">'+
         items.map(function(t,i){return '<div class="it"><span class="n">'+(i+1)+'</span><span class="t">'+esc(t)+'</span></div>'}).join('')+
         '</div><div class="ft">냉장 배송 AI 온도이상 감지체계</div><div class="pn">2</div></div>'}},
-  divider:{label:'간지', note:'표지 배경에 짝이 되는 그림이 달려 있으면 그라데이션 대신 그 그림이 깔리고 로고 워터마크는 빠진다.',
+  divider:{label:'간지',
+    note:function(){var b=curBg();
+      return b&&b.divider ? '고른 표지 «'+b.label+'» 에 짝이 되는 그림이 달려 있어 그라데이션 대신 그 그림이 깔리고 로고 워터마크는 빠진다.'
+                          : '표지 배경에 짝이 되는 그림이 달려 있으면 그라데이션 대신 그 그림이 깔리고 로고 워터마크는 빠진다. 지금 고른 표지에는 짝이 없다.'},
     html:function(){return '<div class="sl-div"><div class="wm">로고 워터마크 12%</div><div class="in">'+
       '<div class="eb">CHAPTER 03</div><h1>해결방안</h1>'+
       '<div class="s">온도 기록을 판단에 넣어 상한 반품을 줄인다</div>'+
@@ -1040,8 +1236,9 @@ function buildTabs(){
   });
 }
 function render(){
+  var n=SLIDES[TAB].note;
   $('#slide').innerHTML=SLIDES[TAB].html();
-  $('#stagenote').textContent=SLIDES[TAB].note;
+  $('#stagenote').textContent=(typeof n==='function'?n():n);
   fit();
 }
 function fit(){
@@ -1322,7 +1519,7 @@ $('#pwNewGo').addEventListener('click',function(){
 $('#admOut').addEventListener('click',function(){ leaveAdmin(); DLG.close() });
 
 /* ── boot ── */
-buildSections(); buildDemos(); buildTabs(); buildTemplates(); apply(); render();
+buildSections(); buildDemos(); buildTabs(); buildTemplates(); apply(); render(); loadCoverSpec();
 document.fonts&&document.fonts.ready.then(fit);
 })();
 </script>
