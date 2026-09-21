@@ -27,7 +27,7 @@
     "contact": { "name": "", "email": "", "phone": "", "web": "" },   // 마무리 장표
     "footer": "",                // 본문 좌하단 (비우면 "i. 섹션명" 자동)
     "agenda": true,              // 목차 장표 생성
-    "dividers": "auto",          // 간지: auto(목차 3개 이상이면 넣음) | true | false
+    "dividers": true,            // 간지: 챕터가 시작되는 자리에 넣는다. 챕터를 두지 않는 문서만 false
     "pageNumbers": true,
     // numbering 은 쓰지 않는다 — 목차·간지 번호는 항상 1·2·3 숫자
   },

@@ -125,15 +125,15 @@ export function loadOutline(file) {
     type: 'gov-proposal', density: 'dense', lang: 'ko', title: '제목', subtitle: '', event: '',
     company: '', presenter: '', date: '', version: '',
     brand: {}, logo: {}, font: 'Pretendard', contact: {},
-    agenda: true, dividers: 'auto', pageNumbers: true, footer: '',
+    agenda: true, dividers: true, pageNumbers: true, footer: '',
     coverBg: 'cube',             // 표지 배경 이미지. 목록은 assets/cover-bg/index.json
   }, raw.meta || {});
   meta.brand = Object.assign({ primary: TOKENS.color.primary }, meta.brand);   // 기본값은 design-tokens.json
   // 기본 로고가 있고, `logo: { light:'', dark:'' }` 로 비우면 그 자리를 비워 둔다.
   meta.logo = Object.assign({ light: 'assets/logo_v_blue.png', dark: 'assets/logo_h_white.png' }, meta.logo);
   const sections = (raw.sections || []).map((s, i) => Object.assign({ no: i + 1, title: '', subtitle: '', slides: [] }, s));
-  // 간지는 목차가 3개 이상이면 넣는다(단원이 하나뿐인 짧은 자료에는 넣지 않는다).
-  if (meta.dividers === 'auto') meta.dividers = meta.density === 'airy' || sections.length >= 3;
+  // 간지는 챕터가 시작되는 자리에 들어간다. 챕터를 두지 않는 문서만 dividers:false 로 끈다.
+  meta.dividers = meta.dividers !== false;   // 옛 아웃라인의 'auto' 도 넣는 쪽으로 읽는다
   const closing = raw.closing === false ? null : Object.assign({ message: '감사합니다', sub: '' }, raw.closing || {});
   const appendix = raw.appendix || [];
   return { meta, sections, closing, appendix, _file: path.resolve(file) };

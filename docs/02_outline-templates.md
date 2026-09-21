@@ -18,7 +18,7 @@
 | --- | --- | --- | --- |
 | 1 | 표지 | 필수 | 상단 행사·문서명 / 제목 / 부제 / 회사명 / 발표자 또는 날짜 / 로고 |
 | 2 | 목차 | 권장 | 4~7개 섹션, 번호 + 제목 |
-| 섹션 시작 | 간지 | 선택 | dense 모드는 생략(헤더 번호로 대체), airy 모드는 다크 배경 디바이더 |
+| 챕터 시작 | 간지 | 선택 | 챕터가 시작되는 자리마다 1장. 챕터를 두지 않는 문서는 `meta.dividers: false` |
 | 끝-1 | 마무리 | 필수 | 핵심 한 문장 / 회사명 / 연락처 / 로고 |
 | 끝 | Appendix | 선택 | 질의 대비 상세 자료, 번호 없이 "Appendix – 제목" |
 
@@ -45,7 +45,7 @@
 | 01 | Cover — Dark Brand | 표지 | 자동(`meta.title/subtitle/orgs/date`). 다크 표지 한 종만 쓴다 |
 | 02 | Cover — Clean Light | 밝은 표지 | 쓰지 않는다(01 로 통일) |
 | 03 | Agenda | 목차 | 자동(`meta.agenda`). 번호 + 섹션명만 |
-| 04 | Section Divider | 단원 시작 간지 | 자동(`meta.dividers`, 목차 3개 이상이면 들어감) |
+| 04 | Section Divider | 단원 시작 간지 | 자동(`meta.dividers`). 챕터를 두지 않는 문서는 `false` |
 | 05 | Title + Bullet Points | 항목 3~5개 나열 | `bullets`. 4개 넘으면 `columns`/`cards` 로 |
 | 06 | Title + Image Right | 텍스트 설명 + 화면·사진 | `image` (`side:"right"`, `text:{heading, items}`) |
 | 07 | Title + Image Left | 이미지가 주인공, 설명은 보조 | `image` (`side:"left"`) |

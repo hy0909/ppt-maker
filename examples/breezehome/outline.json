@@ -10,7 +10,7 @@
     "date": "2026. 09",
     "brand": { "primary": "#14366B", "secondary": "#1E5BB8" },
     "contact": { "email": "marketing@example.com" },
-    "agenda": false
+    "agenda": false, "dividers": false
   },
   "sections": [
     {
