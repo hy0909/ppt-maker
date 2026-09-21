@@ -1,0 +1,4 @@
+interface:
+  display_name: "PPT Maker"
+  short_description: "텍스트 또는 기존 PPTX → 목적별 발표자료 (HTML·PDF·PPTX)"
+  default_prompt: "이 내용으로 발표자료를 만들어 주세요. 문서 유형과 브랜드 컬러를 먼저 확인해 주세요."

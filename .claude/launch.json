@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ppt-maker-ui",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["skills/ppt-maker/app/server.mjs"],
+      "port": 3790,
+      "autoPort": true
+    }
+  ]
+}

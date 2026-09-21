@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+# regenerable build outputs (keep outline.json; deliverables are re-built)
+examples/*/out/png/
+examples/*/out/png_pptx/
+examples/*/out/*.pptx.pdf
+examples/*/out/fit.json
+examples/*/extracted_assets/
+skills/ppt-maker/app/workspace/
+__pycache__/
+*.pyc

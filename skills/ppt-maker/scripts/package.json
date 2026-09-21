@@ -1,0 +1,20 @@
+{
+  "name": "ppt-maker-scripts",
+  "version": "1.0.0",
+  "scripts": {
+    "html": "node build_html.mjs",
+    "pdf": "node export_pdf.mjs",
+    "pptx": "node build_pptx.mjs",
+    "check": "node check_overflow.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "ppt-maker skill build scripts: outline JSON -> deck.html / PDF / PPTX",
+  "dependencies": {
+    "playwright": "^1.63.0",
+    "pptxgenjs": "^4.0.1"
+  },
+  "type": "module",
+  "private": true
+}

@@ -1,0 +1,36 @@
+{
+  "origin": "Images generated with AI tools by the owner; SafeAI copyright. See NOTICE.md.",
+  "backgrounds": [
+    {
+      "key": "cube",
+      "label": "유리 큐브",
+      "file": "cube.jpg"
+    },
+    {
+      "key": "stripe",
+      "label": "스캔라인",
+      "file": "stripe.png"
+    },
+    {
+      "key": "haze",
+      "label": "양옆 파란 빛",
+      "file": "haze.png",
+      "divider": "haze-divider.png"
+    },
+    {
+      "key": "cctv",
+      "label": "감시 카메라 도트",
+      "file": "cctv.jpg"
+    },
+    {
+      "key": "wave",
+      "label": "보라 물결",
+      "file": "wave.png"
+    },
+    {
+      "key": "cube-mono",
+      "label": "큐브 흑백",
+      "file": "cube-mono.png"
+    }
+  ]
+}

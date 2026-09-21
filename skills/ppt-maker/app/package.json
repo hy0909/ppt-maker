@@ -1,0 +1,16 @@
+{
+  "name": "ppt-maker-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.124.0"
+  },
+  "type": "module",
+  "private": true
+}

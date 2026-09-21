@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PPT Maker</title>
+<style>
+/* ──────────────────────────────────────────────────────────────
+   shadcn/ui 디자인 시스템(뉴욕 스타일)을 그대로 옮긴 토큰·컴포넌트.
+   React 없이 순수 CSS 로 같은 모양을 낸다: 토큰 → 버튼/인풋/탭/카드/배지/알림.
+   ────────────────────────────────────────────────────────────── */
+:root{
+  --background:0 0% 100%;
+  --foreground:240 10% 3.9%;
+  --card:0 0% 100%;
+  --card-foreground:240 10% 3.9%;
+  --popover:0 0% 100%;
+  --muted:240 4.8% 95.9%;
+  --muted-foreground:240 3.8% 46.1%;
+  --accent:240 4.8% 95.9%;
+  --accent-foreground:240 5.9% 10%;
+  --primary:250 92% 41%;              /* #2F0CC5 포인트 컬러 */
+  --primary-foreground:0 0% 100%;
+  --secondary:240 4.8% 95.9%;
+  --secondary-foreground:240 5.9% 10%;
+  --destructive:0 72% 51%;
+  --destructive-foreground:0 0% 98%;
+  --success:142 71% 36%;
+  --warning:38 92% 40%;
+  --border:240 5.9% 90%;
+  --input:240 5.9% 90%;
+  --ring:250 92% 41%;
+  --radius:.5rem;
+  /* 버튼 높이 체계 — 위계마다 고정: xs 24 · s 32 · m 40(입력창과 동일) · l 48 */
+  --h-xs:24px;--h-s:32px;--h-m:40px;--h-l:48px;
+  --shadow-sm:0 1px 2px 0 hsl(240 6% 10% / .05);
+  --shadow:0 1px 3px 0 hsl(240 6% 10% / .1),0 1px 2px -1px hsl(240 6% 10% / .1);
+  --shadow-md:0 4px 6px -1px hsl(240 6% 10% / .1),0 2px 4px -2px hsl(240 6% 10% / .1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Pretendard,'Apple SD Gothic Neo',Inter,ui-sans-serif,system-ui,'Noto Sans KR',sans-serif;
+  color:hsl(var(--foreground));background:hsl(var(--muted)/.45);
+  font-size:14px;line-height:1.5;height:100vh;display:flex;flex-direction:column;overflow:hidden;
+  -webkit-font-smoothing:antialiased;font-feature-settings:'cv11','ss01';
+}
+::selection{background:hsl(var(--primary)/.18)}
+
+/* ── header ───────────────────────────────────────────────── */
+header{height:56px;background:hsl(var(--background)/.9);backdrop-filter:blur(8px);border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;position:relative;z-index:20}
+header .logo{font-weight:600;letter-spacing:-.02em;font-size:15px;color:hsl(var(--foreground));display:flex;align-items:center;gap:8px}
+header .logo::before{content:'';width:22px;height:22px;border-radius:6px;background:hsl(var(--primary));box-shadow:var(--shadow-sm)}
+/* 스텝 = shadcn Tabs (muted 컨테이너 + 선택 항목만 흰 배경) */
+header .steps{display:inline-flex;align-items:center;gap:2px;margin-left:8px;background:hsl(var(--muted));padding:4px;border-radius:var(--radius)}
+header .steps button{border:0;background:transparent;height:var(--h-s);padding:0 12px;border-radius:calc(var(--radius) - 2px);font:inherit;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground));cursor:pointer;white-space:nowrap;transition:color .15s,background .15s}
+header .steps button:hover{color:hsl(var(--foreground))}
+header .steps button.on{background:hsl(var(--background));color:hsl(var(--foreground));box-shadow:var(--shadow-sm);font-weight:600}
+header .steps button.done{color:hsl(var(--success))}
+header .sp{flex:1}
+header .status{font-size:12px;color:hsl(var(--muted-foreground));display:inline-flex;align-items:center;gap:6px}
+header .status b{font-weight:500;color:hsl(var(--success))} header .status b.no{color:hsl(var(--warning))}
+
+/* ── layout ───────────────────────────────────────────────── */
+main{flex:1;display:flex;min-height:0}
+#left{width:520px;min-width:420px;background:hsl(var(--background));border-right:1px solid hsl(var(--border));overflow:auto;padding:20px 22px 48px}
+#right{flex:1;display:flex;flex-direction:column;min-width:0;background:hsl(240 6% 7%)}
+#right .bar{height:48px;background:hsl(var(--background));border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;gap:10px;padding:0 16px;font-size:13px;color:hsl(var(--muted-foreground))}
+#right iframe{flex:1;border:0;width:100%;background:hsl(240 6% 7%)}
+#right .empty{flex:1;display:flex;align-items:center;justify-content:center;color:hsl(240 5% 65%);font-size:13.5px;text-align:center;line-height:1.7}
+h2{font-size:18px;font-weight:600;letter-spacing:-.02em;margin:4px 0 4px}
+h2+.hint{margin-bottom:14px}
+h3{font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));margin:20px 0 8px;letter-spacing:.02em;text-transform:none}
+.pane{display:none}.pane.on{display:block}
+
+/* ── label · input · textarea · select (shadcn Form) ───────── */
+label{display:block;font-size:13px;font-weight:500;color:hsl(var(--foreground));margin:14px 0 6px;line-height:1.2}
+input[type=text],input[type=date],textarea,select{
+  width:100%;border:1px solid hsl(var(--input));border-radius:calc(var(--radius) - 2px);
+  padding:8px 12px;font:inherit;font-size:13.5px;background:hsl(var(--background));color:hsl(var(--foreground));
+  box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s;
+}
+input[type=text],input[type=date],select{height:var(--h-m);padding-top:0;padding-bottom:0}
+input::placeholder,textarea::placeholder{color:hsl(var(--muted-foreground))}
+input:focus,textarea:focus,select:focus{outline:0;border-color:hsl(var(--ring));box-shadow:0 0 0 3px hsl(var(--ring)/.15)}
+input[readonly]{background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+textarea{resize:vertical;line-height:1.6;min-height:80px}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,hsl(var(--muted-foreground)) 50%),linear-gradient(135deg,hsl(var(--muted-foreground)) 50%,transparent 50%);background-position:calc(100% - 16px) 17px,calc(100% - 11px) 17px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:34px}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.color{display:flex;align-items:center;gap:8px}
+.color input[type=color]{width:var(--h-m);height:var(--h-m);flex:0 0 auto;border:1px solid hsl(var(--input));border-radius:calc(var(--radius) - 2px);padding:3px;background:hsl(var(--background));box-shadow:var(--shadow-sm);cursor:pointer}
+
+/* ── 선택 카드 (문서 유형) ─────────────────────────────────── */
+.types{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:start}
+.type{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:12px 14px;cursor:pointer;background:hsl(var(--card));box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s,background .15s}
+.type:hover{background:hsl(var(--accent))}
+.type.on{border-color:hsl(var(--primary));box-shadow:0 0 0 1px hsl(var(--primary))}
+.type .th{display:flex;align-items:center;gap:6px}
+.type b{font-size:13px;font-weight:600}
+.type .tn{font-size:13px;font-weight:400;color:hsl(var(--muted-foreground))}
+.ti,.hi{flex:none;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:transparent;color:hsl(var(--muted-foreground));cursor:pointer;display:grid;place-items:center;transition:color .15s,background .15s}
+.ti svg,.hi svg{display:block;width:16px;height:16px}
+.type .ti{margin-left:auto}
+.hi{display:inline-grid;vertical-align:-5px;margin-left:2px}
+.ti:hover,.hi:hover{color:hsl(var(--primary));background:hsl(var(--accent))}
+.ti[aria-expanded="true"],.hi[aria-expanded="true"]{color:hsl(var(--primary));background:hsl(var(--accent))}
+
+/* ── 세그먼트 (shadcn Tabs 형태) ───────────────────────────── */
+/* 표지 배경 — 썸네일 고르기 + 큰 미리보기 */
+.bgpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.bgpick button{border:1px solid hsl(var(--border));border-radius:var(--radius);padding:0;overflow:hidden;background:hsl(var(--card));cursor:pointer;font:inherit;display:block;text-align:left;transition:border-color .15s,box-shadow .15s}
+.bgpick button:hover{border-color:hsl(var(--primary)/.5)}
+.bgpick button.on{border-color:hsl(var(--primary));box-shadow:0 0 0 1px hsl(var(--primary))}
+.bgpick img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#0b0718}
+.bgpick span{display:block;padding:7px 10px;font-size:12.5px;font-weight:500;color:hsl(var(--foreground))}
+.bgpick span em{display:block;font-style:normal;font-size:11px;font-weight:400;color:hsl(var(--muted-foreground));margin-top:2px}
+.bgpick button.on span{font-weight:600;color:hsl(var(--primary))}
+.cvwrap{margin-top:10px;border:1px solid hsl(var(--border));border-radius:var(--radius);overflow:hidden;background:#0b0718;position:relative;aspect-ratio:16/9}
+.cvstage{position:absolute;top:0;left:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;
+  font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif}
+.cvstage .bg{position:absolute;inset:0;background:#000 center/cover no-repeat}
+.cvstage .sc{position:absolute;inset:0}
+.cvstage .lead,.cvstage .ttl,.cvstage .badge{position:absolute;z-index:2;color:#fff;word-break:keep-all}
+.cvstage .lead{color:#E7E6E6}
+.cvstage .logo{position:absolute;z-index:2;object-fit:contain;object-position:left center}
+.cvstage .badge{display:flex;align-items:center;justify-content:flex-end;font-weight:700;white-space:nowrap}
+.seg{display:inline-flex;width:100%;gap:2px;background:hsl(var(--muted));padding:4px;border-radius:var(--radius)}
+.seg button{flex:1;border:0;background:transparent;height:var(--h-s);padding:0 10px;font:inherit;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground));cursor:pointer;border-radius:calc(var(--radius) - 2px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .15s,color .15s}
+.seg button:hover{color:hsl(var(--foreground))}
+.seg button.on{background:hsl(var(--background));color:hsl(var(--foreground));box-shadow:var(--shadow-sm);font-weight:600}
+
+/* ── 탭 (편집/JSON) ───────────────────────────────────────── */
+.tabs{display:inline-flex;gap:2px;background:hsl(var(--muted));padding:4px;border-radius:var(--radius);margin:16px 0 12px}
+.tabs button{border:0;background:transparent;height:var(--h-s);padding:0 14px;font:inherit;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground));cursor:pointer;border-radius:calc(var(--radius) - 2px);transition:background .15s,color .15s}
+.tabs button:hover{color:hsl(var(--foreground))}
+.tabs button.on{background:hsl(var(--background));color:hsl(var(--foreground));box-shadow:var(--shadow-sm);font-weight:600}
+
+/* ── 버튼 (shadcn Button variants) ─────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:calc(var(--radius) - 2px);height:var(--h-m);padding:0 16px;line-height:1;font:inherit;font-size:13.5px;font-weight:500;cursor:pointer;background:hsl(var(--primary));color:hsl(var(--primary-foreground));white-space:nowrap;box-shadow:var(--shadow-sm);transition:background .15s,opacity .15s,box-shadow .15s;text-decoration:none}
+.btn:hover{background:hsl(var(--primary)/.9)}
+.btn:focus-visible{outline:0;box-shadow:0 0 0 3px hsl(var(--ring)/.25)}
+.btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
+.btn.l{height:var(--h-l);font-size:15px;padding:0 22px;border-radius:var(--radius)}
+.btn.s{height:var(--h-s);font-size:13px;padding:0 12px}
+.btn.xs{height:var(--h-xs);font-size:12px;padding:0 8px;border-radius:6px}
+.btn.sec{background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));border-color:transparent}
+.btn.sec:hover{background:hsl(var(--secondary)/.8)}
+.btn.outline{background:hsl(var(--background));color:hsl(var(--foreground));border-color:hsl(var(--border))}
+.btn.outline:hover{background:hsl(var(--accent))}
+.btn.ghost{background:transparent;color:hsl(var(--foreground));box-shadow:none;border-color:transparent}
+.btn.ghost:hover{background:hsl(var(--accent))}
+.btn.wide{width:100%;margin-top:16px;height:var(--h-l);font-size:15px;font-weight:600;border-radius:var(--radius)}
+.btn .spin{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:none;opacity:.8}
+.btn.busy .spin{display:inline-block}@keyframes s{to{transform:rotate(360deg)}}
+.mini{display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:hsl(var(--muted-foreground));cursor:pointer;font:inherit;font-size:12px;height:var(--h-xs);padding:0 8px;border-radius:6px;line-height:1;transition:background .15s,color .15s}
+.mini:hover{background:hsl(var(--accent));color:hsl(var(--foreground))}
+
+/* ── 알림 (shadcn Alert) · 힌트 ────────────────────────────── */
+.note{background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius);padding:12px 14px;font-size:12.5px;color:hsl(var(--muted-foreground));line-height:1.6;margin-top:12px;box-shadow:var(--shadow-sm)}
+.note b{color:hsl(var(--foreground));font-weight:600}
+.note.warn{background:hsl(38 92% 97%);border-color:hsl(38 92% 84%);color:hsl(30 80% 30%)}
+.note.bad{background:hsl(0 86% 98%);border-color:hsl(0 86% 90%);color:hsl(0 70% 40%)}
+/* 인포 아이콘 말풍선 — 한 번에 하나만 뜬다 */
+.pop{position:fixed;z-index:60;max-width:310px;padding:12px 14px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--card));box-shadow:0 10px 30px rgba(16,20,28,.16);font-size:12px;line-height:1.75;color:hsl(var(--muted-foreground))}
+.pop h4{margin:0 0 7px;padding-right:22px;font-size:12px;font-weight:600;color:hsl(var(--foreground))}
+.pop ul{margin:0;padding:0;list-style:none}
+.pop .kv b{display:inline-block;min-width:74px;font-weight:600;color:hsl(var(--foreground))}
+.pop .x{position:absolute;top:7px;right:7px;width:22px;height:22px;padding:0;border:0;border-radius:4px;background:transparent;color:hsl(var(--muted-foreground));font-size:13px;line-height:1;cursor:pointer;display:grid;place-items:center}
+.pop .x:hover{background:hsl(var(--accent));color:hsl(var(--foreground))}
+.pop .arw{position:absolute;width:10px;height:10px;background:hsl(var(--card));border-left:1px solid hsl(var(--border));border-top:1px solid hsl(var(--border))}
+.hint{font-size:12px;color:hsl(var(--muted-foreground));line-height:1.55;margin-top:6px}
+.drop{border:1px dashed hsl(var(--border));border-radius:var(--radius);padding:20px;text-align:center;color:hsl(var(--muted-foreground));font-size:13px;cursor:pointer;background:hsl(var(--muted)/.4);transition:border-color .15s,background .15s}
+.drop:hover{background:hsl(var(--muted)/.7)}
+.drop.on{border-color:hsl(var(--primary));background:hsl(var(--primary)/.06)}
+
+/* ── 장표 구성 편집기 (shadcn Card 계열) ───────────────────── */
+.sec{border:1px solid hsl(var(--border));border-radius:var(--radius);margin-bottom:10px;background:hsl(var(--card));box-shadow:var(--shadow-sm);overflow:hidden}
+.sec .sh{display:flex;align-items:center;gap:8px;padding:10px 12px;background:hsl(var(--muted)/.5);border-bottom:1px solid transparent;cursor:pointer}
+.sec:not(.closed) .sh{border-bottom-color:hsl(var(--border))}
+.sec .sh .no{font-weight:600;color:hsl(var(--primary));width:22px;font-size:13px}
+.sec .sh input{flex:1;border:0;background:transparent;font-weight:600;font-size:14px;padding:4px;box-shadow:none;height:auto}
+.sec .sh input:focus{box-shadow:none}
+.sec.closed .sl{display:none}
+.slide{border-top:1px solid hsl(var(--border));padding:12px}
+.slide:first-child{border-top:0}
+.slide .st{display:flex;gap:6px;align-items:center}
+.slide .st .idx{font-size:11px;color:hsl(var(--muted-foreground));width:34px;font-weight:600}
+.slide .st input{flex:1;font-weight:500}
+.slide textarea{margin-top:8px;font-size:12.5px;min-height:56px}
+.slide .blocks{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;align-items:center;font-size:11.5px;font-weight:500;background:hsl(var(--primary)/.08);color:hsl(var(--primary));padding:3px 9px;border-radius:6px;cursor:pointer;border:1px solid hsl(var(--primary)/.14)}
+.chip.x{background:hsl(var(--muted));color:hsl(var(--muted-foreground));border-color:hsl(var(--border))}
+.slide .adv{display:none;margin-top:8px}.slide.adv .adv{display:block}
+.slide .adv textarea{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;min-height:120px}
+#rawjson{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;min-height:420px}
+pre.log{background:hsl(240 6% 10%);color:hsl(240 5% 84%);font-size:11px;padding:12px 14px;border-radius:var(--radius);white-space:pre-wrap;max-height:240px;overflow:auto;margin-top:12px;line-height:1.6;font-family:ui-monospace,Menlo,monospace}
+.dl{display:flex;gap:8px;margin-top:12px}.dl a{flex:1;text-decoration:none}
+.kbd{font-family:ui-monospace,Menlo,monospace;background:hsl(var(--muted));border:1px solid hsl(var(--border));padding:1px 6px;border-radius:4px;font-size:11.5px;color:hsl(var(--muted-foreground))}
+/* ── 배지 (shadcn Badge) ───────────────────────────────────── */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 9px;border-radius:6px;background:hsl(var(--muted));color:hsl(var(--muted-foreground));font-weight:500;border:1px solid hsl(var(--border))}
+.pill.ok{background:hsl(142 71% 96%);color:hsl(142 71% 29%);border-color:hsl(142 51% 85%)}
+.pill.warn{background:hsl(38 92% 96%);color:hsl(30 80% 34%);border-color:hsl(38 92% 84%)}
+label.pill{margin:0;cursor:pointer}
+label.pill input[type=checkbox]{accent-color:hsl(var(--primary));width:13px;height:13px;margin:0}
+a{color:hsl(var(--foreground));text-decoration:none}
+a.lnk{color:hsl(var(--foreground));text-decoration:underline;text-underline-offset:3px;text-decoration-color:hsl(var(--border))}
+a.lnk:hover{text-decoration-color:hsl(var(--foreground))}
+#previewLinks{display:inline-flex;gap:6px}
+#previewLinks a{display:inline-flex;align-items:center;height:var(--h-s);padding:0 12px;border:1px solid hsl(var(--border));border-radius:calc(var(--radius) - 2px);background:hsl(var(--background));font-size:12.5px;font-weight:500;box-shadow:var(--shadow-sm)}
+#previewLinks a:hover{background:hsl(var(--accent))}
+details>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:'▸ ';color:hsl(var(--muted-foreground))}
+details[open]>summary::before{content:'▾ '}
+</style></head>
+<body>
+<header>
+  <div class="logo">PPT Maker</div>
+  <nav class="steps">
+    <button data-step="1" class="on">1 설정</button><button data-step="2">2 입력</button><button data-step="3">3 장표 구성</button><button data-step="4">4 결과</button>
+  </nav>
+  <div class="sp"></div>
+  <div class="status" id="status">연결 중…</div>
+</header>
+<main>
+<section id="left">
+
+  <!-- STEP 1 -->
+  <div class="pane on" data-pane="1">
+    <h2>어떤 자료를 만들까요?</h2>
+    <label>작업 이름</label>
+    <input type="text" id="project" placeholder="예: 회사명-문서유형" >
+    <div class="hint">폴더 이름으로 쓰입니다. 같은 이름으로 다시 만들면 이전 결과를 덮어씁니다.</div>
+
+    <h3>모드</h3>
+    <div class="seg" id="mode"><button data-v="new" class="on">텍스트로 새로 만들기</button><button data-v="improve">기존 PPTX 개선</button></div>
+
+    <h3>문서 유형</h3>
+    <div class="types" id="types"></div>
+
+    <h3>제출 조건</h3>
+    <div class="seg" id="format"><button data-v="free">자유 양식</button><button data-v="fixed">지정 양식 (분량·목차 제한)</button></div>
+    <div class="hint" id="formatHint"></div>
+
+    <h3>읽는 방식 <button type="button" class="hi" data-info="densityInfo" data-title="읽는 방식" aria-expanded="false" aria-label="읽는 방식 설명 보기"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.9" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="4.7" r=".95" fill="currentColor"/><path d="M8 7.3v4.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></h3>
+    <div class="seg" id="density"><button data-v="airy">발표용</button><button data-v="dense">제출·열람용</button></div>
+    <template id="densityInfo">
+      <div class="kv"><b>발표용</b>글자·이미지 크게, 핵심만</div>
+      <div class="kv"><b>제출·열람용</b>텍스트 밀도 높게</div>
+    </template>
+    <div class="hint">텍스트가 적으면 전문적으로 보이지 않고, 많으면 잘 안 읽힙니다. 읽는 방식을 기준으로 정합니다.</div>
+
+    <h3>표지 배경</h3>
+    <div class="bgpick" id="coverbg"></div>
+    <div class="cvwrap" id="cvWrap"><div class="cvstage" id="cvStage">
+      <div class="bg"></div><div class="sc"></div>
+      <div class="lead"></div><div class="ttl"></div><img class="logo" alt=""><div class="badge"></div>
+    </div></div>
+    <div class="hint">아래 <b>표지 정보</b>에 제목·행사명을 적으면 그대로 비칩니다. 비어 있으면 예시 문구가 보입니다.</div>
+
+    <h3>브랜드</h3>
+    <div class="row">
+      <div><label>메인 컬러 (필수)</label><div class="color"><input type="color" id="c1" value="#2F0CC5"><input type="text" id="c1t" value="#2F0CC5"></div></div>
+      <div><label>보조 컬러 (선택)</label><div class="color"><input type="color" id="c2" value="#0EA5E9"><input type="text" id="c2t" value="#0EA5E9"></div></div>
+    </div>
+    <div class="hint">군·공공 제출용이면 네이비(<span class="kbd">#002060</span>)를 권합니다. 나머지 톤은 메인 컬러에서 자동 파생됩니다.</div>
+    <label>로고 (선택 · 없으면 기본 로고)</label>
+    <div class="drop" id="logoDrop">로고 이미지를 끌어다 놓거나 클릭 (밝은 배경용 / 어두운 배경용 2개까지)</div>
+    <div class="hint" id="logoInfo"></div>
+
+    <h3>표지 정보</h3>
+    <div class="row"><div><label>회사명</label><input type="text" id="company" value="" placeholder="예: 주식회사 아크미"></div><div><label>파일명 회사 약칭 (영문)</label><input type="text" id="fileCompany" value="" placeholder="acme"><div class="hint">저장 파일명 = 약칭_출력날짜. 예: <b id="fileNameEx">acme_260821.pptx</b></div></div><div><label>발표자 / 작성자</label><input type="text" id="presenter"></div></div>
+    <div class="row"><div><label>날짜</label><input type="text" id="date" placeholder="2026.09.08"></div><div><label>행사·공고명 (선택)</label><input type="text" id="event"></div></div>
+    <label>문서 제목 (비우면 AI가 제안)</label><input type="text" id="title">
+    <div class="row"><div><label>표지 라벨 (2~4글자, 선택)</label><input type="text" id="pill" placeholder="예: 기술개발 · 사업제안 · 연차보고"></div><div><label>문서 종류 표기 (선택)</label><input type="text" id="docType" placeholder="예: 기술 개발 방향 검토"></div></div>
+    <div class="row"><div><label>연락처 이메일</label><input type="text" id="email"></div><div><label>웹사이트</label><input type="text" id="web"></div></div>
+    <div class="row" style="margin-top:14px"><button class="btn" onclick="go(2)">다음 → 입력</button></div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="pane" data-pane="2">
+    <h2 id="inTitle">원문을 붙여 넣으세요</h2>
+    <div id="inNew">
+      <textarea id="text" rows="16" placeholder="기획안, 보고서 초안, 메모, 회의록… 길어도 괜찮습니다. 장표 단위로 나누고 제목·리드 메시지를 새로 씁니다."></textarea>
+      <div class="hint" id="textCount"></div>
+    </div>
+    <div id="inImprove" style="display:none">
+      <div class="drop" id="pptxDrop">개선할 PPTX 파일을 끌어다 놓거나 클릭</div>
+      <div class="hint" id="pptxInfo"></div>
+      <label>개선 방향 (복수 선택)</label>
+      <div class="row" style="flex-wrap:wrap" id="improveOpts">
+        <label class="pill" style="cursor:pointer"><input type="checkbox" value="가독성 개선" checked> 가독성</label>
+        <label class="pill" style="cursor:pointer"><input type="checkbox" value="디자인 통일" checked> 디자인 통일</label>
+        <label class="pill" style="cursor:pointer"><input type="checkbox" value="장표 흐름 개선"> 장표 흐름</label>
+        <label class="pill" style="cursor:pointer"><input type="checkbox" value="텍스트 요약"> 텍스트 요약</label>
+        <label class="pill" style="cursor:pointer"><input type="checkbox" value="표/그래프 단순화"> 표 단순화</label>
+      </div>
+    </div>
+    <h3>유형별 추가 정보</h3>
+    <div class="note" id="typeHints"></div>
+    <textarea id="notes" rows="6" placeholder="위 질문에 답을 적어 주세요. 모르는 항목은 비워 두면 [입력 필요]로 남깁니다."></textarea>
+    <div class="row" style="margin-top:14px"><button class="btn outline" onclick="go(1)">← 설정</button><button class="btn" onclick="go(3)">다음 → 장표 구성</button></div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="pane" data-pane="3">
+    <h2>장표 구성</h2>
+    <div class="hint" style="margin:-8px 0 12px">원문을 장표 단위로 나눈 구성표입니다. 목차, 장표 제목, 핵심 메시지, 본문 형태(카드·표·절차 등)를 먼저 확인하고 고친 뒤 "미리보기 만들기"를 누르세요. 미리보기는 웹에서 바로 보고 고칠 수 있고, PDF·PPTX 파일은 필요할 때 따로 만듭니다(AI 토큰 소모 없음).</div>
+    <div id="aiBox">
+      <div class="hint" id="estHint" style="margin-top:6px"></div>
+      <button class="btn wide" id="genBtn" onclick="generate()"><span class="spin"></span><span id="genLabel">AI로 장표 구성 만들기</span></button>
+      <div class="note warn" id="staleBox" style="display:none"></div>
+      <div id="prog" class="note" style="display:none;background:#fff">
+        <div class="row" style="align-items:center"><b id="progTitle" style="color:hsl(var(--foreground))">생성 중…</b><span class="sp" style="flex:1"></span><button class="btn sec s" style="flex:0 0 auto;color:hsl(var(--destructive))" onclick="cancelGen()">취소</button></div>
+        <div style="height:8px;background:hsl(var(--muted));border-radius:999px;overflow:hidden;margin:12px 0 10px"><div id="progBar" style="height:100%;width:0;background:hsl(var(--primary));transition:width .5s"></div></div>
+        <div class="row" style="font-size:12px;color:hsl(var(--muted-foreground));gap:14px;flex-wrap:wrap">
+          <span>경과 <b id="pElapsed" style="color:hsl(var(--foreground))">0초</b></span>
+          <span>남은 예상 <b id="pRemain" style="color:hsl(var(--foreground))">—</b></span>
+          <span>예상 총 <b id="pTotal" style="color:hsl(var(--foreground))">—</b></span>
+          <span>생성 토큰 <b id="pTok" style="color:hsl(var(--foreground))">0</b><span id="pTokEst"> / 예상 —</span></span>
+          <span id="pBackend"></span>
+        </div>
+        <div class="hint" id="pNote" style="margin-top:6px"></div>
+      </div>
+      <div class="note" id="genDone" style="display:none;background:#ECFDF5;border-color:#A7F3D0;color:#065F46"></div>
+      <div class="note warn" id="noKey" style="display:none">
+        AI 백엔드가 없어 자동 생성이 꺼져 있습니다. Claude Code CLI(<span class="kbd">claude</span>)를 설치·로그인하면 API 키 없이도 됩니다.
+        대신 <b>프롬프트 복사</b> → Claude(또는 Claude Code)에 붙여 JSON을 받아 → 아래 <b>JSON 붙여넣기</b>로 가져오세요.
+        <div class="row" style="margin-top:8px"><button class="btn outline" onclick="copyPrompt()">프롬프트 복사</button><button class="btn outline" onclick="pasteJson()">JSON 붙여넣기</button></div>
+      </div>
+      <div class="row" style="margin-top:8px" id="altRow"><button class="btn outline s" onclick="copyPrompt()">프롬프트 복사</button><button class="btn outline s" onclick="pasteJson()">JSON 붙여넣기</button><button class="btn outline s" onclick="loadExample()">예제 불러오기</button></div>
+      <div class="note warn" id="genWarn" style="display:none"></div>
+      <div class="note bad" id="genErr" style="display:none"></div>
+    </div>
+    <div id="editor" style="display:none">
+      <div class="tabs"><button class="on" data-tab="tree">장표 편집</button><button data-tab="raw">JSON (고급)</button></div>
+      <div id="tabTree">
+        <div class="note" id="outlineSummary"></div>
+        <div id="tree"></div>
+        <button class="mini" onclick="addSection()">+ 섹션 추가</button>
+        <h3>마무리</h3>
+        <input type="text" id="closingMsg" placeholder="감사합니다"><input type="text" id="closingSub" placeholder="한 줄 (선택)" style="margin-top:6px">
+      </div>
+      <div id="tabRaw" style="display:none">
+        <textarea id="rawjson"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn outline" onclick="applyRaw()">JSON 적용</button><button class="btn outline" onclick="downloadJson()">구성 파일 저장 (JSON)</button></div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn outline" onclick="go(2)">← 입력</button><button class="btn" id="buildBtn" onclick="build()"><span class="spin"></span><span>미리보기 만들기</span></button></div>
+      <button class="mini" style="margin-top:8px" onclick="resetOutline()">장표 구성 비우기</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="pane" data-pane="4">
+    <h2>결과</h2>
+    <div id="resultBox"><div class="note">아직 PPT를 만들지 않았습니다.</div></div>
+    <div class="row" style="margin-top:14px"><button class="btn outline" onclick="go(3)">← 장표 구성 수정</button><button class="btn" id="rebuildBtn" onclick="build()"><span class="spin"></span><span>미리보기 다시 만들기</span></button></div>
+    <h3>검수 체크</h3>
+    <div class="note">
+      · 오른쪽 미리보기에서 <span class="kbd">←</span><span class="kbd">→</span>로 넘기고 <span class="kbd">T</span>로 썸네일, <span class="kbd">F</span> 전체화면.<br>
+      · <span class="kbd">E</span>를 누르면 화면에서 텍스트를 바로 고칠 수 있습니다(임시 확인용). 확정 수정은 3단계 장표 구성에서 하세요.<br>
+      · <span class="kbd">[ … ]</span> 점선 자리표시자가 보이면 이미지가 필요한 자리입니다. 3단계에서 image 블록의 src 를 채우세요.
+    </div>
+  </div>
+</section>
+
+<section id="right">
+  <div class="bar"><span id="previewTitle" style="font-weight:600;color:hsl(var(--foreground))">미리보기</span><span class="sp" style="flex:1"></span><span id="previewLinks"></span></div>
+  <div class="empty" id="previewEmpty">PPT를 만들면 여기에 슬라이드가 표시됩니다.<br><small>표지 · 목차 · 본문 · 마무리가 자동 구성됩니다</small></div>
+  <iframe id="preview" style="display:none"></iframe>
+</section>
+</main>
+
+<script>
+const TYPES = [
+  ['gov-proposal','제안서','정부 과제 제안서',
+    ['1. 배경 및 문제점','2. 요구사항','3. 해결방안','4. 시제품 시연','5. 세부 기술','6. 데이터 확보','7. 활용·기대효과']],
+  ['client-proposal','제안서','고객사 제안서',
+    ['1. 회사 및 솔루션 소개','2. 기술 구현·시스템 구조','3. 시스템 구축 방안','4. 유사 프로젝트 수행 경험','5. 구축 일정','6. 운영 및 유지보수','7. 예상 비용·견적','8. ROI']],
+  ['annual-report','보고서','연차보고서',
+    ['i. 과제 개요','ii. 추진 현황','iii. 연구개발 결과','iv. 사업화','v. 향후 계획']],
+  ['internal-report','보고서','내부 진행보고',
+    ['무엇을 할 것인가?','언제까지 할 것인가?','개발 진행 현황','추가 필요 사항']],
+  ['company-intro','소개서','회사 소개서',
+    ['회사 개요','연혁','진행 현황','솔루션·제품','매출','보유 특허','팀과 추진체계']],
+  ['ir','소개서','IR (투자자)',
+    ['01 개요 및 연혁','02 솔루션 및 핵심기술','03 특허','04 매출','05 Exit 전략','06 인력']],
+];
+const HINTS = {
+  'gov-proposal':'공고명·과제명 / 발주처 요구사항 원문 / 핵심 기술 모듈 이름 / 시연 자료(영상·캡처) / 기대효과 수치와 근거 / 공고문의 목차·분량 제한',
+  'client-proposal':'고객사명·제안명 / 고객 현장 정보와 문제 / 솔루션·제품 목록 / 유사 프로젝트 수행 사례 / 견적·구축 일정·유지보수 범위 / KPI 목표치',
+  'annual-report':'과제명·기간·주관/참여기관·보고 차수 / 연차 목표 대비 실적(정량) / 사업비 집행 / 증빙 파일 / 표에서 강조할 열(보통 달성현황·집행률)',
+  'internal-report':'보고 대상과 목적 / 이번 기간 과제 범위 / 마일스톤 단위(주·월) / 개발 인원 현황 / 받아야 할 결정과 지원',
+  'company-intro':'인원 구성·거점·연락처 / 연혁 / 솔루션별 특징 3가지와 적용 산업 / 매출·수주 잔고·성장률 / 특허 현황 / 대표 이력과 조직',
+  'ir':'한 문장 소개 / 올해 매출·수주 잔고·고객 증가 / 핵심 기술 5종 / 3개년 매출 목표 / 이번 라운드 금액과 사용처 / 대표·CTO 이력',
+};
+// 읽는 방식 기본값 — 발표용 airy, 제출·열람용 dense
+const DEFAULT_DENSITY = {'gov-proposal':'dense','client-proposal':'dense','annual-report':'dense','internal-report':'airy','company-intro':'airy','ir':'airy'};
+const S = { step:1, mode:'new', type:'gov-proposal', density:'dense', format:'free', coverBg:'cube', logo:{}, outline:null, result:null, pptx:null, creds:false, srcSig:null };
+// 입력 지문: 장표 구성이 어떤 입력으로 만들어졌는지 기억해, 입력이 바뀌면 3단계에서 경고한다
+// 출력 파일명: 회사약칭_YYMMDD (예 acme_260821). 날짜는 파일을 만드는 날.
+function fileSlug(){ return (($('#fileCompany')&&$('#fileCompany').value)||'deck').trim().toLowerCase().replace(/[^a-z0-9-]/g,'')||'deck'; }
+function fileBase(d=new Date()){ return fileSlug()+'_'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
+function syncFileNameEx(){ const el=$('#fileNameEx'); if(el) el.textContent=fileBase()+'.pptx'; }
+document.addEventListener('DOMContentLoaded',()=>{ syncFileNameEx(); const f=$('#fileCompany'); if(f) f.addEventListener('input',syncFileNameEx); });
+function inputSig(){ return JSON.stringify([S.mode, S.type, ($('#text').value||'').trim(), S.pptx?S.pptx.name:'']); }
+
+// ─── boot ────────────────────────────────────────────────────────
+const $ = s => document.querySelector(s);
+try { Object.assign(S, JSON.parse(localStorage.getItem('pptmaker')||'{}'), {step:1}); if(S.result&&typeof S.result.log==='string') S.result.log=S.result.log.replace(/\(이전 빌드\)/g,'(이전에 만든 결과)').replace(/빌드/g,'만들기'); } catch {}
+function save(){ try{ localStorage.setItem('pptmaker', JSON.stringify({mode:S.mode,type:S.type,density:S.density,format:S.format,coverBg:S.coverBg,logo:S.logo,outline:S.outline,result:S.result,srcSig:S.srcSig,form:formValues()})); }catch{} }
+function formValues(){ const o={}; for (const id of ['project','company','fileCompany','presenter','date','event','title','pill','docType','email','web','text','notes','c1t','c2t']) o[id]=$('#'+id).value; return o; }
+function restoreForm(f){ if(!f) return; for (const [k,v] of Object.entries(f)) if ($('#'+k)) $('#'+k).value=v; $('#c1').value=f.c1t||'#2F0CC5'; $('#c2').value=f.c2t||'#0EA5E9'; }
+
+const INFO_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.9" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="4.7" r=".95" fill="currentColor"/><path d="M8 7.3v4.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
+// ── 인포 말풍선 ─────────────────────────────────────────────
+// 한 번에 하나만 뜬다. 닫기 단추·말풍선 밖 누르기·Esc 로 닫힌다.
+const POP = Object.assign(document.createElement('div'), { className: 'pop', hidden: true });
+POP.innerHTML = '<span class="arw"></span><button type="button" class="x" aria-label="닫기">✕</button><div class="pb"></div>';
+document.body.appendChild(POP);
+let popFor = null;
+
+function closePop(){
+  if(!popFor) return;
+  popFor.setAttribute('aria-expanded','false'); popFor = null; POP.hidden = true;
+}
+function placePop(){
+  if(!popFor) return;
+  const r = popFor.getBoundingClientRect();
+  if(r.bottom < 0 || r.top > innerHeight){ closePop(); return; }   // 아이콘이 화면 밖으로 나가면 닫는다
+  const w = POP.offsetWidth, h = POP.offsetHeight;
+  const left = Math.min(Math.max(8, r.left + r.width/2 - w/2), innerWidth - w - 8);
+  let top = r.bottom + 9, below = true;
+  if(top + h > innerHeight - 8 && r.top - 9 - h > 8){ top = r.top - 9 - h; below = false; }
+  POP.style.left = left + 'px'; POP.style.top = top + 'px';
+  const arw = POP.querySelector('.arw');
+  arw.style.left = Math.min(Math.max(r.left + r.width/2 - left - 5, 12), w - 22) + 'px';
+  arw.style.top = below ? '-6px' : (h - 5) + 'px';
+  arw.style.transform = 'rotate(' + (below ? 45 : 225) + 'deg)';
+}
+function openPop(btn, title, html){
+  if(popFor === btn){ closePop(); return; }          // 같은 아이콘을 다시 누르면 닫힌다
+  closePop();
+  POP.querySelector('.pb').innerHTML = (title ? `<h4>${title}</h4>` : '') + html;
+  popFor = btn; btn.setAttribute('aria-expanded','true');
+  POP.style.visibility = 'hidden'; POP.hidden = false;
+  placePop(); POP.style.visibility = '';
+}
+POP.querySelector('.x').addEventListener('click', closePop);
+document.addEventListener('click', e=>{ if(popFor && !POP.contains(e.target) && !e.target.closest('.ti,.hi')) closePop(); });
+document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closePop(); });
+addEventListener('resize', placePop);
+addEventListener('scroll', placePop, true);
+
+$('#types').innerHTML = TYPES.map(([k,p,n])=>`<div class="type" data-v="${k}">
+  <div class="th"><b>${p}</b><span class="tn">${n}</span><button type="button" class="ti" aria-expanded="false" aria-label="${n} 목차 보기">${INFO_SVG}</button></div>
+</div>`).join('');
+$('#types').addEventListener('click', e=>{
+  const i = e.target.closest('.ti');                 // 인포 아이콘은 고르는 게 아니라 목차 말풍선만 띄운다
+  if(i){ const [,,n,toc] = TYPES.find(t=>t[0]===i.closest('.type').dataset.v);
+         openPop(i, n + ' 목차', '<ul>' + toc.map(t=>`<li>${t}</li>`).join('') + '</ul>'); return; }
+  const t=e.target.closest('.type'); if(!t) return; S.type=t.dataset.v; S.density=DEFAULT_DENSITY[S.type]; sync();
+});
+$('#mode').addEventListener('click', e=>{ if(e.target.dataset.v){ S.mode=e.target.dataset.v; sync(); } });
+$('#density').addEventListener('click', e=>{ if(e.target.dataset.v){ S.density=e.target.dataset.v; sync(); } });
+document.querySelectorAll('.hi').forEach(b=>b.addEventListener('click', ()=>{
+  openPop(b, b.dataset.title || '', $('#' + b.dataset.info).innerHTML);
+}));
+$('#coverbg').addEventListener('click', e=>{ const b=e.target.closest('button[data-v]'); if(b){ S.coverBg=b.dataset.v; sync(); } });
+$('#format').addEventListener('click', e=>{ if(e.target.dataset.v){ S.format=e.target.dataset.v; sync(); } });
+for (const [c,t] of [['c1','c1t'],['c2','c2t']]) { $('#'+c).addEventListener('input',()=>{$('#'+t).value=$('#'+c).value.toUpperCase();save();}); $('#'+t).addEventListener('change',()=>{ if(/^#[0-9a-f]{6}$/i.test($('#'+t).value)) $('#'+c).value=$('#'+t).value; save(); }); }
+document.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('change',save));
+$('#text').addEventListener('input',()=>{ $('#textCount').textContent = $('#text').value.length.toLocaleString()+'자'; });
+document.querySelectorAll('header .steps button').forEach(b=>b.onclick=()=>go(+b.dataset.step));
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b)); $('#tabTree').style.display=b.dataset.tab==='tree'?'':'none'; $('#tabRaw').style.display=b.dataset.tab==='raw'?'':'none'; if(b.dataset.tab==='raw') $('#rawjson').value=JSON.stringify(S.outline,null,2); });
+
+// ─── 표지 미리보기 ──────────────────────────────────────────────
+// 글자 크기·줄간격·자간·좌표는 서버가 lib/common.mjs 에서 그대로 내려준다(한 곳에서만 관리).
+let COVERSPEC = null;
+const PXpt = pt => pt * 96 / 72;
+const faceCss = t => `font-family:'${t.face}','Pretendard','Apple SD Gothic Neo',sans-serif;font-weight:400;`
+  + `font-size:${PXpt(t.size).toFixed(2)}px;line-height:${PXpt(t.line).toFixed(2)}px;letter-spacing:${t.spc}pt;`;
+const boxCss = b => `left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;`;
+// 표지 오른쪽 아래 상자 색 — 메인 컬러에서 만든다(lib/common.mjs 의 coverBadge 와 같은 식)
+const mix = (a,b,t) => { const h=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16));
+  const A=h(a), B=h(b); return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join(''); };
+function badgeColor(){
+  const v = ($('#c1t') && $('#c1t').value || '#2F0CC5').trim();
+  const c = /^#[0-9a-f]{6}$/i.test(v) ? v : '#2F0CC5';
+  return mix(mix(c,'#000000',0.28),'#FFFFFF',0.17);
+}
+
+async function initCover(){
+  try { COVERSPEC = await (await fetch('/api/coverspec')).json(); } catch { return; }
+  $('#coverbg').innerHTML = COVERSPEC.backgrounds
+    .map(b=>`<button type="button" data-v="${b.key}"><img src="${b.src}" alt="" loading="lazy"><span>${b.label}${b.divider?'<em>간지도 같이 바뀜</em>':''}</span></button>`).join('');
+  fitCover(); sync();
+}
+function fitCover(){
+  const w = $('#cvWrap'); if(!w) return;
+  $('#cvStage').style.transform = `scale(${w.clientWidth/1280})`;
+}
+window.addEventListener('resize', fitCover);
+
+function drawCover(){
+  if(!COVERSPEC || !$('#cvStage')) return;
+  const C = COVERSPEC.box, T = COVERSPEC.type, st = $('#cvStage');
+  const bg = COVERSPEC.backgrounds.find(b=>b.key===S.coverBg) || COVERSPEC.backgrounds[0];
+  st.querySelector('.bg').style.backgroundImage = `url('${bg.src}')`;
+  st.querySelector('.sc').style.background = COVERSPEC.scrim;
+
+  const lead = st.querySelector('.lead');
+  lead.style.cssText = boxCss(C.lead) + faceCss(T.body2);
+  lead.textContent = ($('#docType') && $('#docType').value) || '무엇을 담은 자료인지 한 줄로';
+
+  const ttl = st.querySelector('.ttl');
+  // 제목은 길어지면 아래로 자라야 하므로 높이를 고정하지 않는다
+  ttl.style.cssText = `left:${C.title.x}px;top:${C.title.y}px;width:${C.title.w}px;` + faceCss(T.h0);
+  ttl.textContent = ($('#title') && $('#title').value) || '문서 제목이 여기에 들어갑니다';
+
+  const logo = st.querySelector('.logo');
+  logo.style.cssText = boxCss(C.logo);
+  logo.src = COVERSPEC.logo;
+
+  const badge = st.querySelector('.badge');
+  const padX = +(C.badge.x + C.badge.w - C.badgeText.x - C.badgeText.w).toFixed(1);
+  badge.style.cssText = `right:${1280-C.badge.x-C.badge.w}px;bottom:${720-C.badge.y-C.badge.h}px;`
+    + `height:${C.badge.h}px;min-width:${C.badge.w}px;padding:0 ${padX}px;background:${badgeColor()};`
+    + `font-size:${PXpt(C.badgeText.size).toFixed(2)}px;letter-spacing:${C.badgeText.spc}pt;`;
+  badge.textContent = ($('#event') && $('#event').value) || '행사·사업명';
+}
+['title','event','docType','c1t','c1'].forEach(id=>{ const el=$('#'+id); if(el) el.addEventListener('input', drawCover); });
+initCover();
+
+function sync(){
+  document.querySelectorAll('#types .type').forEach(t=>t.classList.toggle('on',t.dataset.v===S.type));
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.mode));
+  document.querySelectorAll('#density button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.density));
+  document.querySelectorAll('#coverbg button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.coverBg));
+  document.querySelectorAll('#format button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.format));
+  $('#formatHint').textContent = S.format==='fixed' ? '분량·목차 제한을 아래 «추가 메모»에 적어 주세요. 공고문 목차가 템플릿보다 우선합니다.' : '장수는 유형별 권장값을 따릅니다.';
+  drawCover();
+  $('#inNew').style.display = S.mode==='new'?'':'none'; $('#inImprove').style.display = S.mode==='improve'?'':'none';
+  $('#inTitle').textContent = S.mode==='new' ? '원문을 붙여 넣으세요' : '개선할 PPTX를 올려 주세요';
+  $('#typeHints').innerHTML = `<b>${S.type} 유형에서 있으면 좋은 정보</b><br>${HINTS[S.type]}`;
+  $('#genLabel').textContent = S.mode==='new' ? 'AI로 장표 구성 만들기' : 'PPTX 추출 → AI로 다시 구성';
+  $('#logoInfo').textContent = [S.logo.light&&'밝은 배경: '+S.logo.light, S.logo.dark&&'어두운 배경: '+S.logo.dark].filter(Boolean).join(' · ');
+  save();
+}
+function go(n){ S.step=n; document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',+p.dataset.pane===n)); document.querySelectorAll('header .steps button').forEach(b=>{ b.classList.toggle('on',+b.dataset.step===n); }); if(n===3){ renderEditor(); showEstimate(); } if(n===4) renderResult(); }
+
+function serverDown(msg){
+  $('#status').innerHTML = '<b class="no">서버 연결 안 됨</b>';
+  const box = document.getElementById('downBox') || Object.assign(document.createElement('div'),{id:'downBox',className:'note bad'});
+  box.style.margin='0 0 14px';
+  box.innerHTML = (location.protocol==='file:'
+    ? '<b>파일을 직접 열었습니다.</b> 이 화면은 서버를 통해 열어야 동작합니다.<br>'
+    : '<b>서버가 꺼져 있습니다.</b> (이 페이지의 fetch 가 실패했습니다: '+msg+')<br>')
+    + '터미널에서 아래를 실행한 뒤 <b>http://localhost:3790</b> 을 여세요.<br><span class="kbd">cd ppt-maker && ./start.sh</span>';
+  $('#left').prepend(box);
+}
+async function status(){
+  if (location.protocol==='file:') { serverDown('file://'); return; }
+  try{ const r = await (await fetch('/api/status')).json(); S.creds=r.hasCreds; document.getElementById('downBox')?.remove();
+    $('#status').innerHTML = `AI <b class="${r.hasCreds?'':'no'}">${r.backend==='api'?'API 키 · '+r.model:r.backend==='cli'?'Claude Code 로그인 사용':'없음'}</b>` + (r.projects.length?` · 최근 작업: ${r.projects.slice(0,3).map(p=>`<a class="lnk" href="#" onclick="loadProject('${p.name}');return false">${p.name}</a>`).join(', ')}`:'');
+    $('#noKey').style.display = r.hasCreds?'none':''; $('#altRow').style.display = r.hasCreds?'':'none'; $('#genBtn').disabled=!r.hasCreds;
+  }catch(e){ serverDown(e.message); }
+}
+// generic fetch guard: turn "Failed to fetch" into a readable message
+const _fetch = window.fetch.bind(window);
+window.fetch = async (...a) => { try { return await _fetch(...a); } catch (e) { serverDown(e.message); throw new Error('서버에 연결할 수 없습니다. 터미널에서 ./start.sh 로 서버를 켜고 http://localhost:3790 을 여세요.'); } };
+restoreForm(S.form); sync(); status(); if(S.outline) { /* keep */ }
+if ($('#text').value) $('#textCount').textContent = $('#text').value.length.toLocaleString()+'자';
+
+// ─── uploads ─────────────────────────────────────────────────────
+function fileToB64(f){ return new Promise(ok=>{ const r=new FileReader(); r.onload=()=>ok(r.result.split(',')[1]); r.readAsDataURL(f); }); }
+function pickFiles(accept, multiple){ return new Promise(ok=>{ const i=document.createElement('input'); i.type='file'; i.accept=accept; i.multiple=!!multiple; i.onchange=()=>ok([...i.files]); i.click(); }); }
+function dropzone(el, accept, multiple, handler){ el.onclick=async()=>handler(await pickFiles(accept,multiple)); el.ondragover=e=>{e.preventDefault();el.classList.add('on');}; el.ondragleave=()=>el.classList.remove('on'); el.ondrop=e=>{e.preventDefault();el.classList.remove('on');handler([...e.dataTransfer.files]);}; }
+function project(){ const v=$('#project').value.trim(); if(!v){ $('#project').value='deck-'+new Date().toISOString().slice(5,10).replace('-',''); } return $('#project').value.trim(); }
+dropzone($('#logoDrop'),'image/*',true, async files=>{
+  for (const f of files.slice(0,2)) { const r=await (await fetch('/api/asset',{method:'POST',body:JSON.stringify({project:project(),filename:f.name,data:await fileToB64(f)})})).json();
+    // heuristic: name containing white/dark → dark-bg logo
+    if (/white|dark|_w\b/i.test(f.name) && !S.logo.dark) S.logo.dark=r.path; else if(!S.logo.light) S.logo.light=r.path; else S.logo.dark=r.path; }
+  sync();
+});
+dropzone($('#pptxDrop'),'.pptx',false, async files=>{ const f=files[0]; if(!f) return; S.pptx={name:f.name,data:await fileToB64(f)}; $('#pptxInfo').textContent=`${f.name} (${(f.size/1024/1024).toFixed(1)} MB) 준비됨`; });
+
+// ─── meta from form ──────────────────────────────────────────────
+function metaFromForm(){
+  const m = { type:S.type, density:S.density, format:S.format, coverBg:S.coverBg, company:$('#company').value, fileCompany:fileSlug(), presenter:$('#presenter').value, date:$('#date').value, event:$('#event').value,
+    brand:{ primary:$('#c1t').value, secondary:$('#c2t').value }, contact:{ email:$('#email').value, web:$('#web').value }, footer:'' };
+  if ($('#title').value) m.title=$('#title').value;
+  if ($('#pill').value) m.pill=$('#pill').value; if ($('#docType').value) m.docType=$('#docType').value;
+  if (S.logo.light||S.logo.dark) m.logo = { light:S.logo.light||'assets/logo_v_blue.png', dark:S.logo.dark||'assets/logo_h_white.png' };
+  return m;
+}
+function notesText(){ let n=$('#notes').value; if(S.mode==='improve'){ const opts=[...document.querySelectorAll('#improveOpts input:checked')].map(i=>i.value); n = `개선 방향: ${opts.join(', ')}\n원문 의미와 수치는 유지하고 제목·리드를 새로 쓴다. bullets 를 구조 블록으로 재구성한다.\n`+n; } return n; }
+
+// ─── generate ────────────────────────────────────────────────────
+let JOB = null, pollTimer = null, tickTimer = null;
+const fmtSec = n => n < 60 ? `${Math.round(n)}초` : `${Math.floor(n/60)}분 ${Math.round(n%60)}초`;
+const fmtTok = n => n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'k' : String(n);
+async function showEstimate(){
+  const chars = S.mode==='improve' ? 6000 : ($('#text').value.length + $('#notes').value.length);
+  try{ const e = await (await fetch('/api/estimate?chars='+chars)).json();
+    $('#estHint').textContent = `예상: 약 ${fmtSec(e.seconds)} · 입력 약 ${fmtTok(e.inputTokens)} 토큰(구성 규칙·템플릿 포함) · 출력 약 ${fmtTok(e.outputTokens)} 토큰 (${e.basis})`;
+  }catch{}
+}
+function renderProgress(j){
+  $('#prog').style.display=''; $('#genBtn').style.display='none'; $('#genDone').style.display='none';
+  const el = j.elapsedMs/1000;
+  $('#pElapsed').textContent = fmtSec(el);
+  $('#pRemain').textContent = j.remainingSec>0 ? `약 ${fmtSec(j.remainingSec)}` : (j.state==='running' ? '곧 완료 (예상보다 길어지는 중)' : '—');
+  $('#pTotal').textContent = `약 ${fmtSec(j.estimate.seconds)}`;
+  $('#pTok').textContent = fmtTok(j.outputTokens||0) + (j.tokensExact?'':'≈');
+  $('#pTokEst').textContent = ` / 예상 ${fmtTok(j.estimate.outputTokens)}`;
+  $('#pBackend').textContent = j.backend==='cli' ? 'Claude Code 로그인 · opus' : j.backend==='api' ? 'API' : '';
+  $('#progBar').style.width = Math.round((j.progress||0)*100)+'%';
+  $('#pNote').textContent = j.state==='running' ? (j.outputChars>0 ? `장표 구성 JSON 작성 중 (${j.outputChars.toLocaleString()}자)` : '원문 분석 중… (첫 글자가 나오기까지 10~20초)') : '';
+}
+function stopPolling(){ clearInterval(pollTimer); clearInterval(tickTimer); pollTimer=tickTimer=null; }
+function resetGenUI(){ stopPolling(); $('#prog').style.display='none'; $('#genBtn').style.display=''; $('#genBtn').classList.remove('busy'); $('#genBtn').disabled=!S.creds; }
+async function generate(){
+  stopPolling(); // Clear any existing polling before starting a new job
+  $('#genErr').style.display='none'; $('#genDone').style.display='none'; if($('#genWarn')) $('#genWarn').style.display='none';
+  try{
+    let text=$('#text').value;
+    if (S.mode==='improve'){
+      if(!S.pptx) throw new Error('PPTX 파일을 먼저 올려 주세요.');
+      $('#genBtn').classList.add('busy'); $('#genBtn').disabled=true;
+      const ex = await (await fetch('/api/extract',{method:'POST',body:JSON.stringify({project:project(),filename:S.pptx.name,data:S.pptx.data})})).json();
+      if(ex.error) throw new Error(ex.error);
+      const draft = JSON.parse(JSON.stringify(ex.outline)); draft.sections.forEach(s=>s.slides.forEach(sl=>delete sl._raw)); (draft.appendix||[]).forEach(sl=>delete sl._raw);
+      text = `## 기존 PPTX에서 추출한 초안 (장표 순서와 텍스트, 이미지 경로 유지)\n${JSON.stringify(draft,null,1)}`;
+      if(!S.creds){ S.outline=ex.outline; S.outline.meta=Object.assign(S.outline.meta||{}, metaFromForm()); S.srcSig=inputSig(); S.result=null; resetGenUI(); renderEditor(); save(); return; }
+    }
+    const j = await (await fetch('/api/outline/start',{method:'POST',body:JSON.stringify({project:project(),meta:metaFromForm(),text,notes:notesText()})})).json();
+    if(j.error) throw new Error(j.error);
+    JOB = j; renderProgress(j);
+    const t0 = Date.now() - j.elapsedMs;
+    tickTimer = setInterval(()=>{ if(JOB&&JOB.state==='running'){ JOB.elapsedMs = Date.now()-t0; JOB.remainingSec = Math.max(0, JOB.estimate.seconds - JOB.elapsedMs/1000); renderProgress(JOB);} }, 1000);
+    pollTimer = setInterval(async ()=>{
+      try{
+        const st = await (await fetch('/api/outline/status?job='+JOB.id)).json();
+        if(st.error){ throw new Error(st.error); }
+        JOB = Object.assign(JOB, st, { elapsedMs: Date.now()-t0 });
+        if(st.state==='running'){ renderProgress(JOB); return; }
+        stopPolling();
+        if(st.state==='done'){
+          S.outline = st.outline; S.srcSig = inputSig(); S.result = null; save();
+          const u = st.usage||{}; const inTok = (u.input_tokens||0)+(u.cache_read_input_tokens||0)+(u.cache_creation_input_tokens||0);
+          $('#genDone').innerHTML = `<b>완료</b> · ${fmtSec(st.elapsedMs/1000)} 소요 · 입력 ${fmtTok(inTok)} 토큰 · 출력 ${fmtTok(u.output_tokens||st.outputTokens)} 토큰` + (st.costUsd!=null?` · 약 $${st.costUsd.toFixed(2)}`:'') + ` · 예상 대비 ${Math.round(st.elapsedMs/1000/st.estimate.seconds*100)}%`;
+          if(st.warning){ $('#genWarn').textContent = st.warning; $('#genWarn').style.display=''; } else $('#genWarn').style.display='none';
+          $('#genDone').style.display=''; $('#prog').style.display='none'; $('#genBtn').style.display=''; $('#genBtn').classList.remove('busy'); $('#genBtn').disabled=false;
+          renderEditor();
+        } else if(st.state==='cancelled'){ resetGenUI(); $('#genErr').textContent='취소했습니다.'; $('#genErr').style.display=''; }
+        else { const err=new Error(st.error||'생성 실패'); err.cmd=st.cmd; resetGenUI(); showGenError(err); }
+      }catch(e){ stopPolling(); resetGenUI(); showGenError(e); }
+    }, 1000);
+  }catch(e){ resetGenUI(); showGenError(e); }
+}
+async function cancelGen(){ if(!JOB) return; try{ await fetch('/api/outline/cancel',{method:'POST',body:JSON.stringify({job:JOB.id})}); }catch{} stopPolling(); resetGenUI(); $('#genErr').textContent='취소했습니다. 지금까지의 토큰은 소모되었습니다.'; $('#genErr').style.display=''; }
+function showGenError(e){
+    const cmd = e.cmd || '~/.local/bin/claude auth login';
+    $('#genErr').innerHTML = `<div style="white-space:pre-wrap">${esc(e.message)}</div>` + (e.cmd || /로그인|OAuth|authenticate/i.test(e.message)
+      ? `<div style="margin-top:8px"><b>해결 (한 번만):</b> 맥 <b>터미널 앱</b>을 열고 아래 한 줄을 붙여 넣으세요. 브라우저가 열리면 로그인 → 이 화면에서 다시 시도.</div>
+         <div class="row" style="margin-top:6px;align-items:center"><input type="text" readonly value="${esc(cmd)}" style="font-family:ui-monospace,Menlo,monospace;font-size:12px"><button class="btn sec" style="flex:0 0 auto" onclick="navigator.clipboard.writeText('${esc(cmd)}');this.textContent='복사됨'">복사</button></div>` : '');
+    $('#genErr').style.display='';
+}
+async function copyPrompt(){
+  const sys = await (await fetch('/api/prompt')).text();
+  const p = `${sys}\n\n---\n## 설정\n${JSON.stringify(metaFromForm(),null,2)}\n\n## 추가 메모\n${notesText()||'(없음)'}\n\n## 원문\n${$('#text').value}`;
+  await navigator.clipboard.writeText(p); alert('프롬프트를 복사했습니다. Claude 에 붙여 넣고, 돌아온 JSON 을 "JSON 붙여넣기"로 가져오면 장표 구성이 채워집니다.');
+}
+function pasteJson(){ const t=prompt('Claude 가 준 JSON 을 붙여 넣으세요'); if(!t) return; try{ const o=JSON.parse(t.trim().replace(/^```(json)?/,'').replace(/```$/,'')); if(!o.sections) throw 0; S.outline=o; S.outline.meta=Object.assign({},o.meta||{},metaFromForm()); S.srcSig=inputSig(); S.result=null; renderEditor(); save(); }catch{ alert('JSON 파싱 실패'); } }
+async function loadExample(){ const r=await (await fetch('/api/project/breezehome')).json(); if(r.error){ alert('예제가 없습니다. examples/breezehome 를 workspace 로 복사하세요.'); return; } S.outline=r.outline; S.srcSig=null; $('#project').value='breezehome'; renderEditor(); save(); }
+async function loadProject(name){ const r=await (await fetch('/api/project/'+encodeURIComponent(name))).json(); if(r.error) return; S.outline=r.outline; S.srcSig=null; $('#project').value=name; if(r.built){ S.result={ok:true,preview:r.preview,pdf:r.pdf,pptx:r.pptx,log:'(이전에 만든 미리보기)'}; showPreview(); } go(3); save(); }
+
+// ─── editor ──────────────────────────────────────────────────────
+function renderEditor(){
+  const has = !!S.outline; $('#editor').style.display=has?'':'none'; $('#aiBox').style.display='';
+  // srcSig 가 없으면(수정 전 세션·불러온 프로젝트) 현재 입력으로 만든 것인지 알 수 없으므로 '다를 수 있음'으로 취급
+  const changed = has && S.srcSig!==inputSig();
+  $('#genLabel').textContent = !has ? 'AI로 장표 구성 만들기' : changed ? '지금 입력한 내용으로 장표 구성 다시 만들기' : '장표 구성 다시 만들기';
+  $('#staleBox').style.display = changed ? '' : 'none';
+  if(changed) $('#staleBox').innerHTML = (S.srcSig
+    ? '<b>입력이 바뀌었습니다.</b> 아래 장표 구성은 <b>이전 입력</b>으로 만든 것입니다.'
+    : '<b>아래 장표 구성은 지금 입력한 내용으로 만든 것이 아닙니다.</b> (이전 세션에서 만들었거나 불러온 프로젝트)')
+    + ' 새 내용으로 만들려면 위의 <b>“지금 입력한 내용으로 장표 구성 다시 만들기”</b> 버튼을 누르세요. 아래 구성과 이전 결과물은 새 것으로 교체됩니다.';
+  if(!has) return;
+  const o=S.outline; o.sections=o.sections||[]; o.closing=o.closing===false?false:(o.closing||{message:'감사합니다'});
+  const n = o.sections.reduce((a,s)=>a+s.slides.length,0);
+  const need = JSON.stringify(o).match(/\[입력 필요[^\]]*\]/g)||[];
+  $('#outlineSummary').innerHTML = `<b>${o.meta?.title||'(제목 없음)'}</b> · 섹션 ${o.sections.length} · 본문 ${n}장 · 부록 ${(o.appendix||[]).length}장` + (need.length?`<br><span class="pill warn">입력 필요 ${need.length}곳</span> ${need.slice(0,4).join(' ')}`:'');
+  $('#tree').innerHTML = o.sections.map((s,si)=>`
+    <div class="sec" data-si="${si}">
+      <div class="sh" onclick="if(event.target.tagName!=='INPUT'&&event.target.tagName!=='BUTTON')this.parentElement.classList.toggle('closed')">
+        <span class="no">${String(s.no??si+1).padStart(2,'0')}</span>
+        <input value="${esc(s.title||'')}" onchange="S.outline.sections[${si}].title=this.value;save()" placeholder="섹션명">
+        <button class="mini" onclick="moveSec(${si},-1)">↑</button><button class="mini" onclick="moveSec(${si},1)">↓</button><button class="mini" onclick="delSec(${si})">삭제</button>
+      </div>
+      <div class="sl">${s.slides.map((sl,i)=>slideHtml(si,i,sl)).join('')}
+        <div class="slide"><button class="mini" onclick="addSlide(${si})">+ 장표 추가</button></div>
+      </div>
+    </div>`).join('');
+  $('#closingMsg').value = o.closing?o.closing.message||'':''; $('#closingSub').value=o.closing?o.closing.sub||'':'';
+  $('#closingMsg').onchange=e=>{ if(S.outline.closing) S.outline.closing.message=e.target.value; save(); };
+  $('#closingSub').onchange=e=>{ if(S.outline.closing) S.outline.closing.sub=e.target.value; save(); };
+  $('#rawjson').value = JSON.stringify(o,null,2);
+}
+function slideHtml(si,i,sl){
+  const blocks=(sl.blocks||[]).map((b,bi)=>`<span class="chip" title="클릭하면 JSON 편집">${b.type}</span>`).join('');
+  return `<div class="slide" data-si="${si}" data-i="${i}">
+    <div class="st"><span class="idx">${(S.outline.sections[si].no??si+1)}-${i+1}</span>
+      <input value="${esc(sl.title||'')}" placeholder="장표 제목" onchange="S.outline.sections[${si}].slides[${i}].title=this.value;save()">
+      <button class="mini" onclick="moveSlide(${si},${i},-1)">↑</button><button class="mini" onclick="moveSlide(${si},${i},1)">↓</button><button class="mini" onclick="delSlide(${si},${i})">✕</button></div>
+    <textarea rows="2" placeholder="리드 메시지 (결론 1~2문장)" onchange="S.outline.sections[${si}].slides[${i}].lead=this.value;save()">${esc(sl.lead||'')}</textarea>
+    <div class="blocks">${blocks||'<span class="chip x">블록 없음</span>'}<button class="mini" onclick="this.closest('.slide').classList.toggle('adv')">블록 JSON 편집</button></div>
+    <div class="adv"><textarea onchange="setBlocks(${si},${i},this)">${esc(JSON.stringify(sl.blocks||[],null,1))}</textarea></div>
+  </div>`;
+}
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function setBlocks(si,i,ta){ try{ S.outline.sections[si].slides[i].blocks=JSON.parse(ta.value); ta.style.borderColor=''; renderEditor(); save(); }catch{ ta.style.borderColor='hsl(var(--destructive))'; } }
+function addSection(){ S.outline.sections.push({no:S.outline.sections.length+1,title:'새 섹션',slides:[]}); renderEditor(); save(); }
+function delSec(si){ if(!confirm('섹션을 삭제할까요?')) return; S.outline.sections.splice(si,1); renumber(); renderEditor(); save(); }
+function moveSec(si,d){ const a=S.outline.sections, j=si+d; if(j<0||j>=a.length) return; [a[si],a[j]]=[a[j],a[si]]; renumber(); renderEditor(); save(); }
+function renumber(){ S.outline.sections.forEach((s,i)=>s.no=i+1); }
+function addSlide(si){ S.outline.sections[si].slides.push({title:'새 장표',lead:'',blocks:[{type:'bullets',items:['내용']}]}); renderEditor(); save(); }
+function delSlide(si,i){ S.outline.sections[si].slides.splice(i,1); renderEditor(); save(); }
+function moveSlide(si,i,d){ const a=S.outline.sections[si].slides, j=i+d; if(j<0||j>=a.length) return; [a[i],a[j]]=[a[j],a[i]]; renderEditor(); save(); }
+function applyRaw(){ try{ S.outline=JSON.parse($('#rawjson').value); renderEditor(); save(); document.querySelector('.tabs button[data-tab=tree]').click(); }catch(e){ alert('JSON 오류: '+e.message); } }
+function downloadJson(){ const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(S.outline,null,2)); a.download=fileBase()+'.json'; a.click(); }
+function resetOutline(){ if(confirm('장표 구성을 비울까요?')){ S.outline=null; S.result=null; S.srcSig=null; renderEditor(); save(); } }
+
+// ─── build ───────────────────────────────────────────────────────
+// targets: ['html'] 미리보기만(빠름) · ['pdf'] · ['pptx'] 파일은 필요할 때. 파일 변환은 로컬에서 하므로 AI 토큰을 쓰지 않는다.
+async function build(targets=['html']){
+  if(!S.outline) return;
+  const label = targets.includes('html') ? '미리보기 만드는 중… 슬라이드 그리기 → 글자 크기 맞춤 → 넘침 검사 (5~15초)' : `${targets.map(t=>t.toUpperCase()).join('·')} 파일 만드는 중… (10~20초, AI 토큰 소모 없음)`;
+  S.outline.meta = Object.assign({}, S.outline.meta||{}, metaFromForm(), S.outline.meta?.title?{title:S.outline.meta.title}:{});
+  if ($('#title').value) S.outline.meta.title=$('#title').value;
+  for (const b of [$('#buildBtn'),$('#rebuildBtn'),$('#mkPptx'),$('#mkPdf')]) if(b){ b.classList.add('busy'); b.disabled=true; }
+  go(4); if(targets.includes('html')) $('#resultBox').innerHTML=`<div class="note">${label}</div>`; else $('#fileMsg').textContent=label;
+  try{
+    const r = await (await fetch('/api/build',{method:'POST',body:JSON.stringify({project:project(),outline:S.outline,targets})})).json();
+    if(r.ok && !targets.includes('html') && S.result && S.result.ok) r.preview = S.result.preview; // 미리보기는 그대로
+    S.result=r; save(); renderResult(); if(r.ok) showPreview();
+  }catch(e){ $('#resultBox').innerHTML=`<div class="note bad">${e.message}</div>`; }
+  finally{ for (const b of [$('#buildBtn'),$('#rebuildBtn'),$('#mkPptx'),$('#mkPdf')]) if(b){ b.classList.remove('busy'); b.disabled=false; } }
+}
+// 다운로드 버튼을 누른 그 순간에만 PDF·PPTX 를 만든다. 이미 있으면 바로 내려받는다.
+async function getFile(kind){
+  if(!S.outline) return;
+  const ready = S.result && S.result.ok && S.result[kind];
+  if(!ready){
+    await build([kind]);
+    if(!(S.result && S.result.ok && S.result[kind])) return;   // 실패하면 로그가 화면에 남는다
+  }
+  const name = (S.result.fileBase || fileBase()) + '.' + kind;
+  const a=document.createElement('a'); a.href=S.result[kind]; a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  const m=$('#fileMsg'); if(m) m.textContent = name + ' 내려받는 중';
+}
+function renderResult(){
+  const r=S.result; if(!r){ $('#resultBox').innerHTML='<div class="note">아직 PPT를 만들지 않았습니다.</div>'; return; }
+  if(!r.ok){ $('#resultBox').innerHTML=`<div class="note bad">만들기 실패 (${r.failed||""} 단계)</div><pre class="log">${esc(r.log||r.error||'')}</pre>`; return; }
+  const ks=Object.values(r.fit||{}); const tight=Object.entries(r.fit||{}).filter(([,k])=>k<=0.76).map(([o])=>o);
+  $('#resultBox').innerHTML = `
+    <div class="note" style="background:#ECFDF5;border-color:#A7F3D0;color:#065F46"><b>미리보기 완성</b> · ${r.overflow?'<span class="pill warn">넘침 있음 → 로그 확인</span>':'<span class="pill ok">넘침 0</span>'} ${tight.length?`<span class="pill warn">내용 과다 장표 #${tight.join(', #')} → 나누기 권장</span>`:''}</div>
+    <div class="dl"><a class="btn sec" href="${r.preview}" target="_blank">미리보기 새 탭에서 열기</a></div>
+    <h3 style="margin-top:14px">파일로 내보내기 <span class="hint" style="display:inline;font-weight:400">· 누를 때 만들어 바로 내려받습니다 (AI 토큰 소모 없음) · 파일명 ${esc(r.fileBase||fileBase())}</span></h3>
+    <div class="row" id="fileRow">
+      <button class="btn" id="mkPptx" onclick="getFile('pptx')"><span class="spin"></span><span>PPTX 다운로드</span></button>
+      <button class="btn sec" id="mkPdf" onclick="getFile('pdf')"><span class="spin"></span><span>PDF 다운로드</span></button>
+    </div>
+    <div class="hint" id="fileMsg"></div></div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;color:hsl(var(--muted-foreground))">작업 기록 (문제 있을 때 확인)</summary><pre class="log">${esc(r.log||'')}</pre></details>`;
+}
+function showPreview(){ const r=S.result; if(!r||!r.ok) return; $('#previewEmpty').style.display='none'; const f=$('#preview'); f.style.display=''; f.src=r.preview; $('#previewTitle').textContent='미리보기 · '+project(); $('#previewLinks').innerHTML=[r.pptx?`<a href="${r.pptx}">PPTX</a>`:'', r.pdf?`<a href="${r.pdf}">PDF</a>`:''].filter(Boolean).join(' · '); }
+if (S.result && S.result.ok) { showPreview(); }
+if (S.outline) { /* editor renders on step 3 */ }
+</script>
+</body></html>
