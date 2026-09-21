@@ -106,7 +106,7 @@ Paperlogy·Pretendard 는 굵기마다 패밀리 이름이 따로 있다(`Paperl
 | `cctv` | 감시 카메라, 도트로 덮인 | `cctv.jpg` | 없음 |
 | `wave` | 보라 물결 | `wave.png` | 없음 |
 | `cube-mono` | 큐브 흑백 하프톤 | `cube-mono.png` | 없음 |
-| `ring` | 남색 바탕에 퍼지는 파란 동심원 | `ring.png` | 없음 |
+| `retail` | 파란 바탕에 매장 사람 인식 그림 | `retail.png` | 없음 |
 
 - 표지에 짝이 되는 간지 그림(`divider`)이 있으면 **간지 배경도 그 그림으로 바뀐다**. 짝이 없으면 간지는 지금처럼 포인트 컬러 그라데이션이다.
   마무리 장표는 표지와 무관하게 늘 브랜드 그라데이션(`closingBgCss`).
