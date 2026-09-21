@@ -8,7 +8,7 @@
   --ink:#11131A; --ink2:#5B6172; --ink3:#8B91A2;
   --line:#E8E8EF; --line2:#D5D6E0;
   --acc:#2B0CDD; --acc-soft:#EFECFD;
-  --ok:#138A4E;
+  --ok:#138A4E; --bad:#C0392B;
   --ui:'Pretendard Variable','Pretendard','Noto Sans KR',system-ui,-apple-system,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
 }
@@ -17,14 +17,14 @@
   --ink:#E9EAF1; --ink2:#A4AABA; --ink3:#767D8F;
   --line:#272B35; --line2:#363B47;
   --acc:#AC9CFF; --acc-soft:#221E3A;
-  --ok:#4ECB8B;
+  --ok:#4ECB8B; --bad:#FF7A6B;
 }}
 :root[data-theme="dark"]{
   --pg:#101218; --pg2:#171A21; --sunk:#1D212A;
   --ink:#E9EAF1; --ink2:#A4AABA; --ink3:#767D8F;
   --line:#272B35; --line2:#363B47;
   --acc:#AC9CFF; --acc-soft:#221E3A;
-  --ok:#4ECB8B;
+  --ok:#4ECB8B; --bad:#FF7A6B;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--pg);color:var(--ink);font-family:var(--ui);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
@@ -52,6 +52,26 @@ a{color:inherit}
 #save[disabled]{border-color:var(--line2);color:var(--ink3);font-weight:600}
 .svmsg{font-size:11.5px;color:var(--ink3);white-space:nowrap}
 .svmsg.ok{color:var(--ok)}
+#adm.on{border-color:var(--ok);color:var(--ok);font-weight:700}
+
+/* ── 관리자 창 ── */
+.mdl{border:0;padding:0;background:transparent;width:min(92vw,430px)}
+.mdl::backdrop{background:rgba(9,11,17,.45)}
+.mdl .bx{background:var(--pg);border:1px solid var(--line);border-radius:14px;
+  padding:20px 20px 16px;box-shadow:0 20px 50px rgba(9,11,17,.22)}
+.mdl h2{font-size:15px;font-weight:700}
+.mdl p{margin:8px 0 0;font-size:12.5px;line-height:1.7;color:var(--ink2)}
+.mdl label{display:block;margin-top:15px;font-size:11.5px;font-weight:700;color:var(--ink2)}
+.mdl label.chk{display:flex;align-items:center;gap:6px;margin-top:10px;font-weight:600;color:var(--ink3)}
+.mdl input[type=password]{width:100%;margin-top:6px;font:inherit;font-size:13px;color:var(--ink);
+  background:var(--pg2);border:1px solid var(--line2);border-radius:8px;padding:9px 11px}
+.mdl .row{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}
+.mdl .row .sp{flex:1 1 8px}
+.mdl .go{border-color:var(--acc);color:var(--acc);font-weight:700}
+.mdl .err{min-height:16px;margin-top:9px;font-size:12px;line-height:1.5;color:var(--bad)}
+.mdl .err.ok{color:var(--ok)}
+.mdl .hint{font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.mdl a.lnk{text-decoration:underline;text-underline-offset:2px}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:4px}
 
 /* ── layout ── */
@@ -284,10 +304,58 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
     <button id="dAiry" aria-pressed="false">airy 발표용</button>
   </div>
   <button class="gbtn" id="reset" disabled>초기값으로</button>
+  <button class="gbtn" id="adm" hidden>관리자 로그인</button>
   <button class="gbtn" id="save" hidden>저장</button>
   <button class="gbtn" id="dl" hidden>파일로 받기</button>
   <span class="svmsg" id="saveMsg"></span>
 </header>
+
+<dialog class="mdl" id="admdlg" aria-labelledby="admTitle">
+ <div class="bx">
+  <h2 id="admTitle">관리자</h2>
+
+  <div id="stPw">
+    <p>비밀번호를 넣으면 이 화면에서 고친 값을 저장소에 바로 저장할 수 있습니다.</p>
+    <label for="pwIn">비밀번호</label>
+    <input id="pwIn" type="password" autocomplete="current-password">
+    <div class="err" id="admErr0"></div>
+    <div class="row"><span class="sp"></span>
+      <button class="gbtn" data-close>닫기</button>
+      <button class="gbtn go" id="pwGo">들어가기</button></div>
+  </div>
+
+  <div id="stTok" hidden>
+    <p>GitHub 토큰을 한 번 넣어 두면 저장이 열립니다. 토큰은 이 브라우저에만 남고
+       저장소에는 올라가지 않습니다.</p>
+    <p>토큰을 만들 때 고를 것 — 저장소 <span class="hint">hy0909/ppt-maker</span>,
+       권한 <span class="hint">Contents: Read and write</span>.</p>
+    <label for="tokIn">GitHub 토큰</label>
+    <input id="tokIn" type="password" placeholder="github_pat_…" autocomplete="off">
+    <label class="chk"><input type="checkbox" id="tokKeep" checked> 이 브라우저에 기억</label>
+    <div class="err" id="admErr1"></div>
+    <div class="row">
+      <a class="hint lnk" href="https://github.com/settings/personal-access-tokens/new"
+         target="_blank" rel="noopener">토큰 만들기</a>
+      <span class="sp"></span>
+      <button class="gbtn" data-close>닫기</button>
+      <button class="gbtn go" id="tokGo">연결</button></div>
+  </div>
+
+  <div id="stOk" hidden>
+    <p>관리자로 들어와 있습니다. 값을 고치고 <b>저장</b>을 누르면 저장소의
+       <span class="hint" id="admWhere"></span> 이 바뀝니다.</p>
+    <p>내 컴퓨터에서 <span class="hint">git pull</span> 을 받으면 다음 빌드부터 그 값으로 만들어집니다.</p>
+    <label for="pwNew">비밀번호 바꾸기 (8자 이상)</label>
+    <input id="pwNew" type="password" autocomplete="new-password">
+    <div class="err" id="admErr2"></div>
+    <div class="row">
+      <button class="gbtn" id="pwNewGo">비밀번호 바꾸기</button>
+      <span class="sp"></span>
+      <button class="gbtn" id="admOut">나가기</button>
+      <button class="gbtn go" data-close>닫기</button></div>
+  </div>
+ </div>
+</dialog>
 
 <div class="wrap">
   <aside class="stage">
@@ -306,9 +374,11 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
       배경 그림과 로고는 파일이라 점선 자리로 두었다.
     </p>
     <p class="lede" style="margin-top:-18px">
-      <b>저장</b>을 누르면 고친 값이 이 화면에 남는다. 새로고침해도 그대로다.
-      <b>파일로 받기</b>를 누르면 <span class="inl">design-tokens.json</span> 이 내려온다.
-      그 파일을 <span class="inl">skills/ppt-maker/</span> 에 덮으면 PPT 에 그대로 나온다.
+      고친 값을 남기는 길은 세 가지다. 내 컴퓨터의 ppt-maker 앱에서 열었으면 <b>저장</b>이
+      <span class="inl">skills/ppt-maker/design-tokens.json</span> 을 바로 고친다.
+      웹 주소에서 열었으면 <b>관리자 로그인</b>을 거쳐 <b>저장</b>을 누른다. 저장소의 같은 파일이 바뀌고,
+      내 컴퓨터에서 <span class="inl">git pull</span> 을 받으면 다음 빌드부터 그 값으로 만들어진다.
+      <b>파일로 받기</b>는 어디서나 된다. 내려받은 파일을 <span class="inl">skills/ppt-maker/</span> 에 덮어도 결과는 같다.
     </p>
 
     <section class="blk"><h2>판 규격</h2>
@@ -1031,7 +1101,7 @@ function syncSave(){
    내 컴퓨터의 앱(localhost)에서 열었으면 skills/ppt-maker/design-tokens.json 에 바로 쓴다.
    그러면 다음 빌드부터 HTML·PPTX 에 그대로 반영된다.
    그게 아니면 이 화면에 딸린 저장 공간에 담아 두고, 파일은 «파일로 받기» 로 가져간다. */
-var MODE=null;                                    // 'server' | 'db'
+var MODE=null;                       // 'server' | 'db' | 'web' | 'github'
 $('#dl').hidden=false;
 
 function loadState(st){
@@ -1047,7 +1117,7 @@ fetch('/api/tokens').then(function(r){ return r.ok?r.json():Promise.reject(); })
   if(t&&t.frame){ loadState(stateFromTokens(t)); msg('이 프로젝트의 값을 불러왔습니다'); }
   markSaved();
 }).catch(function(){
-  if(!(window.claude&&claude.use))return;
+  if(!(window.claude&&claude.use))return startWeb();   // 웹 주소에서 열었다
   claude.use('db').then(function(db){
     if(!db)return;                                // 담아 둘 곳이 없으면 저장 단추는 감춘 채 둔다
     DB=db; MODE='db'; $('#save').hidden=false;
@@ -1086,6 +1156,10 @@ $('#save').addEventListener('click',function(){
     fetch('/api/tokens',{method:'POST',headers:{'Content-Type':'application/json'},
                          body:JSON.stringify(payload)})
       .then(function(r){ return r.ok?done():fail(); }).catch(fail);
+  } else if(MODE==='github'){
+    ghPutJson(GH.file, payload.tokens, '장표 디자인 값을 디자인 시스템 화면에서 고침')
+      .then(function(){ markSaved(); msg('저장소에 저장했습니다 · git pull 하면 적용',true); })
+      .catch(function(e){ b.disabled=false; msg('저장하지 못했습니다: '+errText(e)); });
   } else if(DB){
     DB.doc(DOCPATH).set(payload).then(done).catch(fail);
   } else { fail(); }
@@ -1105,6 +1179,147 @@ function blob(txt){
   a.download='design-tokens.json'; document.body.appendChild(a); a.click(); a.remove();
   msg('내려받았습니다',true);
 }
+
+/* ── 관리자 ─────────────────────────────────────────────────────
+   이 화면은 GitHub Pages 주소로도 열린다. 거기서는 내 컴퓨터 파일에 쓸 수 없으니,
+   관리자로 들어와 저장소의 design-tokens.json 을 바로 고친다. 고친 값은 git pull 로
+   받아 오면 다음 빌드부터 HTML·PPTX 에 그대로 들어간다.
+   비밀번호는 문을 한 겹 잠그는 것이고, 저장을 실제로 막는 건 GitHub 토큰이다.
+   토큰이 없으면 비밀번호를 알아내도 저장소는 바뀌지 않는다.
+   비밀번호를 잊었으면 저장소에서 docs/design/admin.json 을 지운다. 처음 값으로 돌아간다. */
+var GH={ owner:'hy0909', repo:'ppt-maker', branch:'main',
+         file:'skills/ppt-maker/design-tokens.json', pwfile:'docs/design/admin.json' };
+var RAW='https://raw.githubusercontent.com/'+GH.owner+'/'+GH.repo+'/'+GH.branch+'/';
+var API='https://api.github.com/repos/'+GH.owner+'/'+GH.repo+'/';
+var TOKKEY='ppt-maker.gh-token', OPENKEY='ppt-maker.admin';
+var PW={ salt:'138223a928cdd356a945af4203e1cc1e', iterations:200000,
+         hash:'e56e7ab76a6e85ca75d34af6bd43ce4f2182261087f6780c8b57c2461f92d95c' };
+var TOKEN=null;
+
+function errText(e){ return (e&&e.message)||'다시 해 보세요' }
+function hex(buf){ var a=new Uint8Array(buf),o='';
+  for(var i=0;i<a.length;i++)o+=('0'+a[i].toString(16)).slice(-2); return o }
+function unhex(h){ var a=new Uint8Array(h.length>>1);
+  for(var i=0;i<a.length;i++)a[i]=parseInt(h.substr(i*2,2),16); return a }
+function sub(){ return window.crypto&&crypto.subtle }
+/** 비밀번호를 되돌릴 수 없는 값으로 바꾼다. 원래 글자는 어디에도 남지 않는다. */
+function pwhash(pw,salt,iter){
+  if(!sub())return Promise.reject(new Error('https 주소에서만 됩니다'));
+  return crypto.subtle.importKey('raw',new TextEncoder().encode(pw),{name:'PBKDF2'},false,['deriveBits'])
+    .then(function(k){ return crypto.subtle.deriveBits(
+      {name:'PBKDF2',salt:unhex(salt),iterations:iter||200000,hash:'SHA-256'},k,256) })
+    .then(hex);
+}
+function b64(txt){ var a=new TextEncoder().encode(txt),o='';
+  for(var i=0;i<a.length;i++)o+=String.fromCharCode(a[i]); return btoa(o) }
+
+function ghHead(){ return { Accept:'application/vnd.github+json',
+  'X-GitHub-Api-Version':'2022-11-28', Authorization:'Bearer '+TOKEN } }
+function ghErr(r){ return r.json().catch(function(){ return {} }).then(function(j){
+  throw new Error(r.status===401?'토큰이 맞지 않습니다'
+               : r.status===403?'이 토큰에는 쓰기 권한이 없습니다'
+               : (j.message||('GitHub '+r.status))) }) }
+/** 저장소의 파일 하나를 읽는다. 없으면 null. */
+function ghGet(path){
+  return fetch(API+'contents/'+path+'?ref='+GH.branch,{headers:ghHead(),cache:'no-store'})
+    .then(function(r){ return r.status===404?null:(r.ok?r.json():ghErr(r)) });
+}
+/** 저장소의 파일 하나를 고친다(커밋 하나). */
+function ghPutJson(path,obj,message){
+  var txt=JSON.stringify(obj,null,2)+'\n';
+  return ghGet(path).then(function(cur){
+    return fetch(API+'contents/'+path,{ method:'PUT',
+      headers:Object.assign({'Content-Type':'application/json'},ghHead()),
+      body:JSON.stringify({ message:message, content:b64(txt),
+                            sha:cur?cur.sha:undefined, branch:GH.branch }) });
+  }).then(function(r){ return r.ok?r.json():ghErr(r) });
+}
+
+/** 웹 주소에서 열었을 때. 저장소에 올라가 있는 값을 보여 준다. */
+function startWeb(){
+  MODE='web';
+  if(sub())$('#adm').hidden=false;
+  fetch(RAW+GH.pwfile+'?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){ return r.ok?r.json():null })
+    .then(function(j){ if(j&&j.salt&&j.hash)PW=j })
+    .catch(function(){});
+  fetch(RAW+GH.file+'?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){ return r.ok?r.json():Promise.reject() })
+    .then(function(t){ if(t&&t.frame){ loadState(stateFromTokens(t)); msg('저장소에 올라가 있는 값입니다'); } })
+    .catch(function(){})
+    .then(function(){
+      markSaved();
+      if(sessionStorage.getItem(OPENKEY)==='1'){
+        var t=localStorage.getItem(TOKKEY); if(t){ TOKEN=t; enterAdmin(true) }
+      }
+    });
+}
+function enterAdmin(quiet){
+  MODE='github'; sessionStorage.setItem(OPENKEY,'1');
+  $('#save').hidden=false; $('#adm').textContent='관리자'; $('#adm').classList.add('on');
+  syncSave(); if(!quiet)msg('관리자로 들어왔습니다',true);
+}
+function leaveAdmin(){
+  MODE='web'; TOKEN=null;
+  sessionStorage.removeItem(OPENKEY); localStorage.removeItem(TOKKEY);
+  $('#save').hidden=true; $('#adm').textContent='관리자 로그인'; $('#adm').classList.remove('on');
+  msg('나왔습니다');
+}
+
+/* ── 관리자 창 ── */
+var DLG=$('#admdlg');
+function step(n){ ['stPw','stTok','stOk'].forEach(function(id,i){ $('#'+id).hidden=(i!==n) }); derr(''); }
+function derr(t,ok){ [0,1,2].forEach(function(i){ var e=$('#admErr'+i);
+  if(e){ e.textContent=t||''; e.className='err'+(ok?' ok':'') } }) }
+function focusIn(sel){ setTimeout(function(){ var e=$(sel); if(e)e.focus() },40) }
+function openAdmin(){
+  $('#admWhere').textContent=GH.file;
+  if(MODE==='github'){ step(2); } else { step(0); focusIn('#pwIn'); }
+  DLG.showModal();
+}
+$('#adm').addEventListener('click',openAdmin);
+Array.prototype.forEach.call(DLG.querySelectorAll('[data-close]'),function(b){
+  b.addEventListener('click',function(){ DLG.close() }); });
+
+$('#pwGo').addEventListener('click',function(){
+  var pw=$('#pwIn').value; if(!pw)return derr('비밀번호를 넣어 주세요');
+  derr('확인 중…');
+  pwhash(pw,PW.salt,PW.iterations).then(function(h){
+    if(h!==PW.hash)return derr('비밀번호가 다릅니다');
+    $('#pwIn').value='';
+    var t=localStorage.getItem(TOKKEY);
+    if(t){ TOKEN=t; enterAdmin(); step(2); }
+    else { step(1); focusIn('#tokIn'); }
+  }).catch(function(e){ derr(errText(e)) });
+});
+$('#pwIn').addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();$('#pwGo').click()} });
+
+$('#tokGo').addEventListener('click',function(){
+  var t=$('#tokIn').value.trim(); if(!t)return derr('토큰을 넣어 주세요');
+  derr('확인 중…'); TOKEN=t;
+  ghGet(GH.file).then(function(f){
+    if(!f)throw new Error('저장소에서 파일을 찾지 못했습니다');
+    if($('#tokKeep').checked)localStorage.setItem(TOKKEY,t);
+    $('#tokIn').value=''; enterAdmin(); step(2);
+  }).catch(function(e){ TOKEN=null; derr(errText(e)) });
+});
+$('#tokIn').addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();$('#tokGo').click()} });
+
+$('#pwNewGo').addEventListener('click',function(){
+  var np=$('#pwNew').value;
+  if(np.length<8)return derr('8자 이상으로 정해 주세요');
+  derr('바꾸는 중…');
+  var salt=hex(crypto.getRandomValues(new Uint8Array(16))), iter=200000;
+  pwhash(np,salt,iter).then(function(h){
+    return ghPutJson(GH.pwfile,
+      { _:'디자인 시스템 화면의 관리자 비밀번호. 되돌릴 수 없는 값이라 원래 글자는 알 수 없다. 잊었으면 이 파일을 지우면 처음 비밀번호로 돌아간다.',
+        salt:salt, iterations:iter, hash:h },
+      '디자인 시스템 화면 관리자 비밀번호를 바꿈')
+      .then(function(){ PW={salt:salt,iterations:iter,hash:h}; $('#pwNew').value='';
+                        derr('비밀번호를 바꿨습니다',true); });
+  }).catch(function(e){ derr(errText(e)) });
+});
+$('#admOut').addEventListener('click',function(){ leaveAdmin(); DLG.close() });
 
 /* ── boot ── */
 buildSections(); buildDemos(); buildTabs(); buildTemplates(); apply(); render();
