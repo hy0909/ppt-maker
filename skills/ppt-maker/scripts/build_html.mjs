@@ -66,8 +66,8 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .top{position:absolute;top:30px;left:var(--pad);right:var(--pad);z-index:4;}
 .eyebrow{font-size:15px;color:var(--text-mid);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
 .eyebrow b{color:var(--primary);font-weight:700;}
-.eyebrow .pgno{font-size:14px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}
-.stitle{font-family:var(--font-title);font-size:34.67px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
+.eyebrow .pgno{font-size:13px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}
+.stitle{font-family:var(--font-title);font-size:42px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
 .stitle b{font-family:var(--font-title-b);font-weight:400;color:var(--title);}
 .rule{height:1px;background:#CFD4DC;margin-top:13px;}
 .slead{font-size:16px;color:var(--text-mid);line-height:1.5;margin-top:26px;max-width:1100px;}
@@ -81,7 +81,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 /* card: 제목 피약 + 흰 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .card{position:relative;background:transparent;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
 .card>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
-.card>.bd{background:#fff;border-radius:22px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.card>.bd{background:#fff;border-radius:19px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .card.tint>.bd{background:var(--primary-softer);}
 .card.dark>.bd{background:var(--primary);color:#fff;}
 .card .ct{font-size:var(--fs-card);font-weight:700;color:var(--text);margin-bottom:.5em;line-height:1.3;}
@@ -105,7 +105,7 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 /* stat card: 제목 피약 + 수치 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .stat{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
 .stat>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
-.stat>.bd{background:#fff;border-radius:22px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;overflow:hidden;}
+.stat>.bd{background:#fff;border-radius:19px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;overflow:hidden;}
 .stat .sl{font-size:var(--fs-small);color:var(--body);font-weight:500;}
 .stat .sv{font-size:var(--fs-stat);font-weight:800;color:var(--text);line-height:1.05;margin-top:.1em;letter-spacing:-.04em;font-variant-numeric:tabular-nums;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
@@ -140,7 +140,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .side{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;}
 .side>.cap{background:var(--text-mid);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
 .side.to>.cap{background:var(--primary);}
-.side>.bd{background:#fff;border-radius:22px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.side>.bd{background:#fff;border-radius:19px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .side.to>.bd{background:var(--primary-softer);}
 .side .sh{font-size:var(--fs-card);font-weight:700;margin:.1em 0 .6em;color:var(--text);}
 .side .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;}
@@ -461,7 +461,7 @@ function renderContent(s) {
   const eyebrow = s.kind === 'appendix' ? 'APPENDIX' : esc(s.section.title);
   const headline = sl.headline || sl.title || '';
   const leadLines = sl.lead ? estLines(sl.lead, 16, 1100) : 0;
-  const bodyTop = headline ? (sl.lead ? 262 + Math.max(0, leadLines - 1) * 24 : 190) : 96;
+  const bodyTop = headline ? (sl.lead ? 220 + Math.max(0, leadLines - 1) * 24 : 190) : 96;
   const foot = footLines(sl);
   const safeBottom = footSafeBottom(foot);
   return `<section class="slide" data-label="${esc(slideLabel(s))}" id="s${s.order}" data-fit="1"${fitStyle(s.order)}>

@@ -83,8 +83,8 @@ export function derivePalette(brand = {}) {
 
 // ─── density scale (px) ─────────────────────────────────────────
 export const DENSITY = {
-  dense: { h2: 22, eyebrow: 12, lead: 14, colHead: 14, body: 13, small: 11.5, cardTitle: 14, stat: 34, tableH: 12, table: 12.5, pad: 44, safeTop: 68, safeBottom: 48, gap: 12, headerGap: 12, radius: 8, coverTitle: 44, sectionTitle: 40, agendaItem: 20 },
-  airy:  { h2: 30, eyebrow: 13, lead: 17, colHead: 17, body: 16, small: 14,   cardTitle: 18, stat: 48, tableH: 13, table: 15, pad: 52, safeTop: 76, safeBottom: 52, gap: 20, headerGap: 20, radius: 12, coverTitle: 54, sectionTitle: 44, agendaItem: 24 },
+  dense: { h2: 22, eyebrow: 12, lead: 14, colHead: 14, body: 18, small: 16, cardTitle: 26, stat: 34, tableH: 16, table: 16, pad: 44, safeTop: 68, safeBottom: 48, gap: 12, headerGap: 12, radius: 8, coverTitle: 44, sectionTitle: 40, agendaItem: 20 },
+  airy:  { h2: 30, eyebrow: 13, lead: 17, colHead: 17, body: 18, small: 16, cardTitle: 26, stat: 34, tableH: 16, table: 16, pad: 52, safeTop: 76, safeBottom: 52, gap: 12, headerGap: 20, radius: 12, coverTitle: 54, sectionTitle: 44, agendaItem: 24 },
 };
 
 // ─── outline loading & normalisation ───────────────────────────
@@ -201,7 +201,7 @@ export const roman = n => ROMAN[n - 1] || String(n);
 export const TYPE = {
   h0:    { size: 48, line: 58.6, spc: -1,   face: 'Paperlogy 7 Bold' },     // 표지 제목
   h1:    { size: 40, line: 48,   spc: -1,   face: 'Paperlogy 7 Bold' },     // 목차·간지 제목
-  h2:    { size: 24, line: 31.8, spc: -0.2, face: 'Paperlogy 5 Medium' },   // 목차 항목
+  h2:    { size: 22, line: 31.8, spc: -0.2, face: 'Paperlogy 5 Medium' },   // 목차 항목
   body2: { size: 18, line: 26.6, spc: -0.8, face: 'Pretendard Light' },     // 표지 설명줄
 };
 export const TITLE_FACE = TYPE.h0.face;

@@ -269,7 +269,7 @@ function bandCard(slide, box, k, label, { body = P.white, band = P.primary, labe
   }
   // 흰 본문 카드: 자신의 둥근 카드(반지름 16, 부드러운 그림자)
   const bodyH = Math.max(1, box.y + box.h - contentY);
-  card(slide, box.x, contentY, box.w, bodyH, body, 22);
+  card(slide, box.x, contentY, box.w, bodyH, body, 19);
   const padX = em * 1.4, padT = em * 0.95, padB = em * 1.0;
   return { x: box.x + padX, y: contentY + padT, w: box.w - padX * 2, h: Math.max(1, bodyH - padT - padB) };
 }
@@ -653,15 +653,15 @@ const RGBA = (c, a) => `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3
 function topSection(slide, eyebrowRuns, headline, lead, pageNo) {
   const W = SLIDE_W - PAD * 2;
   slide.addText(eyebrowRuns, { x: IN(PAD), y: IN(30), w: IN(W - 80), h: IN(22), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
-  if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 30, 80, 22, { size: 14, color: P.textLight, align: 'right', valign: 'middle' });
+  if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 30, 80, 22, { size: 13, color: P.textLight, align: 'right', valign: 'middle' });
   let ruleY = 68;
   if (headline) {
-    // .stitle: 26pt(34.67px), weight 600, **강조** 는 같은 색 굵게
+    // .stitle: 31.5pt(42px), weight 600, **강조** 는 같은 색 굵게
     const runs = String(headline).split(/(\*\*.+?\*\*)/g).filter(Boolean).map(p => {
       const m = p.match(/^\*\*(.+)\*\*$/);
-      return m ? { text: m[1], options: { fontFace: FONT_TITLE_B, fontSize: 26, color: colorToHex(P.title), charSpacing: -0.8 } } : { text: p, options: { fontFace: FONT_TITLE, fontSize: 26, color: colorToHex(P.title), charSpacing: -0.8 } };
+      return m ? { text: m[1], options: { fontFace: FONT_TITLE_B, fontSize: 31.5, color: colorToHex(P.title), charSpacing: -0.8 } } : { text: p, options: { fontFace: FONT_TITLE, fontSize: 31.5, color: colorToHex(P.title), charSpacing: -0.8 } };
     });
-    slide.addText(runs, { x: IN(PAD), y: IN(61), w: IN(Math.min(W, 1100)), h: IN(42), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
+    slide.addText(runs, { x: IN(PAD), y: IN(61), w: IN(Math.min(W, 1100)), h: IN(51), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
     ruleY = 116;
   }
   rect(slide, PAD, ruleY, W, 1, { fill: '#CFD4DC' });
@@ -670,7 +670,7 @@ function topSection(slide, eyebrowRuns, headline, lead, pageNo) {
     const n = lines(lead, 16, 1100);
     const runs = richRuns(lead, { fontFace: FONT, fontSize: PT(16), color: colorToHex(P.textMid), charSpacing: -0.8 }).map(r => r.options.bold ? { ...r, options: { ...r.options, color: colorToHex(P.text) } } : r);
     slide.addText(runs, { x: IN(PAD), y: IN(ruleY + 27), w: IN(Math.min(W, 1100)), h: IN(24 * n + 2), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.5, fit: 'none', autoFit: false });
-    bodyTop = 262 + (n - 1) * 24;
+    bodyTop = 220 + (n - 1) * 24;
   }
   return bodyTop;
 }
