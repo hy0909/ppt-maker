@@ -252,6 +252,27 @@ export function coverBgFile(design) {
   const b = BG_LIST.find(x => x.key === design) || BG_LIST[0];
   return `assets/cover-bg/${b.file}`;
 }
+/** 본문 장표 맨 아래 출처·각주 줄. 근거 표기를 요구하는 문서가 있어 자리를 잡아 뒀다.
+ *  safe 는 출처가 없을 때 본문 아래로 비워 두는 여백(px). 출처가 길어지면 그만큼 본문을 위로 올린다. */
+export const SLIDE_FOOT = { size: 11, line: 15.4, spc: -0.2, bottom: 13, safe: 44 };
+
+/** 장표의 출처·각주를 줄 배열로 만든다. 문자열도 배열도 받는다.
+ *  각주는 한 줄에 하나씩, 출처는 여럿이어도 ' · ' 로 묶어 한 줄로 적는다.
+ *  '출처: ' 로 이미 시작하면 덧붙이지 않는다. */
+export function footLines(sl) {
+  const list = v => (Array.isArray(v) ? v : v ? [v] : []).map(x => String(x).trim()).filter(Boolean);
+  const out = list(sl && sl.footnote);
+  const src = list(sl && sl.source).map(t => t.replace(/^출처\s*[:：]\s*/, ''));
+  if (src.length) out.push('출처: ' + src.join(' · '));
+  return out;
+}
+
+/** 출처 줄까지 넣었을 때 본문 아래로 비워야 하는 높이(px) */
+export function footSafeBottom(lines) {
+  if (!lines.length) return SLIDE_FOOT.safe;
+  return Math.max(SLIDE_FOOT.safe, Math.ceil(SLIDE_FOOT.bottom + lines.length * px(SLIDE_FOOT.line)) + 4);
+}
+
 /** 이 표지를 골랐을 때 쓸 간지 배경 — 짝이 없으면 null (그때는 브랜드 그라디언트) */
 export function dividerBgFile(design) {
   const b = BG_LIST.find(x => x.key === design) || BG_LIST[0];

@@ -98,6 +98,7 @@ PPTX 렌더 확인용 LibreOffice 설치(한 번만): `brew install --cask libre
 - **사람이 쓴 보고서 문체.** "본 자료는", "~를 통해 ~할 수 있습니다", 빈 수식어(효율적·체계적), 같은 어미 반복 금지. 껍데기 소제목("화면", "내용") 금지.
 - **카드 안 줄 간격은 내용량에 맞춰 자동**(적으면 넓게, 많으면 좁게). 카드 밖으로 넘치지 않는다.
 - 이미지 경로는 지어내지 않는다. 파일이 없으면 자리표시자로 그려진다.
+- 출처도 지어내지 않는다. 수치에 근거가 필요한데 받지 못했으면 `[출처 필요]` 로 남긴다. 장표 아래 출처 줄은 `slide.source`(여럿이면 한 줄로 묶임) · `slide.footnote` 로 쓴다.
 이 규칙들이 적힌 곳: 디자인 규칙 `references/design-system.md`, 스키마 `references/outline-schema.md`, AI 생성 규칙 `app/server.mjs` 의 `systemPrompt()`, 렌더러 `scripts/build_html.mjs`·`build_pptx.mjs`.
 
 ### 4. 검수 (완료 선언 전 필수)

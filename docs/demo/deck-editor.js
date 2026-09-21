@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   deck-editor.js — Slide WYSIWYG 편집 모드 (bolt-on)
+   deck-editor.js — SafeAI Deck 직접 편집 모드 (bolt-on)
    deck-stage.js 를 수정하지 않고 그 위에 얹는 WYSIWYG 편집 레이어.
 
    - light-DOM <section> 슬라이드를 직접 조작

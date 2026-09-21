@@ -9,7 +9,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, COVER_SCRIM,
-         dividerBgFile, DIVIDER_SCRIM, tieTail } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
+         tieTail } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -125,6 +126,10 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .hbox{background:var(--primary-softer);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.8em 1em;text-align:center;}
 .hbox .hl{font-size:var(--fs-small);color:var(--text);} .hbox .hv{font-size:calc(var(--fs-stat) * .62);font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
 /* banner (callout): 어두운 둥근 박스 — 왼쪽에 라벨(연한 컬러), 오른쪽에 본문. 모두 박스 안에 들어간다 */
+/* 출처·각주: 본문 아래 비워 둔 자리에 깐다. 줄이 늘면 본문이 그만큼 위로 올라간다. */
+.foot{position:absolute;left:var(--pad);right:var(--pad);bottom:${SLIDE_FOOT.bottom}px;z-index:3;
+  font-size:${px(SLIDE_FOOT.size)}px;line-height:${px(SLIDE_FOOT.line)}px;letter-spacing:${SLIDE_FOOT.spc}pt;color:var(--text-light);}
+.foot>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .banner{background:var(--banner);color:#fff;padding:.75em 1.6em;border-radius:14px;display:flex;align-items:center;gap:1.6em;flex-shrink:0;font-size:var(--fs-small);}
 .banner .lead{color:var(--banner-label);font-size:calc(var(--fs-small) * 1.05);font-weight:700;white-space:nowrap;line-height:1.3;flex:0 0 auto;text-align:center;}
 .banner .msg{font-size:var(--fs-small);font-weight:500;line-height:1.3;flex:1;min-width:0;}
@@ -457,9 +462,12 @@ function renderContent(s) {
   const headline = sl.headline || sl.title || '';
   const leadLines = sl.lead ? estLines(sl.lead, 16, 1100) : 0;
   const bodyTop = headline ? (sl.lead ? 262 + Math.max(0, leadLines - 1) * 24 : 190) : 96;
+  const foot = footLines(sl);
+  const safeBottom = footSafeBottom(foot);
   return `<section class="slide" data-label="${esc(slideLabel(s))}" id="s${s.order}" data-fit="1"${fitStyle(s.order)}>
     ${top(eyebrow, headline, sl.lead, meta.pageNumbers && s.pageNo ? String(parseInt(s.pageNo, 10)) : '')}
-    <div class="body" style="--body-top:${bodyTop}px">${renderBlocks(sl.blocks)}</div>
+    <div class="body" style="--body-top:${bodyTop}px;--safe-bottom:${safeBottom}px">${renderBlocks(sl.blocks)}</div>
+    ${foot.length ? `<div class="foot">${foot.map(t => `<div>${rich(t)}</div>`).join('')}</div>` : ''}
   </section>`;
 }
 function renderClosing() {

@@ -11,7 +11,7 @@ import pptxgen from 'pptxgenjs';
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, COVER_SCRIM,
-         dividerBgFile, DIVIDER_SCRIM } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -104,11 +104,13 @@ function text(slide, str, x, y, w, h, { size, color = P.text, bold = false, alig
   });
 }
 
+/* altText 를 반드시 준다. 비워 두면 pptxgenjs 가 파일의 전체 경로를 대체 텍스트로 넣어,
+   만든 사람 컴퓨터의 폴더 이름이 PPTX 안에 그대로 남는다. */
 function image(slide, rel, x, y, w, h, contain = true) {
   if (!rel) return false;
   const p = path.resolve(outdir, rel);
   if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) return false;
-  slide.addImage({ path: p, x: IN(x), y: IN(y), w: IN(w), h: IN(h), sizing: { type: contain ? 'contain' : 'cover', w: IN(w), h: IN(h) } });
+  slide.addImage({ path: p, altText: path.basename(rel), x: IN(x), y: IN(y), w: IN(w), h: IN(h), sizing: { type: contain ? 'contain' : 'cover', w: IN(w), h: IN(h) } });
   return true;
 }
 
@@ -117,7 +119,7 @@ function logo(slide, dark = true) {
   const p = asset(rel);
   if (!fs.existsSync(p)) return;
   const h = 20, w = 80;
-  slide.addImage({ path: p, x: IN(SLIDE_W - 53 - w), y: IN(30), w: IN(w), h: IN(h), sizing: { type: 'contain', w: IN(w), h: IN(h) } });
+  slide.addImage({ path: p, altText: '로고', x: IN(SLIDE_W - 53 - w), y: IN(30), w: IN(w), h: IN(h), sizing: { type: 'contain', w: IN(w), h: IN(h) } });
 }
 
 function estW(str, sizePx) {
@@ -778,7 +780,8 @@ function content(sl) {
   const headline = slide.headline || slide.title || '';
   const bodyTop = topSection(s, parts, headline, slide.lead, meta.pageNumbers && sl.pageNo ? String(parseInt(sl.pageNo, 10)) : '');
 
-  const W = SLIDE_W - PAD * 2, bodyH = SLIDE_H - 44 - bodyTop;
+  const foot = footLines(slide);
+  const W = SLIDE_W - PAD * 2, bodyH = SLIDE_H - footSafeBottom(foot) - bodyTop;
   const blocks = slide.blocks || [];
   const gap = D.gap * k;
   const em = D.body * k;
@@ -797,6 +800,14 @@ function content(sl) {
     fn(s, b, { x: PAD, y, w: W, h: Math.max(1, hh) }, k);
     by += h + gap;
   });
+  // 출처·각주 — HTML 의 .foot 과 같은 자리·같은 크기
+  if (foot.length) {
+    const lh = PXL(SLIDE_FOOT.line), h = foot.length * lh;
+    text(s, foot.join('\n'), PAD, SLIDE_H - SLIDE_FOOT.bottom - h, W, h, {
+      size: PXL(SLIDE_FOOT.size), color: P.textLight, lineSpacingPt: SLIDE_FOOT.line,
+      letterSpacing: SLIDE_FOOT.spc, valign: 'bottom',
+    });
+  }
   if (slide.notes) s.addNotes(slide.notes);
 }
 
