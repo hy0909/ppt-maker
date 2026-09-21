@@ -266,7 +266,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 /* 배경 그림을 못 불러오면 브랜드 그라데이션으로 대신한다 */
 .sl-cover{background:#000 var(--cover-bg,linear-gradient(118deg,var(--p-deep) 0%,var(--p) 52%,var(--p2) 100%)) center center / cover no-repeat}
 .sl-cover .scrim{position:absolute;inset:0;
-  background:var(--cover-scrim,linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%))}
+  background:var(--cover-scrim,none)}   /* 지금은 어느 배경에도 덮지 않는다 */
 .sl-cover .clead{position:absolute;left:61.5px;top:56px;width:530.2px;font-family:var(--deck-light);font-weight:300;
   font-size:var(--h0b2);line-height:var(--h0b2l);letter-spacing:var(--h0b2s);color:#E7E6E6;word-break:keep-all}
 .sl-cover .ctitle{position:absolute;left:59.4px;top:117px;width:720px;font-family:var(--deck-bold);font-weight:400;
@@ -1108,15 +1108,15 @@ window.addEventListener('resize',zoomFit);
    그림 목록은 내 컴퓨터의 앱에서는 /api/coverspec 이, 웹에서는 coverspec.json 이 준다.
    고른 그림 한 장이 이 화면의 표지 전부에 한꺼번에 걸린다.
    짝이 되는 간지 그림이 달린 표지를 고르면 간지도 같이 바뀐다. */
-var COVERBG=[], BG='', COVERLOGO='', SPEC_SCRIM='';
+var COVERBG=[], BG='', COVERLOGO='';
 var DIV_SCRIM='linear-gradient(90deg,rgba(5,3,18,.74) 0%,rgba(5,3,18,.62) 40%,rgba(5,3,18,.26) 70%,rgba(5,3,18,.06) 100%)';
 function curBg(){ for(var i=0;i<COVERBG.length;i++)if(COVERBG[i].key===BG)return COVERBG[i]; return null }
 function applyCoverBg(){
   var r=document.documentElement, st=r.style, b=curBg();
   if(b){
     st.setProperty('--cover-bg',"url('"+b.src+"')");
-    /* 그라데이션은 배경마다 다르다 — 덮지 않는 배경은 'none' 이 온다 */
-    st.setProperty('--cover-scrim',b.scrim||SPEC_SCRIM||'none');
+    /* 그라데이션은 배경마다 다르다. 지금은 일곱 장 모두 'none' 이 온다 */
+    st.setProperty('--cover-scrim',b.scrim||'none');
   }else{
     st.removeProperty('--cover-bg'); st.removeProperty('--cover-scrim');
   }
@@ -1165,7 +1165,6 @@ function loadCoverSpec(){
         return {key:b.key,label:b.label,src:abs(b.src),divider:abs(b.divider),scrim:b.scrim||''};
       });
       COVERLOGO=abs(o.j.logo);
-      SPEC_SCRIM=o.j.scrim||'';
       if(COVERLOGO){
         document.documentElement.style.setProperty('--cover-logo',"url('"+COVERLOGO+"')");
         document.documentElement.setAttribute('data-coverlogo','');
@@ -1180,8 +1179,8 @@ function loadCoverSpec(){
 var SLIDES={
   cover:{label:'표지',
     note:function(){var b=curBg();
-      return b ? '배경은 «'+b.label+'» 한 장에 왼쪽이 진한 그라데이션을 한 겹 덮는다. 아래에서 다른 그림으로 바꿔 본다.'
-               : '배경 그림은 meta.coverBg 로 고른 파일 한 장에 왼쪽이 진한 그라데이션을 한 겹 덮는다. 그림을 못 불러와 브랜드 그라데이션으로 대신했다.'},
+      return b ? '배경은 «'+b.label+'» 그림 한 장이다. 위에 덮는 그라데이션은 없다. 아래에서 다른 그림으로 바꿔 본다.'
+               : '배경 그림은 meta.coverBg 로 고른 파일 한 장이다. 그림을 못 불러와 브랜드 그라데이션으로 대신했다.'},
     html:function(){return '<div class="sl-cover"><div class="scrim"></div>'+
       '<div class="clead">온도 기록을 반영한 냉장 배송 관리 체계</div>'+
       '<div class="ctitle">냉장 배송 AI<br>온도이상 감지체계</div>'+

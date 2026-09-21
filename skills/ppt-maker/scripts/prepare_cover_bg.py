@@ -297,10 +297,10 @@ def main():
     ap.add_argument('--kind', default=None, choices=['stripe-h', 'stripe-v', 'dither', 'graphic', 'photo'],
                     help='자동 판별이 틀렸을 때 방법을 직접 지정한다')
     g = ap.add_mutually_exclusive_group()
-    g.add_argument('--no-scrim', dest='no_scrim', action='store_true',
-                   help='표지 왼쪽을 눌러 주는 그라데이션을 덮지 않는다 (왼쪽이 이미 어둡고 고른 배경)')
     g.add_argument('--scrim', dest='scrim', action='store_true',
-                   help='--no-scrim 으로 꺼 뒀던 것을 다시 덮는다')
+                   help='표지 왼쪽을 눌러 주는 그라데이션을 덮는다 (기본은 덮지 않는다)')
+    g.add_argument('--no-scrim', dest='no_scrim', action='store_true',
+                   help='--scrim 으로 켜 뒀던 것을 다시 끈다')
     a = ap.parse_args()
 
     src = Image.open(a.source).convert('RGB')
@@ -363,9 +363,9 @@ def main():
     entry = {'key': a.key, 'label': a.label or a.key, 'file': fname}
     # 그라데이션 여부는 그림 성질이라 같은 키로 다시 넣을 때만 이어받는다.
     # --replace 는 다른 그림으로 갈아 끼우는 것이라 이어받지 않는다.
-    if a.no_scrim or (prev and prev.get('scrim') is False and not a.scrim):
-        entry['scrim'] = False
-        print('덮개      표지 왼쪽 그라데이션을 덮지 않는다')
+    if a.scrim or (prev and prev.get('scrim') is True and not a.no_scrim):
+        entry['scrim'] = True
+        print('덮개      표지 왼쪽 그라데이션을 덮는다')
     if a.replace:                                   # 자리를 그대로 이어받는다
         idx = next((i for i, b in enumerate(m['backgrounds']) if b['key'] == a.replace), len(bgs))
         old = next((b for b in m['backgrounds'] if b['key'] == a.replace), None)
