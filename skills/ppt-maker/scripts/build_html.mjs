@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 // Copyright (c) 2026 SafeAI. All rights reserved.
 // See COPYRIGHT.md — 복제·수정·재배포는 허락 없이 할 수 없습니다.
-// outline.json → deck.html (deck-stage.js driven, PDF-safe)
-// Visual style: 연차보고서형 리포트 덱을 1280×720 으로 맞춘 것.
 // usage: node build_html.mjs <outline.json> [outdir]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, COVER_SCRIM,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
-         tieTail } from './lib/common.mjs';
+         tieTail, SHAPE, HEAD, FRAME } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -43,7 +41,7 @@ deck-stage:not(:defined){visibility:hidden;}
   --success:${P.success};--warning:${P.warning};--danger:${P.danger};
   --bg-soft:${P.bgSoft};--border:${P.border};--border-strong:${P.borderStrong};
   --text:${P.text};--title:#10141C;--body:#515B75;--banner:${P.banner};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
-  --pad:40px;--hdr:0px;--foot:0px;--safe-bottom:44px;--page:#E9ECF0;--card-shadow:0 2px 12px rgba(20,40,80,.07);
+  --pad:${FRAME.pad}px;--hdr:0px;--foot:0px;--safe-bottom:${FRAME.safeBottom}px;--page:#E9ECF0;--card-shadow:${SHAPE.shadowCss};
   --font:'${meta.font}','Pretendard','Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
   --font-title:'Paperlogy 6 SemiBold',${FALLBACK_FACES};
   --font-title-b:'Paperlogy 8 ExtraBold',${FALLBACK_FACES};
@@ -64,24 +62,24 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .slide{width:1280px;height:720px;overflow:hidden;background:var(--page);position:relative;font-size:var(--fs-body);line-height:1.5;letter-spacing:-.8pt;word-break:keep-all;}
 /* top: eyebrow + page no · headline · rule · meta line (minimal, no header strip) */
 .top{position:absolute;top:30px;left:var(--pad);right:var(--pad);z-index:4;}
-.eyebrow{font-size:15px;color:var(--text-mid);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
+.eyebrow{font-size:${HEAD.eyebrow}px;color:var(--text-mid);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
 .eyebrow b{color:var(--primary);font-weight:700;}
-.eyebrow .pgno{font-size:13px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}
-.stitle{font-family:var(--font-title);font-size:42px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
+.eyebrow .pgno{font-size:${HEAD.pgno}px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}
+.stitle{font-family:var(--font-title);font-size:${HEAD.stitle}px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
 .stitle b{font-family:var(--font-title-b);font-weight:400;color:var(--title);}
-.rule{height:1px;background:#CFD4DC;margin-top:13px;}
-.slead{font-size:16px;color:var(--text-mid);line-height:1.5;margin-top:26px;max-width:1100px;}
+.rule{height:1px;background:${HEAD.ruleColor};margin-top:13px;}
+.slead{font-size:${HEAD.lead}px;color:var(--text-mid);line-height:1.5;margin-top:26px;max-width:1100px;}
 .slead b{color:var(--text);font-weight:700;}
 /* body */
 .body{position:absolute;left:var(--pad);right:var(--pad);top:var(--body-top,238px);bottom:var(--safe-bottom);display:flex;flex-direction:column;gap:var(--gap);z-index:3;}
 .blk{min-height:0;display:flex;flex-direction:column;}
 .blk>.inner{flex:1;min-height:0;display:flex;flex-direction:column;}
 /* block label above a block (작은 라벨) */
-.slabel{display:inline-flex;align-items:center;height:2.1em;padding:0 1.05em;background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;border-radius:8px;white-space:nowrap;line-height:1;margin-bottom:.8em;align-self:flex-start;}
+.slabel{display:inline-flex;align-items:center;height:2.1em;padding:0 1.05em;background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;border-radius:${SHAPE.label}px;white-space:nowrap;line-height:1;margin-bottom:.8em;align-self:flex-start;}
 /* card: 제목 피약 + 흰 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .card{position:relative;background:transparent;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
-.card>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
-.card>.bd{background:#fff;border-radius:19px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.card>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
+.card>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .card.tint>.bd{background:var(--primary-softer);}
 .card.dark>.bd{background:var(--primary);color:#fff;}
 .card .ct{font-size:var(--fs-card);font-weight:700;color:var(--text);margin-bottom:.5em;line-height:1.3;}
@@ -104,8 +102,8 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .grid{display:grid;gap:calc(var(--gap) * 1.6);flex:1;min-height:0;}
 /* stat card: 제목 피약 + 수치 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .stat{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
-.stat>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
-.stat>.bd{background:#fff;border-radius:19px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;overflow:hidden;}
+.stat>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
+.stat>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;overflow:hidden;}
 .stat .sl{font-size:var(--fs-small);color:var(--body);font-weight:500;}
 .stat .sv{font-size:var(--fs-stat);font-weight:800;color:var(--text);line-height:1.05;margin-top:.1em;letter-spacing:-.04em;font-variant-numeric:tabular-nums;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
@@ -130,7 +128,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .foot{position:absolute;left:var(--pad);right:var(--pad);bottom:${SLIDE_FOOT.bottom}px;z-index:3;
   font-size:${px(SLIDE_FOOT.size)}px;line-height:${px(SLIDE_FOOT.line)}px;letter-spacing:${SLIDE_FOOT.spc}pt;color:var(--text-light);}
 .foot>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.banner{background:var(--banner);color:#fff;padding:.75em 1.6em;border-radius:14px;display:flex;align-items:center;gap:1.6em;flex-shrink:0;font-size:var(--fs-small);}
+.banner{background:var(--banner);color:#fff;padding:.75em 1.6em;border-radius:${SHAPE.banner}px;display:flex;align-items:center;gap:1.6em;flex-shrink:0;font-size:var(--fs-small);}
 .banner .lead{color:var(--banner-label);font-size:calc(var(--fs-small) * 1.05);font-weight:700;white-space:nowrap;line-height:1.3;flex:0 0 auto;text-align:center;}
 .banner .msg{font-size:var(--fs-small);font-weight:500;line-height:1.3;flex:1;min-width:0;}
 .banner .msg ul.rl li{color:var(--banner-text);font-size:var(--fs-small);} .banner .msg ul.rl li::before{color:var(--banner-text);} .banner .msg b{color:#fff;font-weight:800;} .banner .msg ul.rl li .v{color:rgba(255,255,255,.75);}
@@ -138,9 +136,9 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 /* compare: two labeled cards */
 .cmp{display:grid;grid-template-columns:1fr 3em 1fr;align-items:stretch;flex:1;min-height:0;font-size:var(--fs-body);}
 .side{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;}
-.side>.cap{background:var(--text-mid);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:999px;flex:0 0 auto;white-space:nowrap;}
+.side>.cap{background:var(--text-mid);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
 .side.to>.cap{background:var(--primary);}
-.side>.bd{background:#fff;border-radius:19px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.side>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .side.to>.bd{background:var(--primary-softer);}
 .side .sh{font-size:var(--fs-card);font-weight:700;margin:.1em 0 .6em;color:var(--text);}
 .side .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;}
@@ -460,8 +458,8 @@ function renderContent(s) {
   // 아이브로우 = 이 장표가 속한 목차(섹션) 이름 하나만. 다른 것은 붙이지 않는다.
   const eyebrow = s.kind === 'appendix' ? 'APPENDIX' : esc(s.section.title);
   const headline = sl.headline || sl.title || '';
-  const leadLines = sl.lead ? estLines(sl.lead, 16, 1100) : 0;
-  const bodyTop = headline ? (sl.lead ? 220 + Math.max(0, leadLines - 1) * 24 : 190) : 96;
+  const leadLines = sl.lead ? estLines(sl.lead, HEAD.lead, 1100) : 0;
+  const bodyTop = headline ? (sl.lead ? FRAME.bodyTop + Math.max(0, leadLines - 1) * 24 : FRAME.bodyTop - 30) : 96;
   const foot = footLines(sl);
   const safeBottom = footSafeBottom(foot);
   return `<section class="slide" data-label="${esc(slideLabel(s))}" id="s${s.order}" data-fit="1"${fitStyle(s.order)}>

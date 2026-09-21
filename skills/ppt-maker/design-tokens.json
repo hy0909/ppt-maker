@@ -1,0 +1,12 @@
+{
+  "_": "장표 디자인 값. 웹 디자인 시스템 화면에서 고쳐 저장하면 이 파일이 바뀐다. 손으로 고쳐도 된다.",
+  "color":   { "primary": "#2F0CC5", "secondary": "#1E5BB8" },
+  "type":    { "h0":{"size":48,"line":58.6,"spc":-1}, "h1":{"size":40,"line":48,"spc":-1},
+               "h2":{"size":22,"line":31.8,"spc":-0.2}, "body2":{"size":18,"line":26.6,"spc":-0.8} },
+  "head":    { "eyebrow":15, "pgno":13, "stitle":42, "lead":16, "ruleColor":"#CFD4DC" },
+  "frame":   { "pad":40, "safeBottom":44, "bodyTop":220 },
+  "shape":   { "card":19, "banner":14, "label":8, "pill":999,
+               "shadowY":2, "shadowBlur":12, "shadowOpacity":7 },
+  "density": { "dense":{"body":18,"small":16,"cardTitle":26,"stat":34,"table":16,"tableH":16,"gap":12},
+               "airy": {"body":18,"small":16,"cardTitle":26,"stat":34,"table":16,"tableH":16,"gap":12} }
+}

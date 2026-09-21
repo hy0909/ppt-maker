@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 // Copyright (c) 2026 SafeAI. All rights reserved.
 // See COPYRIGHT.md — 복제·수정·재배포는 허락 없이 할 수 없습니다.
-// outline.json → deck.pptx (native, editable shapes/text) via pptxgenjs.
-// Mirrors build_html.mjs report-style layouts. Reads <outdir>/fit.json (from fit_slides.mjs) for per-slide body scale.
 // usage: node build_pptx.mjs <outline.json> [outdir]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,7 +9,7 @@ import pptxgen from 'pptxgenjs';
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, COVER_SCRIM,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -27,7 +25,7 @@ const D = DENSITY[meta.density] || DENSITY.dense;
 const slides = flattenSlides(outline);
 const fitFile = path.join(outdir, 'fit.json');
 const K_DAMP = 0.92;
-const PAD = 40; // --pad in build_html.mjs (사용자 원본 PPTX 기준 좌우 40px)
+const PAD = FRAME.pad; // --pad in build_html.mjs (사용자 원본 PPTX 기준 좌우 40px)
 const FIT = fs.existsSync(fitFile) ? JSON.parse(fs.readFileSync(fitFile, 'utf8')) : {};
 const FONT = meta.font || 'Pretendard';
 const FONT_TITLE = 'Paperlogy 6 SemiBold';      // 본문 장표 헤드라인
@@ -653,24 +651,24 @@ const RGBA = (c, a) => `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3
 function topSection(slide, eyebrowRuns, headline, lead, pageNo) {
   const W = SLIDE_W - PAD * 2;
   slide.addText(eyebrowRuns, { x: IN(PAD), y: IN(30), w: IN(W - 80), h: IN(22), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
-  if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 30, 80, 22, { size: 13, color: P.textLight, align: 'right', valign: 'middle' });
+  if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 30, 80, 22, { size: HEAD.pgno, color: P.textLight, align: 'right', valign: 'middle' });
   let ruleY = 68;
   if (headline) {
     // .stitle: 31.5pt(42px), weight 600, **강조** 는 같은 색 굵게
     const runs = String(headline).split(/(\*\*.+?\*\*)/g).filter(Boolean).map(p => {
       const m = p.match(/^\*\*(.+)\*\*$/);
-      return m ? { text: m[1], options: { fontFace: FONT_TITLE_B, fontSize: 31.5, color: colorToHex(P.title), charSpacing: -0.8 } } : { text: p, options: { fontFace: FONT_TITLE, fontSize: 31.5, color: colorToHex(P.title), charSpacing: -0.8 } };
+      return m ? { text: m[1], options: { fontFace: FONT_TITLE_B, fontSize: HEAD.stitle * 0.75, color: colorToHex(P.title), charSpacing: -0.8 } } : { text: p, options: { fontFace: FONT_TITLE, fontSize: HEAD.stitle * 0.75, color: colorToHex(P.title), charSpacing: -0.8 } };
     });
     slide.addText(runs, { x: IN(PAD), y: IN(61), w: IN(Math.min(W, 1100)), h: IN(51), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
     ruleY = 116;
   }
-  rect(slide, PAD, ruleY, W, 1, { fill: '#CFD4DC' });
-  let bodyTop = headline ? 190 : 96;
+  rect(slide, PAD, ruleY, W, 1, { fill: HEAD.ruleColor });
+  let bodyTop = headline ? FRAME.bodyTop - 30 : 96;
   if (lead) {
-    const n = lines(lead, 16, 1100);
-    const runs = richRuns(lead, { fontFace: FONT, fontSize: PT(16), color: colorToHex(P.textMid), charSpacing: -0.8 }).map(r => r.options.bold ? { ...r, options: { ...r.options, color: colorToHex(P.text) } } : r);
+    const n = lines(lead, HEAD.lead, 1100);
+    const runs = richRuns(lead, { fontFace: FONT, fontSize: PT(HEAD.lead), color: colorToHex(P.textMid), charSpacing: -0.8 }).map(r => r.options.bold ? { ...r, options: { ...r.options, color: colorToHex(P.text) } } : r);
     slide.addText(runs, { x: IN(PAD), y: IN(ruleY + 27), w: IN(Math.min(W, 1100)), h: IN(24 * n + 2), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.5, fit: 'none', autoFit: false });
-    bodyTop = 220 + (n - 1) * 24;
+    bodyTop = FRAME.bodyTop + (n - 1) * 24;
   }
   return bodyTop;
 }

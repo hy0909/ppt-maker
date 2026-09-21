@@ -81,11 +81,40 @@ export function derivePalette(brand = {}) {
   };
 }
 
-// ─── density scale (px) ─────────────────────────────────────────
-export const DENSITY = {
-  dense: { h2: 22, eyebrow: 12, lead: 14, colHead: 14, body: 18, small: 16, cardTitle: 26, stat: 34, tableH: 16, table: 16, pad: 44, safeTop: 68, safeBottom: 48, gap: 12, headerGap: 12, radius: 8, coverTitle: 44, sectionTitle: 40, agendaItem: 20 },
-  airy:  { h2: 30, eyebrow: 13, lead: 17, colHead: 17, body: 18, small: 16, cardTitle: 26, stat: 34, tableH: 16, table: 16, pad: 52, safeTop: 76, safeBottom: 52, gap: 12, headerGap: 20, radius: 12, coverTitle: 54, sectionTitle: 44, agendaItem: 24 },
+// ─── design tokens ──────────────────────────────────────────────
+// 값의 원본은 design-tokens.json 한 곳이다. 웹 디자인 시스템 화면에서 저장하면 그 파일이 바뀐다.
+// 아래 기본값은 파일이 없거나 칸이 빠졌을 때만 쓴다.
+const DEFAULT_TOKENS = {
+  color:   { primary: '#2F0CC5', secondary: '#1E5BB8' },
+  type:    { h0: { size: 48, line: 58.6, spc: -1 }, h1: { size: 40, line: 48, spc: -1 },
+             h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
+  head:    { eyebrow: 15, pgno: 13, stitle: 42, lead: 16, ruleColor: '#CFD4DC' },
+  frame:   { pad: 40, safeBottom: 44, bodyTop: 220 },
+  shape:   { card: 19, banner: 14, label: 8, pill: 999, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
+  density: { dense: { body: 18, small: 16, cardTitle: 26, stat: 34, table: 16, tableH: 16, gap: 12 },
+             airy:  { body: 18, small: 16, cardTitle: 26, stat: 34, table: 16, tableH: 16, gap: 12 } },
 };
+/** 읽어 온 값을 기본값 위에 덮는다. 빠진 칸은 기본값이 남는다. */
+const overlay = (base, over) => {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(over || {}))
+    out[k] = (v && typeof v === 'object' && !Array.isArray(v)) ? overlay(base[k] || {}, v) : v;
+  return out;
+};
+const tokenFile = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'design-tokens.json');
+let TOKENS = DEFAULT_TOKENS;
+try {
+  TOKENS = overlay(DEFAULT_TOKENS, JSON.parse(fs.readFileSync(tokenFile, 'utf8')));
+} catch (e) {
+  console.warn(`design-tokens.json 을 읽지 못해 기본값을 썼습니다: ${e.message}`);
+}
+export const SHAPE = TOKENS.shape;
+export const HEAD = TOKENS.head;
+export const FRAME = TOKENS.frame;
+SHAPE.shadowCss = `0 ${SHAPE.shadowY}px ${SHAPE.shadowBlur}px rgba(20,40,80,${SHAPE.shadowOpacity / 100})`;
+
+// ─── density scale (px) ─────────────────────────────────────────
+export const DENSITY = TOKENS.density;
 
 // ─── outline loading & normalisation ───────────────────────────
 export function loadOutline(file) {
@@ -198,14 +227,20 @@ export const roman = n => ROMAN[n - 1] || String(n);
 // ─── 글자 규격 (사용자 원본 PPTX 에서 그대로 옮김) ──────────────────────
 // size = pt, line = 고정 줄간격(pt), spc = 자간(pt, 음수가 '좁게'), face = 글꼴 이름.
 // Paperlogy·Pretendard 는 굵기마다 패밀리가 따로 있다 → bold 속성을 켜지 않는다(가짜 굵기 방지).
-export const TYPE = {
-  h0:    { size: 48, line: 58.6, spc: -1,   face: 'Paperlogy 7 Bold' },     // 표지 제목
-  h1:    { size: 40, line: 48,   spc: -1,   face: 'Paperlogy 7 Bold' },     // 목차·간지 제목
-  h2:    { size: 22, line: 31.8, spc: -0.2, face: 'Paperlogy 5 Medium' },   // 목차 항목
-  body2: { size: 18, line: 26.6, spc: -0.8, face: 'Pretendard Light' },     // 표지 설명줄
+const FACE = {
+  h0: 'Paperlogy 7 Bold',
+  h1: 'Paperlogy 7 Bold',
+  h2: 'Paperlogy 5 Medium',
+  body2: 'Pretendard Light'
 };
-export const TITLE_FACE = TYPE.h0.face;
-export const BODY_FACE = TYPE.body2.face;
+export const TYPE = {
+  h0:    { size: TOKENS.type.h0.size, line: TOKENS.type.h0.line, spc: TOKENS.type.h0.spc,   face: FACE.h0 },
+  h1:    { size: TOKENS.type.h1.size, line: TOKENS.type.h1.line,   spc: TOKENS.type.h1.spc,   face: FACE.h1 },
+  h2:    { size: TOKENS.type.h2.size, line: TOKENS.type.h2.line, spc: TOKENS.type.h2.spc, face: FACE.h2 },
+  body2: { size: TOKENS.type.body2.size, line: TOKENS.type.body2.line, spc: TOKENS.type.body2.spc, face: FACE.body2 },
+};
+export const TITLE_FACE = FACE.h0;
+export const BODY_FACE = FACE.body2;
 export const FALLBACK_FACES = `'Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif`;
 /** pt → px (1280×720 화면 기준, 96dpi) */
 export const px = pt => +(pt * 96 / 72).toFixed(2);

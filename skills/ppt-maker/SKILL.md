@@ -5,7 +5,7 @@ description: 텍스트 원문 또는 기존 PPTX를 목적에 맞는 발표자�
 
 # ppt-maker
 
-텍스트 → **outline.json** → `deck.html`(deck-stage.js) → PDF(Playwright) + PPTX(pptxgenjs).
+텍스트 → **outline.json** + `design-tokens.json`(디자인 값) → `deck.html`(deck-stage.js) → PDF(Playwright) + PPTX(pptxgenjs).
 사용자와 합의하는 것은 항상 **장표 구성(outline.json)**이다. HTML/PPTX는 아웃라인에서 재생성하는 산출물이지 편집 대상이 아니다.
 
 **구성 규칙 (필독):** `references/deck-rules.md` — 모든 슬라이드의 구조, 텍스트 길이 한계, 색상·글꼴 규칙, 레이아웃 결정 사항
