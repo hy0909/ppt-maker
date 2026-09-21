@@ -31,6 +31,11 @@
       "key": "cube-mono",
       "label": "큐브 흑백",
       "file": "cube-mono.png"
+    },
+    {
+      "key": "ring",
+      "label": "파란 동심원",
+      "file": "ring.png"
     }
   ]
 }

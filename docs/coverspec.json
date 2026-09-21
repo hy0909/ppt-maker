@@ -96,6 +96,12 @@
       "label": "큐브 흑백",
       "src": "assets/cover-bg/cube-mono.png",
       "divider": null
+    },
+    {
+      "key": "ring",
+      "label": "파란 동심원",
+      "src": "assets/cover-bg/ring.png",
+      "divider": null
     }
   ],
   "logo": "assets/logo_h_white.png"

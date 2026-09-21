@@ -8,7 +8,7 @@
   "meta": {
     "type": "gov-proposal",      // gov-proposal | client-proposal | annual-report | internal-report | company-intro | ir
     "density": "dense",          // 읽는 방식 — dense(제출·열람용) | airy(발표용)
-    "coverBg": "cube",           // 표지 배경 그림. 목록은 assets/cover-bg/index.json (cube | stripe | haze | cctv | wave | cube-mono)
+    "coverBg": "cube",           // 표지 배경 그림. 목록은 assets/cover-bg/index.json (cube | stripe | haze | cctv | wave | cube-mono | ring)
     "pill": "기술개발",           // 마무리 장표의 골드 라벨 (짧게, 선택)
     "event": "행사·공고명",       // 표지 오른쪽 아래 상자 (선택, 없으면 docType)
     "docType": "기술 개발 방향 검토", // event 가 없을 때 상자에 들어갈 말 (선택)
