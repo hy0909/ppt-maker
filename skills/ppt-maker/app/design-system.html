@@ -266,7 +266,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 /* 배경 그림을 못 불러오면 브랜드 그라데이션으로 대신한다 */
 .sl-cover{background:#000 var(--cover-bg,linear-gradient(118deg,var(--p-deep) 0%,var(--p) 52%,var(--p2) 100%)) center center / cover no-repeat}
 .sl-cover .scrim{position:absolute;inset:0;
-  background:var(--cover-scrim,none)}   /* 지금은 어느 배경에도 덮지 않는다 */
+  background:var(--cover-scrim,none)}   /* 목록에서 켠 배경에만 덮는다 */
 .sl-cover .clead{position:absolute;left:61.5px;top:56px;width:530.2px;font-family:var(--deck-light);font-weight:300;
   font-size:var(--h0b2);line-height:var(--h0b2l);letter-spacing:var(--h0b2s);color:#E7E6E6;word-break:keep-all}
 .sl-cover .ctitle{position:absolute;left:59.4px;top:117px;width:720px;font-family:var(--deck-bold);font-weight:400;
@@ -1115,7 +1115,7 @@ function applyCoverBg(){
   var r=document.documentElement, st=r.style, b=curBg();
   if(b){
     st.setProperty('--cover-bg',"url('"+b.src+"')");
-    /* 그라데이션은 배경마다 다르다. 지금은 일곱 장 모두 'none' 이 온다 */
+    /* 그라데이션은 배경마다 다르다. 유리 큐브·스캔라인만 덮고 나머지는 'none' 이 온다 */
     st.setProperty('--cover-scrim',b.scrim||'none');
   }else{
     st.removeProperty('--cover-bg'); st.removeProperty('--cover-scrim');

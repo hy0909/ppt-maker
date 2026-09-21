@@ -66,14 +66,14 @@
       "label": "유리 큐브",
       "src": "assets/cover-bg/cube.jpg",
       "divider": null,
-      "scrim": "none"
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "stripe",
       "label": "스캔라인",
       "src": "assets/cover-bg/stripe.png",
       "divider": null,
-      "scrim": "none"
+      "scrim": "linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%)"
     },
     {
       "key": "haze",

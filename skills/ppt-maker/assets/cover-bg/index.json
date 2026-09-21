@@ -4,12 +4,14 @@
     {
       "key": "cube",
       "label": "유리 큐브",
-      "file": "cube.jpg"
+      "file": "cube.jpg",
+      "scrim": true
     },
     {
       "key": "stripe",
       "label": "스캔라인",
-      "file": "stripe.png"
+      "file": "stripe.png",
+      "scrim": true
     },
     {
       "key": "haze",
