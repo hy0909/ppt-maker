@@ -474,8 +474,8 @@ const B = {
     let x = box.x;
     cols.forEach((c, i) => {
       const w = (box.w - gap * (cols.length - 1)) * weights[i] / tw;
-      const tint = c.tint || (b.tintLast && i === cols.length - 1);
-      const inner = labeledCard(slide, { x, y: box.y, w, h: box.h }, k, c.heading, tint ? P.softerBlue : P.white);
+      // 강조 컬럼도 본문 박스는 흰색이다 (build_html 의 .card.tint>.bd 와 같은 값)
+      const inner = labeledCard(slide, { x, y: box.y, w, h: box.h }, k, c.heading, P.white);
       stack(slide, inner, k, cardFrags({ ...c, _row: b.rowItems }, k, inner.w));
       x += w + gap;
     });
@@ -610,7 +610,7 @@ const B = {
     if (b.heading) { const hh = sh2(slide, b.heading, px + em * 1.2, y, iw, k); y += hh + em * 0.5; ih -= hh + em * 0.5; }
     fragImage(b.src, b.caption || b.alt, k, iw).draw(slide, px + em * 1.2, y, Math.max(1, ih));
     if (!full) {
-      const inner = labeledCard(slide, { x: tx, y: box.y, w: tw, h: box.h }, k, b.text.heading, P.softerBlue);
+      const inner = labeledCard(slide, { x: tx, y: box.y, w: tw, h: box.h }, k, b.text.heading, P.white);
       stack(slide, inner, k, [b.text.sections ? fragSections(b.text.sections, k, inner.w) : null, b.text.items ? fragList(b.text.items, k, inner.w) : null]);
     }
   },

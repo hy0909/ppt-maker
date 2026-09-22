@@ -63,7 +63,7 @@
 | type | 필드 | 용도 | 권장 개수 |
 | --- | --- | --- | --- |
 | `columns` | `columns:[{heading, items?, sections?:[{heading, items}], stat?:{sub, value, desc}, chart?:{…chart 블록 필드}, rows?, highlight?, text?, image?, caption?, flex?, tint?}]`, `tintLast?`, `rowItems?` | 소주제별 흰 카드(`heading` = 카드 위 라벨 칩). `sections` 는 카드 안 "| 소제목" + 목록, `stat` 은 큰 수치, `chart` 는 카드 안 그래프 | 컬럼 2~3 |
-| `cards` | `cards:[{title, desc?, items?, sections?, num?, tag?, rows?:[[라벨, 값]], highlight?:{label, value}, stat?, chart?, primary?, dark?}]`, `cols?` | 병렬 카드(`title` = 라벨 칩). **지표 비교는 `rows`(7월/8월 표) + `highlight`(전월대비 18% 증가 박스)**, `tag` 는 "| 소제목", `primary` 연파랑, `dark` 네이비 반전 | 2~6 |
+| `cards` | `cards:[{title, desc?, items?, sections?, num?, tag?, rows?:[[라벨, 값]], highlight?:{label, value}, stat?, chart?, primary?, dark?}]`, `cols?` | 병렬 카드(`title` = 라벨 칩). **지표 비교는 `rows`(7월/8월 표) + `highlight`(전월대비 18% 증가 박스)**, `tag` 는 "| 소제목", `dark` 네이비 반전(`primary` 는 더 이상 바탕을 바꾸지 않는다) | 2~6 |
 | `process` | `steps:[{title, desc?, items?, period?, highlight?, dark?}]`, `darkLast?` | 좌→우 절차·로드맵(선 + 번호 원 + 단계 카드). `period` 는 "1단계 · 2026 상" 같은 위 라벨 | 3~5 |
 | `timeline` | `phases:[{period, title, items?, desc?, highlight?}]`, `darkLast?` | process 와 같은 모양, 기간 중심 | 3~5 |
 | `table` | `headers, rows, emphasize?(열 index), leftAlign?([열 index]), widths?(["20%",…])` | 비교표, 평가지표 대응표, 예산. 강조 열은 연파랑 배경 + 파란 굵은 글씨. 셀에 `**굵게**` 가능. "달성/조기달성/진행중" 은 배지로 표시 | 행 3~7 |

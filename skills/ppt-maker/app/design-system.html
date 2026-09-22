@@ -222,7 +222,8 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
   line-height:1.3;text-align:center;padding:.325em 1em;border-radius:var(--r-pill);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .d-card>.bd{background:#fff;border-radius:var(--r-card);box-shadow:var(--card-shadow);
   padding:.95em 1.4em 1em;flex:1;min-height:0;overflow:hidden}
-.d-card.tint>.bd{background:var(--p-softer)}
+/* 강조 카드도 본문은 흰색이다 — build_html 의 .card.tint>.bd 와 같은 값 */
+.d-card.tint>.bd{background:#fff}
 .d-card.dark>.bd{background:var(--p);color:#fff}
 .rl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.5em}
 .rl li{position:relative;padding-left:1.05em;font-size:calc(var(--fs-body)*var(--k));line-height:1.25;color:#1A2438}

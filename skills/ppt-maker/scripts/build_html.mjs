@@ -80,7 +80,9 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .card{position:relative;background:transparent;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
 .card>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
 .card>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
-.card.tint>.bd{background:var(--primary-softer);}
+/* 강조 카드도 본문 박스는 흰색이다. 한 장표 안에서 카드 바탕이 서로 달라 보이면
+   어느 쪽이 중요한지가 아니라 "왜 색이 다르지" 로 읽힌다. 강조는 알약 제목으로만 한다. */
+.card.tint>.bd{background:#fff;}
 .card.dark>.bd{background:var(--primary);color:#fff;}
 .card .ct{font-size:var(--fs-card);font-weight:700;color:var(--text);margin-bottom:.5em;line-height:1.3;}
 .card.dark .ct{color:#fff;}
