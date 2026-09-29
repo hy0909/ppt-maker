@@ -182,11 +182,12 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .card .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.45em;line-height:1.4;margin-bottom:.9em;}
 .sec2+.sec2{margin-top:1em;padding-top:1em;border-top:1px solid #E6E9EE;}
 /* chart */
-.chart{background:var(--bg-soft);border-radius:10px;padding:1em 1.2em .8em;display:flex;flex-direction:column;flex:1;min-height:0;}
+/* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
+.chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
 .chart .chh b{color:var(--text);font-weight:700;font-size:var(--fs-body);} .chart .chh span{color:var(--text-mid);}
-.chart svg{flex:1;min-height:0;width:100%;height:100%;display:block;margin-top:.3em;}
-.chart .lg{display:flex;gap:1.2em;font-size:var(--fs-small);color:var(--text-mid);margin-top:.2em;} .chart .lg i{display:inline-block;width:.8em;height:.8em;border-radius:2px;margin-right:.35em;vertical-align:-.1em;}
+.chart svg{flex:1;min-height:0;width:100%;height:100%;display:block;margin-top:.5em;}
+.chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--text);margin-top:.35em;} .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
 /* cover / toc / divider / closing */
 /* 표지 배경 — meta.coverBg 로 고른 이미지. 마무리 장표는 브랜드 그라디언트로 따로 간다 */
 .cover{position:absolute;inset:0;overflow:hidden;color:#fff;}
@@ -276,6 +277,8 @@ function chartPanel(b) {
   return `<div class="chart"><div class="chh"><b>${rich(b.title || '')}</b><span>${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div>${chartSvg(b)}${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS()[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
 }
 const SERIES_COLORS = () => [P.primary2, P.primary, P.teal, P.gold];
+/** 그래프 — shadcn/ui Charts(recharts) 모양을 따른다: 가로 격자선만(CartesianGrid vertical=false), 축선·눈금선 없음,
+ *  막대는 위 모서리만 둥글게(Bar radius), 선은 부드러운 곡선(type=monotone) + 선 색으로 채운 점, 값 라벨은 위(LabelList top). 색은 브랜드 팔레트(SERIES_COLORS). */
 function chartSvg(b) {
   const labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = SERIES_COLORS();
   const all = series.flatMap(sr => sr.values || []).filter(v => typeof v === 'number');
@@ -284,27 +287,51 @@ function chartSvg(b) {
   const n = Math.max(labels.length, ...series.map(sr => (sr.values || []).length));
   const x = i => padL + (n <= 1 ? (W - padL - padR) / 2 : (W - padL - padR) * i / (n - 1));
   const y = v => padT + (H - padT - padB) * (1 - (v - min) / (max - min));
+  const num = v => esc(String(v));
   let out = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">`;
-  out += `<line x1="${padL}" y1="${H - padB}" x2="${W - padR}" y2="${H - padB}" stroke="#C9CFD8" stroke-width="1"/>`;
-  labels.forEach((l, i) => { out += `<text x="${x(i)}" y="${H - padB + 16}" text-anchor="middle" font-size="10" fill="${P.textMid}">${esc(l)}</text>`; if (i) out += `<line x1="${(x(i) + x(i - 1)) / 2}" y1="${H - padB}" x2="${(x(i) + x(i - 1)) / 2}" y2="${H - padB + 4}" stroke="#C9CFD8"/>`; });
+  for (let g = 0; g <= 4; g++) {   // 가로 격자선 4칸, 연한 테두리색
+    const gy = (padT + (H - padT - padB) * g / 4).toFixed(1);
+    out += `<line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="${P.border}" stroke-opacity=".6" stroke-width="1"/>`;
+  }
+  labels.forEach((l, i) => { out += `<text x="${x(i)}" y="${H - padB + 16}" text-anchor="middle" font-size="10" fill="${P.textMid}">${esc(l)}</text>`; });
   if (b.kind === 'bar') {
-    const gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(28, gw * 0.6 / series.length);
+    const gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(28, gw * 0.6 / series.length), r = series.length > 1 ? 3 : 5;
     series.forEach((sr, si) => (sr.values || []).forEach((v, i) => {
-      const bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si;
-      out += `<rect x="${bx}" y="${y(v)}" width="${bw - 2}" height="${Math.max(0, H - padB - y(v))}" rx="2" fill="${cols[si]}" opacity="${si ? .75 : 1}"/>`;
-      out += `<text x="${bx + (bw - 2) / 2}" y="${y(v) - 5}" text-anchor="middle" font-size="10" font-weight="700" fill="${P.text}">${esc(String(v))}</text>`;
+      const bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 1, w = bw - 2;
+      const top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
+      out += `<path d="M${bx},${bot} V${top + rr} Q${bx},${top} ${bx + rr},${top} H${bx + w - rr} Q${bx + w},${top} ${bx + w},${top + rr} V${bot} Z" fill="${cols[si]}"/>`;
+      out += `<text x="${bx + w / 2}" y="${top - 6}" text-anchor="middle" font-size="10" font-weight="600" fill="${P.text}">${num(v)}</text>`;
     }));
   } else {
     series.forEach((sr, si) => {
-      const pts = (sr.values || []).map((v, i) => `${x(i)},${y(v)}`).join(' ');
-      out += `<polyline points="${pts}" fill="none" stroke="${cols[si]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-      (sr.values || []).forEach((v, i) => {
-        out += `<circle cx="${x(i)}" cy="${y(v)}" r="3.2" fill="#fff" stroke="${cols[si]}" stroke-width="2"/>`;
-        out += `<text x="${x(i)}" y="${y(v) - 8}" text-anchor="middle" font-size="11" font-weight="700" fill="${P.text}">${esc(String(v))}</text>`;
+      const pts = (sr.values || []).map((v, i) => [x(i), y(v)]);
+      out += `<path d="${smoothPath(pts)}" fill="none" stroke="${cols[si]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      pts.forEach(([px, py], i) => {
+        out += `<circle cx="${px}" cy="${py}" r="3.2" fill="${cols[si]}"/>`;
+        out += `<text x="${px}" y="${py - 9}" text-anchor="middle" font-size="11" font-weight="600" fill="${P.text}">${num((sr.values || [])[i])}</text>`;
       });
     });
   }
   return out + '</svg>';
+}
+/** 점들을 지나는 부드러운 곡선(monotone cubic — recharts type="monotone"). 값 사이에서 위아래로 튀지 않는다. */
+function smoothPath(pts) {
+  if (pts.length < 2) return pts.length ? `M${pts[0][0]},${pts[0][1]}` : '';
+  const n = pts.length, dx = [], m = [], t = [];
+  for (let i = 0; i < n - 1; i++) { dx[i] = pts[i + 1][0] - pts[i][0]; m[i] = dx[i] ? (pts[i + 1][1] - pts[i][1]) / dx[i] : 0; }
+  t[0] = m[0]; t[n - 1] = m[n - 2];
+  for (let i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
+  for (let i = 0; i < n - 1; i++) {
+    if (!m[i]) { t[i] = 0; t[i + 1] = 0; continue; }
+    const a = t[i] / m[i], c = t[i + 1] / m[i], q = a * a + c * c;
+    if (q > 9) { const tau = 3 / Math.sqrt(q); t[i] = tau * a * m[i]; t[i + 1] = tau * c * m[i]; }
+  }
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < n - 1; i++) {
+    const h = dx[i] / 3;
+    d += ` C${(pts[i][0] + h).toFixed(1)},${(pts[i][1] + t[i] * h).toFixed(1)} ${(pts[i + 1][0] - h).toFixed(1)},${(pts[i + 1][1] - t[i + 1] * h).toFixed(1)} ${pts[i + 1][0]},${pts[i + 1][1]}`;
+  }
+  return d;
 }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
 /** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */

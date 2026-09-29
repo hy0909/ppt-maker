@@ -425,8 +425,8 @@ function fragChart(c, k, w) {
   return { h: 96 * k, flex: 1, draw: (slide, x, y, h) => chartPanel(slide, c, x, y, w, h, k) };
 }
 function chartPanel(slide, c, x, y, w, h, k) {
-  const em = D.body * k, padX = em * 1.2, padY = em;
-  rect(slide, x, y, w, h, { fill: P.bgSoft, radius: 10 });
+  // shadcn/ui Charts 모양: 회색 패널 없이 카드 위에 바로, 가로 격자선만, 축선 없음, 선은 부드럽게 + 선 색 점. (막대 위 모서리 둥글리기는 PowerPoint 차트에 없어 생략)
+  const em = D.body * k, padX = em * 1.2, padY = em * 0.6;
   const hh = em * 1.5;
   text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.body, k, bold: true, color: P.text, valign: 'middle' });
   if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small, k, color: P.textMid, align: 'right', valign: 'middle' });
@@ -439,13 +439,13 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const common = {
     x: IN(x + padX * 0.4), y: IN(y + padY + hh), w: IN(w - padX * 0.8), h: IN(ch),
     chartColors: SERIES().map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(10.5, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
-    catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(10.5, k), catAxisLabelColor: colorToHex(P.textMid), catAxisLineColor: 'C9CFD8', catGridLine: { style: 'none' },
-    valAxisHidden: true, valGridLine: { style: 'none' }, valAxisMinVal: Math.min(0, ...all), valAxisMaxVal: Math.ceil(max * 1.3), valAxisLineShow: false,
+    catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(10.5, k), catAxisLabelColor: colorToHex(P.textMid), catAxisLineShow: false, catGridLine: { style: 'none' },
+    valAxisHidden: true, valGridLine: { color: colorToHex(P.border), style: 'solid', size: 0.75 }, valAxisMinVal: Math.min(0, ...all), valAxisMaxVal: Math.ceil(max * 1.3), valAxisLineShow: false, valAxisMajorUnit: Math.ceil(max * 1.3 / 4),
     showLegend: series.length > 1, legendPos: 'b', legendFontFace: FONT, legendFontSize: PT(10, k), legendColor: colorToHex(P.textMid),
-    plotArea: { fill: { color: colorToHex(P.bgSoft) } }, chartArea: { fill: { color: colorToHex(P.bgSoft) } },
+    plotArea: { fill: { color: colorToHex(P.white) } }, chartArea: { fill: { color: colorToHex(P.white) } },
   };
-  if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 80, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
-  else slide.addChart(pres.charts.LINE, data, { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 7, lineDataSymbolLineColor: colorToHex(P.primary2), lineDataSymbolLineSize: 1.5, dataLabelPosition: 't', lineSmooth: false });
+  if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
+  else slide.addChart(pres.charts.LINE, data, { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 6, lineDataSymbolLineSize: 1, dataLabelPosition: 't', lineSmooth: true });
 }
 /** 이미지 상자 비율. 기본 16:9. 'original' 이면 원본 비율 그대로(contain). HTML 의 IMAGE_RATIOS 와 같은 값. */
 const IMAGE_RATIOS = { '16:9': 16 / 9, '4:3': 4 / 3, '1:1': 1, '9:16': 9 / 16, '3:4': 3 / 4 };
