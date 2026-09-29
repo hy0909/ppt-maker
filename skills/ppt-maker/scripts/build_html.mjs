@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
-         tieTail, SHAPE, HEAD, FRAME } from './lib/common.mjs';
+         tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -33,6 +33,7 @@ function css() {
   const K = meta.density === 'airy' ? 1.5 : 1.9;
   const C = COVER_BOX, A = AGENDA_BOX;
   return `
+${PAPERLOGY_FONT_FACE}
 deck-stage:not(:defined){visibility:hidden;}
 :root{
   --primary:${P.primary};--primary-2:${P.primary2};--primary-deep:${P.primaryDeep};
@@ -111,14 +112,15 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
 .stat .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.5em;line-height:1.4;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
-table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;}
-.rt thead th{background:var(--bg-soft);color:var(--text);font-weight:700;text-align:center;padding:.6em .8em;border:1px solid #E3E7EC;font-size:var(--fs-tableh);line-height:1.3;}
-.rt thead th.em{background:var(--primary);color:#fff;border-color:var(--primary);}
-.rt tbody td{padding:.6em .8em;border:1px solid #E3E7EC;vertical-align:middle;color:var(--text);background:#fff;text-align:center;line-height:1.45;}
-.rt tbody td:first-child{text-align:left;font-weight:600;background:var(--bg-soft);}
-.rt tbody td.em{background:var(--primary-softer);font-weight:700;color:var(--primary);}
+/* 표 — shadcn/ui Table(new-york) 을 따른다: 세로선 없음, 행 아래 1px 구분선, 머리글 중간 굵기·왼쪽 정렬, 첫 칸 중간 굵기, 마지막 행은 TableFooter(연회색·중간 굵기). 강조 열만 연파랑 */
+table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;text-align:left;}
+.rt thead th{background:transparent;color:var(--text);font-weight:500;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
+.rt thead th.em{color:var(--primary);font-weight:600;border-bottom:2px solid var(--primary);}
+.rt tbody td{padding:.6em .8em;border:0;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
+.rt tbody td:first-child{font-weight:500;}
+.rt tbody td.em{background:var(--primary-softer);font-weight:600;color:var(--primary);}
 .rt tbody td.l{text-align:left;}
-.rt tbody tr:last-child td{font-weight:700;}
+.rt tbody tr:last-child td{border-bottom:0;background:var(--bg-soft);font-weight:500;}
 .badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
 .badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.prog{background:#FFF6E1;color:var(--warning);} .badge.n{background:var(--bg-soft);color:var(--text-mid);}
@@ -162,8 +164,11 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 /* image */
 .imgblk{display:flex;gap:calc(var(--gap) * 1.6);flex:1;min-height:0;font-size:var(--fs-body);}
 .imgblk .pic{flex:1.3;min-height:0;display:flex;flex-direction:column;background:#fff;border-radius:12px;box-shadow:var(--card-shadow);padding:1em 1.2em;overflow:hidden;}
-.imgblk .pic .fr{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;}
+.imgblk .pic .fr{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;container-type:size;}
 .imgblk .pic img{max-height:100%;max-width:100%;object-fit:contain;}
+/* 이미지 상자 비율: 기본 16:9(--arw/--arh). 칸 너비와 높이 중 작은 쪽에 맞춰 비율을 지키고, 원본은 cover 로 가장자리를 잘라 채운다. ratio:"original" 이면 .ib 없이 contain */
+.imgblk .pic .fr>.ib{--arw:16;--arh:9;aspect-ratio:var(--arw) / var(--arh);width:min(100%, calc(100cqh * var(--arw) / var(--arh)));height:auto;max-height:100%;object-fit:cover;flex:0 0 auto;}
+.imgblk .pic .fr>.ph.ib{padding:0;min-height:0;}
 .imgblk .cp{font-size:var(--fs-small);color:var(--text-light);text-align:center;margin-top:.5em;}
 .imgblk .txt{flex:1;min-height:0;display:flex;flex-direction:column;}
 .ph{border:1.5px dashed #C3CAD5;border-radius:8px;background:var(--bg-soft);color:#6F7C92;display:flex;align-items:center;justify-content:center;font-size:var(--fs-small);font-weight:500;padding:1em;text-align:center;width:100%;height:100%;min-height:4em;}
@@ -302,12 +307,20 @@ function chartSvg(b) {
   return out + '</svg>';
 }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
-function imgOrPh(src, alt) {
+/** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */
+export const IMAGE_RATIOS = { '16:9': [16, 9], '4:3': [4, 3], '1:1': [1, 1], '9:16': [9, 16], '3:4': [3, 4] };
+function ratioAttr(ratio) {
+  if (ratio === 'original') return '';
+  const [w, h] = IMAGE_RATIOS[ratio] || IMAGE_RATIOS['16:9'];
+  return ` class="ib" style="--arw:${w};--arh:${h}"`;
+}
+function imgOrPh(src, alt, ratio) {
   const ok = src && (/^(https?:)?\/\//.test(src) || fs.existsSync(path.resolve(outdir, src)));
   if (src && !ok) console.warn(`  (이미지 파일이 없어 자리표시자로 그림: ${src})`);
   const label = String(alt || '이미지 자리').trim();
-  if (!ok) return `<div class="ph">${/^\[.*\]$/.test(label) ? esc(label) : `[ ${esc(label)} ]`}</div>`;
-  return `<img src="${esc(src)}" alt="${esc(alt || '')}">`;
+  const ra = ratioAttr(ratio);
+  if (!ok) return `<div class="ph${ra ? ' ib' : ''}"${ra ? ra.replace(' class="ib"', '') : ''}>${/^\[.*\]$/.test(label) ? esc(label) : `[ ${esc(label)} ]`}</div>`;
+  return `<img src="${esc(src)}" alt="${esc(alt || '')}"${ra}>`;
 }
 function badgeCell(txt) {
   const t = String(txt).replace(/\*\*/g, '');
@@ -325,7 +338,7 @@ const BLOCKS = {
     return `<div class="grid" style="grid-template-columns:${cols.map(c => `${c.flex || 1}fr`).join(' ')}">${cols.map((c, i) => `
       ${cardOpen(c.tint || (b.tintLast && i === cols.length - 1) ? 'tint' : '', c.heading)}
         <div class="fill">${c.stat ? statFrag(c.stat) : ''}${c.rows ? `<div class="kv">${kvTable(c.rows)}${c.highlight ? `<div class="hbox"><div class="hl">${rich(c.highlight.label || '')}</div><div class="hv">${rich(c.highlight.value || '')}</div></div>` : ''}</div>` : ''}${c.sections ? subSections(c.sections) : ''}${c.items ? listItems(c.items, { row: b.rowItems }) : ''}${c.text ? `<div class="cd">${rich(c.text)}</div>` : ''}${c.chart ? chartPanel(c.chart) : ''}
-        ${c.image !== undefined ? `<div class="imgblk" style="flex:1"><div class="pic" style="border:0;padding:0;box-shadow:none"><div class="fr">${imgOrPh(c.image, c.caption)}</div>${c.caption && c.image ? `<div class="cp">${esc(c.caption)}</div>` : ''}</div></div>` : ''}</div>
+        ${c.image !== undefined ? `<div class="imgblk" style="flex:1"><div class="pic" style="border:0;padding:0;box-shadow:none"><div class="fr">${imgOrPh(c.image, c.caption, c.ratio)}</div>${c.caption && c.image ? `<div class="cp">${esc(c.caption)}</div>` : ''}</div></div>` : ''}</div>
       ${CARD_CLOSE}`).join('')}</div>`;
   },
   cards(b) {
@@ -368,7 +381,7 @@ const BLOCKS = {
     return `<div class="cmp">${side(b.left || {}, 'from', 'AS-IS')}<div class="arr">›</div>${side(b.right || {}, 'to', 'TO-BE')}</div>`;
   },
   image(b) {
-    const pic = `<div class="pic">${b.heading ? `<div class="sh2">${rich(b.heading)}</div>` : ''}<div class="fr">${imgOrPh(b.src, b.caption || b.alt)}</div>${b.caption && b.src ? `<div class="cp">${esc(b.caption)}</div>` : ''}</div>`;
+    const pic = `<div class="pic">${b.heading ? `<div class="sh2">${rich(b.heading)}</div>` : ''}<div class="fr">${imgOrPh(b.src, b.caption || b.alt, b.ratio)}</div>${b.caption && b.src ? `<div class="cp">${esc(b.caption)}</div>` : ''}</div>`;
     if (b.side === 'full' || !b.text) return `<div class="imgblk">${pic}</div>`;
     const txt = `<div class="txt">${cardOpen('tint', b.text.heading)}<div class="fill">${listItems(b.text.items)}</div>${CARD_CLOSE}</div>`;
     return `<div class="imgblk">${b.side === 'left' ? pic + txt : txt + pic}</div>`;

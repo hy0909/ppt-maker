@@ -328,3 +328,12 @@ export function coverScrim(design) {
 export const DIVIDER_SCRIM = 'linear-gradient(90deg,rgba(5,3,18,.74) 0%,rgba(5,3,18,.62) 40%,rgba(5,3,18,.26) 70%,rgba(5,3,18,.06) 100%)';
 /** 마무리 장표 배경 — 표지와 따로 간다(브랜드 그라디언트) */
 export const closingBgCss = P => `linear-gradient(135deg,${P.primaryDeep} 0%,${P.primary} 45%,${P.primary2} 100%)`;
+
+// ─── Paperlogy 웹 글꼴 ──────────────────────────────────────
+// 설치돼 있으면 local() 로 그 글꼴을 쓰고, 없으면 jsDelivr(Freesentation/paperlogy, OFL 1.1) 에서 받아온다.
+// 굵기마다 패밀리 이름이 따로라(`Paperlogy 7 Bold`) 이름별로 선언하고 weight 는 400 으로 둔다(가짜 굵기 방지).
+export const PAPERLOGY_WEIGHTS = ['4 Regular', '5 Medium', '6 SemiBold', '7 Bold', '8 ExtraBold'];
+export const PAPERLOGY_FONT_FACE = PAPERLOGY_WEIGHTS.map(w => {
+  const file = 'Paperlogy-' + w.replace(' ', '');
+  return `@font-face{font-family:'Paperlogy ${w}';src:local('Paperlogy ${w}'),local('${file}'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/${file}.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}`;
+}).join('\n');

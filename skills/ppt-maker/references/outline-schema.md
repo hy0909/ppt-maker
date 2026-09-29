@@ -62,7 +62,7 @@
 
 | type | 필드 | 용도 | 권장 개수 |
 | --- | --- | --- | --- |
-| `columns` | `columns:[{heading, items?, sections?:[{heading, items}], stat?:{sub, value, desc}, chart?:{…chart 블록 필드}, rows?, highlight?, text?, image?, caption?, flex?, tint?}]`, `tintLast?`, `rowItems?` | 소주제별 흰 카드(`heading` = 카드 위 라벨 칩). `sections` 는 카드 안 "| 소제목" + 목록, `stat` 은 큰 수치, `chart` 는 카드 안 그래프 | 컬럼 2~3 |
+| `columns` | `columns:[{heading, items?, sections?:[{heading, items}], stat?:{sub, value, desc}, chart?:{…chart 블록 필드}, rows?, highlight?, text?, image?, caption?, ratio?, flex?, tint?}]`, `tintLast?`, `rowItems?` | 소주제별 흰 카드(`heading` = 카드 위 라벨 칩). `sections` 는 카드 안 "| 소제목" + 목록, `stat` 은 큰 수치, `chart` 는 카드 안 그래프 | 컬럼 2~3 |
 | `cards` | `cards:[{title, desc?, items?, sections?, num?, tag?, rows?:[[라벨, 값]], highlight?:{label, value}, stat?, chart?, primary?, dark?}]`, `cols?` | 병렬 카드(`title` = 라벨 칩). **지표 비교는 `rows`(7월/8월 표) + `highlight`(전월대비 18% 증가 박스)**, `tag` 는 "| 소제목", `dark` 네이비 반전(`primary` 는 더 이상 바탕을 바꾸지 않는다) | 2~6 |
 | `process` | `steps:[{title, desc?, items?, period?, highlight?, dark?}]`, `darkLast?` | 좌→우 절차·로드맵(선 + 번호 원 + 단계 카드). `period` 는 "1단계 · 2026 상" 같은 위 라벨 | 3~5 |
 | `timeline` | `phases:[{period, title, items?, desc?, highlight?}]`, `darkLast?` | process 와 같은 모양, 기간 중심 | 3~5 |
@@ -70,7 +70,7 @@
 | `stats` | `stats:[{label, sub?, value, desc?}]` | 핵심 수치 카드(`label` = 라벨 칩, `sub` = 작은 지표명, `value` 큰 숫자+단위, `desc` 파란 보조 문장 "전월 31만 회 · 35% 성장") | 2~4 |
 | `chart` | `kind:"line"\|"bar", title, unit?, labels:[…], series:[{name, values:[…]}], heading?` | **월별 추이 등 수치는 표로 나열하지 말고 그래프로**. 시리즈 1~3개. 채널별 추이 그래프는 형식을 통일 | 1 |
 | `compare` | `left:{tag?, heading, items}, right:{tag?, heading, items}` | AS-IS→TO-BE, 난제→해법. `tag` 기본 AS-IS/TO-BE, 오른쪽이 연파랑 강조 | 항목 3~4 |
-| `image` | `src, alt?, caption?, heading?, side:"left"\|"right"\|"full", text?:{heading, items}, flex?` | 구성도·화면·사진. `src`가 비어 있으면 `[ alt ]` 점선 자리표시자 | 1 |
+| `image` | `src, alt?, caption?, heading?, side:"left"\|"right"\|"full", ratio?:"16:9"\|"4:3"\|"1:1"\|"9:16"\|"3:4"\|"original", text?:{heading, items}, flex?` | 구성도·화면·사진. `src`가 비어 있으면 `[ alt ]` 점선 자리표시자. **`ratio` 기본 16:9** — 원본이 다르면 사용자에게 묻고, 고른 비율 상자에 맞춰 가장자리를 잘라 채운다(`original` 만 안 자름) | 1 |
 | `bullets` | `heading?, items` | 최후의 수단. 항목이 4개 넘으면 columns/cards 로 | 3~5 |
 | `callout` | `items?:[…] 또는 text, label?("핵심 요약"·"특이사항"), tone?:"light"` | 장표 맨 아래 어두운 둥근 배너, 왼쪽에 흰 라벨 칩. **불릿 2~3개(`items`) 권장** | 1 |
 

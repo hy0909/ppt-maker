@@ -6,6 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pptxgen from 'pptxgenjs';
+import * as _imageSize from 'image-size';
+const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // 그림 파일 가로·세로 읽기 (v1: 경로를 주면 동기)
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
@@ -104,11 +106,27 @@ function text(slide, str, x, y, w, h, { size, color = P.text, bold = false, alig
 
 /* altText 를 반드시 준다. 비워 두면 pptxgenjs 가 파일의 전체 경로를 대체 텍스트로 넣어,
    만든 사람 컴퓨터의 폴더 이름이 PPTX 안에 그대로 남는다. */
+/** 그림 파일의 가로·세로(px). 못 읽으면 null → 상자 비율 그대로 둔다. */
+function imgDims(p) {
+  try { const d = sizeOf(p); return d && d.width && d.height ? { w: d.width, h: d.height } : null; } catch { return null; }
+}
+/**
+ * 상자(x,y,w,h)에 그림을 넣는다. contain 이면 원래 비율대로 상자 안에 맞춰 가운데, 아니면(cover) 상자를 꽉 채우고 가장자리를 자른다.
+ * pptxgenjs 규약: addImage 의 w/h 는 그림의 원래 비율, sizing.w/h 가 상자여야 cover 의 srcRect(잘림)가 계산된다. 둘 다 상자를 주면 잘림이 0 이 되어 그림이 늘어난다.
+ */
 function image(slide, rel, x, y, w, h, contain = true) {
   if (!rel) return false;
   const p = path.resolve(outdir, rel);
   if (!fs.existsSync(p) || fs.statSync(p).isDirectory()) return false;
-  slide.addImage({ path: p, altText: path.basename(rel), x: IN(x), y: IN(y), w: IN(w), h: IN(h), sizing: { type: contain ? 'contain' : 'cover', w: IN(w), h: IN(h) } });
+  const d = imgDims(p);
+  if (d && contain) {
+    const sc = Math.min(w / d.w, h / d.h), dw = d.w * sc, dh = d.h * sc;
+    slide.addImage({ path: p, altText: path.basename(rel), x: IN(x + (w - dw) / 2), y: IN(y + (h - dh) / 2), w: IN(dw), h: IN(dh) });
+  } else if (d) {
+    slide.addImage({ path: p, altText: path.basename(rel), x: IN(x), y: IN(y), w: IN(w), h: IN(w * d.h / d.w), sizing: { type: 'cover', w: IN(w), h: IN(h) } });
+  } else {
+    slide.addImage({ path: p, altText: path.basename(rel), x: IN(x), y: IN(y), w: IN(w), h: IN(h), sizing: { type: contain ? 'contain' : 'cover', w: IN(w), h: IN(h) } });
+  }
   return true;
 }
 
@@ -117,7 +135,8 @@ function logo(slide, dark = true) {
   const p = asset(rel);
   if (!fs.existsSync(p)) return;
   const h = 20, w = 80;
-  slide.addImage({ path: p, altText: '로고', x: IN(SLIDE_W - 53 - w), y: IN(30), w: IN(w), h: IN(h), sizing: { type: 'contain', w: IN(w), h: IN(h) } });
+  const d = imgDims(p), sc = d ? Math.min(w / d.w, h / d.h) : 1, dw = d ? d.w * sc : w, dh = d ? d.h * sc : h;   // 원래 비율대로 상자 안에
+  slide.addImage({ path: p, altText: '로고', x: IN(SLIDE_W - 53 - w + (w - dw)), y: IN(30 + (h - dh) / 2), w: IN(dw), h: IN(dh) });
 }
 
 function estW(str, sizePx) {
@@ -354,12 +373,13 @@ function fragKv(rows, hl, k, w) {
   return { h, draw: (slide, x, y) => {
     const gap = em * 1.2, tw = hl ? (w - gap) * 1.4 / 2.4 : w, hw = w - gap - tw;
     const lw = tw * 0.38;
+    // shadcn/ui Table 과 같은 모양(HTML 의 .rt): 칸 상자 없이 행 아래 1px 선, 마지막 행은 연회색 footer
     rows.forEach((r, i) => {
       const ry = y + i * rowH, last = i === rows.length - 1;
-      rect(slide, x, ry, lw, rowH, { fill: P.bgSoft, line: { color: '#E3E7EC', width: 0.75 } });
+      if (last) rect(slide, x, ry, tw, rowH, { fill: P.bgSoft });
       text(slide, r[0] ?? '', x + fs * 0.8, ry, lw - fs * 1.6, rowH, { size: D.table, k, bold: true, color: P.text, valign: 'middle' });
-      rect(slide, x + lw, ry, tw - lw, rowH, { fill: P.white, line: { color: '#E3E7EC', width: 0.75 } });
-      text(slide, r[1] ?? '', x + lw + fs * 0.8, ry, tw - lw - fs * 1.6, rowH, { size: D.table, k, bold: last, color: P.text, align: 'center', valign: 'middle' });
+      text(slide, r[1] ?? '', x + lw + fs * 0.8, ry, tw - lw - fs * 1.6, rowH, { size: D.table, k, bold: last, color: P.text, align: 'left', valign: 'middle' });
+      if (!last) rect(slide, x, ry + rowH - 1, tw, 1, { fill: P.border });
     });
     if (hl) {
       const hx = x + tw + gap;
@@ -427,13 +447,20 @@ function chartPanel(slide, c, x, y, w, h, k) {
   if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 80, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
   else slide.addChart(pres.charts.LINE, data, { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 7, lineDataSymbolLineColor: colorToHex(P.primary2), lineDataSymbolLineSize: 1.5, dataLabelPosition: 't', lineSmooth: false });
 }
-function fragImage(src, caption, k, w) {
+/** 이미지 상자 비율. 기본 16:9. 'original' 이면 원본 비율 그대로(contain). HTML 의 IMAGE_RATIOS 와 같은 값. */
+const IMAGE_RATIOS = { '16:9': 16 / 9, '4:3': 4 / 3, '1:1': 1, '9:16': 9 / 16, '3:4': 3 / 4 };
+function fragImage(src, caption, k, w, ratio) {
   return { h: 60, flex: 1, draw: (slide, x, y, h) => {
     const capH = caption && src ? D.small * k * 1.6 : 0;
-    if (!image(slide, src, x, y, w, Math.max(1, h - capH))) {
-      rect(slide, x, y, w, h, { fill: P.bgSoft, line: { color: '#C3CAD5', width: 1.5 }, radius: 8, dash: 'dash' });
+    const r = ratio === 'original' ? null : (IMAGE_RATIOS[ratio] || IMAGE_RATIOS['16:9']);
+    // 비율 상자: 칸 안에서 너비·높이 중 작은 쪽에 맞춰 가운데 놓고, 그림은 cover 로 잘라 채운다
+    const ah = Math.max(1, h - capH);
+    const bw = r ? Math.min(w, ah * r) : w, bh = r ? bw / r : ah;
+    const bx = x + (w - bw) / 2, by = y + (ah - bh) / 2;
+    if (!image(slide, src, bx, by, bw, bh, !r)) {
+      rect(slide, bx, by, bw, bh, { fill: P.bgSoft, line: { color: '#C3CAD5', width: 1.5 }, radius: 8, dash: 'dash' });
       const lab = String(caption || '이미지 자리').trim();
-      text(slide, /^\[.*\]$/.test(lab) ? lab : `[ ${lab} ]`, x, y, w, h, { size: D.small, k, color: '#6F7C92', align: 'center', valign: 'middle' });
+      text(slide, /^\[.*\]$/.test(lab) ? lab : `[ ${lab} ]`, bx, by, bw, bh, { size: D.small, k, color: '#6F7C92', align: 'center', valign: 'middle' });
     } else if (capH) text(slide, caption, x, y + h - capH, w, capH, { size: D.small, k, color: P.textLight, align: 'center', valign: 'middle' });
   } };
 }
@@ -463,7 +490,7 @@ function cardFrags(c, k, w, dark = false) {
     c.items ? fragList(c.items, k, w, { dark, row: c._row }) : null,
     c.text ? fragText(c.text, k, w) : null,
     c.chart ? fragChart(c.chart, k, w) : null,
-    c.image !== undefined ? fragImage(c.image, c.caption, k, w) : null,
+    c.image !== undefined ? fragImage(c.image, c.caption, k, w, c.ratio) : null,
   ];
 }
 
@@ -555,29 +582,33 @@ const B = {
     // white card behind the table
     card(slide, box.x, box.y, box.w, hdrH + rowHs.reduce((a, c) => a + c, 0), P.white, 6);
     let y = box.y, x = box.x;
+    // shadcn/ui Table: 세로선·칸 배경 없이 머리글 아래 1px 선. 강조 열 머리글은 포인트 컬러 글자 + 2px 선
     headers.forEach((h, i) => {
-      rect(slide, x, y, colW[i], hdrH, { fill: i === em ? P.primary : P.bgSoft, line: { color: i === em ? P.primary : '#E3E7EC', width: 0.75 } });
-      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: true, color: i === em ? P.white : P.text, align: 'center', valign: 'middle', lineSpacing: 1.2 });
+      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: true, color: i === em ? P.primary : P.text, align: 'left', valign: 'middle', lineSpacing: 1.2 });
+      if (i === em) rect(slide, x, y + hdrH - 2, colW[i], 2, { fill: P.primary });
       x += colW[i];
     });
+    rect(slide, box.x, y + hdrH - 1, box.w, 1, { fill: P.border });
     y += hdrH;
     rows.forEach((r, ri) => {
       x = box.x; const h = rowHs[ri]; const last = ri === rows.length - 1;
       r.forEach((c, i) => {
         const isEm = i === em;
-        rect(slide, x, y, colW[i], h, { fill: isEm ? P.softerBlue : i === 0 ? P.bgSoft : P.white, line: { color: '#E3E7EC', width: 0.75 } });
+        if (isEm) rect(slide, x, y, colW[i], h, { fill: P.softerBlue });
+        else if (last) rect(slide, x, y, colW[i], h, { fill: P.bgSoft });
         const t = clean(c).trim();
         const badge = /^(달성|완료|충족|조기달성|초과달성|초과|진행중|진행 중|예정|계획|미달|보류|중단)$/.test(t);
         if (badge && !isEm) {
           const [bg, fg] = /^(달성|완료|충족)$/.test(t) ? ['#E6F5EC', P.success] : /^(조기달성|초과달성|초과)$/.test(t) ? ['#DDEEFF', P.primary2] : /^(진행중|진행 중|예정|계획)$/.test(t) ? ['#FFF6E1', P.warning] : [P.bgSoft, P.textMid];
           const bw = estW(t, fs * 0.8) + fs * 2.2, bh = fs * 1.6;
-          rect(slide, x + colW[i] / 2 - bw / 2, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
-          text(slide, '● ' + t, x + colW[i] / 2 - bw / 2, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
+          rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
+          text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
         } else {
-          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || i === 0 || last, color: isEm ? P.primary : P.text, align: leftCols.has(i) ? 'left' : 'center', valign: 'middle', lineSpacing: 1.3 });
+          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || i === 0 || last, color: isEm ? P.primary : P.text, align: 'left', valign: 'middle', lineSpacing: 1.3 });
         }
         x += colW[i];
       });
+      if (!last) rect(slide, box.x, y + h - 1, box.w, 1, { fill: P.border });
       y += h;
     });
   },
@@ -608,7 +639,7 @@ const B = {
     card(slide, px, box.y, pw, box.h, P.white);
     let y = box.y + em, ih = box.h - em * 2; const iw = pw - em * 2.4;
     if (b.heading) { const hh = sh2(slide, b.heading, px + em * 1.2, y, iw, k); y += hh + em * 0.5; ih -= hh + em * 0.5; }
-    fragImage(b.src, b.caption || b.alt, k, iw).draw(slide, px + em * 1.2, y, Math.max(1, ih));
+    fragImage(b.src, b.caption || b.alt, k, iw, b.ratio).draw(slide, px + em * 1.2, y, Math.max(1, ih));
     if (!full) {
       const inner = labeledCard(slide, { x: tx, y: box.y, w: tw, h: box.h }, k, b.text.heading, P.white);
       stack(slide, inner, k, [b.text.sections ? fragSections(b.text.sections, k, inner.w) : null, b.text.items ? fragList(b.text.items, k, inner.w) : null]);

@@ -1,4 +1,10 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>
+/* Paperlogy — 설치돼 있으면 그걸 쓰고, 없으면 jsDelivr(Freesentation/paperlogy, OFL 1.1)에서 받아온다 */
+@font-face{font-family:'Paperlogy 4 Regular';src:local('Paperlogy 4 Regular'),local('Paperlogy-4Regular'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/Paperlogy-4Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Paperlogy 5 Medium';src:local('Paperlogy 5 Medium'),local('Paperlogy-5Medium'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/Paperlogy-5Medium.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Paperlogy 6 SemiBold';src:local('Paperlogy 6 SemiBold'),local('Paperlogy-6SemiBold'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/Paperlogy-6SemiBold.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Paperlogy 7 Bold';src:local('Paperlogy 7 Bold'),local('Paperlogy-7Bold'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/Paperlogy-7Bold.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Paperlogy 8 ExtraBold';src:local('Paperlogy 8 ExtraBold'),local('Paperlogy-8ExtraBold'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/Paperlogy-8ExtraBold.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>장표 디자인 시스템</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
@@ -238,14 +244,15 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .d-banner .msg .rl li{color:var(--p-btext);font-size:calc(var(--fs-small)*var(--k));gap:.35em}
 .d-banner .msg .rl li::before{color:var(--p-btext)}
 .d-banner .msg .rl{gap:.35em}
-.d-tbl{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table)*var(--k));background:#fff;table-layout:fixed}
-.d-tbl th{background:#F5F7FA;color:#1A2438;font-weight:700;text-align:center;padding:.6em .8em;
-  border:1px solid #E3E7EC;font-size:calc(var(--fs-tableh)*var(--k));line-height:1.3}
-.d-tbl th.em{background:var(--p);color:#fff;border-color:var(--p)}
-.d-tbl td{padding:.6em .8em;border:1px solid #E3E7EC;text-align:center;color:#1A2438;background:#fff;line-height:1.45}
-.d-tbl td:first-child{text-align:left;font-weight:600;background:#F5F7FA}
-.d-tbl td.em{background:var(--p-softer);font-weight:700;color:var(--p)}
-.d-tbl tr:last-child td{font-weight:700}
+/* 표 — shadcn/ui Table: 세로선 없음, 행 아래 1px 선, 머리글 중간 굵기·왼쪽 정렬, 마지막 행 footer */
+.d-tbl{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table)*var(--k));background:#fff;table-layout:fixed;text-align:left}
+.d-tbl th{background:transparent;color:#1A2438;font-weight:500;text-align:left;padding:.55em .8em;
+  border:0;border-bottom:1px solid #D9DEE6;font-size:calc(var(--fs-tableh)*var(--k));line-height:1.3;white-space:nowrap}
+.d-tbl th.em{color:var(--p);font-weight:600;border-bottom:2px solid var(--p)}
+.d-tbl td{padding:.6em .8em;border:0;border-bottom:1px solid #D9DEE6;text-align:left;color:#1A2438;background:transparent;line-height:1.45}
+.d-tbl td:first-child{font-weight:500}
+.d-tbl td.em{background:var(--p-softer);font-weight:600;color:var(--p)}
+.d-tbl tr:last-child td{border-bottom:0;background:#F5F7FA;font-weight:500}
 .d-ph{border:1.5px dashed #C3CAD5;border-radius:8px;background:#F5F7FA;color:#6F7C92;
   display:flex;align-items:center;justify-content:center;font-size:calc(var(--fs-small)*var(--k));
   font-weight:500;padding:1em;text-align:center;min-height:4em}

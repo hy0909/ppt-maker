@@ -35,6 +35,7 @@ cd <skill>/scripts && npm install && npx playwright install chromium
 pip install python-pptx pymupdf
 ```
 **Pretendard**(본문)와 **Paperlogy**(표지·섹션 제목) 두 글꼴이 시스템에 있어야 HTML·PDF·PPTX 글꼴이 일치한다.
+Paperlogy 는 HTML·PDF 에서 `@font-face`(`lib/common.mjs` 의 `PAPERLOGY_FONT_FACE`) 로 jsDelivr 에서도 받아오므로 브라우저에서는 설치 없이도 보인다. PPTX 는 여전히 설치가 필요하다.
 `./install_fonts.sh` 가 공식 배포처에서 받아 깐다. 둘 다 SIL OFL 1.1 이라 누구나 공짜로 쓴다.
 굵기마다 패밀리가 따로라 `Paperlogy 7 Bold`·`Pretendard Light` 처럼 이름을 그대로 쓴다. 본문 글꼴만 바꾸려면 `meta.font`.
 표지·목차의 글자 크기·줄 간격(pt 고정)·자간·좌표는 `references/design-system.md` 의 "표지·목차 글자 규격" 표에 있고, 값은 `scripts/lib/common.mjs` 의 `TYPE`·`COVER_BOX`·`AGENDA_BOX` 한 곳에만 둔다.
@@ -74,6 +75,7 @@ python3 <skill>/scripts/prepare_cover_bg.py <원본이미지> <키> --label "이
 4. **표를 넣을 때는 강조할 열을 사용자에게 먼저 묻는다.**
 5. 수치·시장규모·고객명은 원문에 있는 것만. 같은 개념은 문서 전체에서 한 표현으로 통일.
 6. 사용자에게 보여주고 확인받는다: 섹션 목록, 장표별 제목+리드+블록 타입, `[입력 필요]` 목록.
+7. **이미지 상자는 기본 16:9.** 이미지 파일을 받으면 원본 비율을 잰다(`sips -g pixelWidth -g pixelHeight <파일>`). 16:9 가 아니면 이렇게 묻는다 — "이미지 비율을 몇으로 할까요? 정사각형(1:1) / 가로형 1(16:9) / 가로형 2(4:3) / 세로형 1(9:16) / 세로형 2(3:4) / 이미지 원본 비율". 고른 값을 그 블록의 `ratio` 에 적는다(`original` 은 원본 그대로, 나머지는 상자에 맞춰 가장자리가 잘림). 같은 장표에 이미지가 여럿이면 한 번에 묶어 묻는다.
 
 저장 위치: `<작업폴더>/outline.json`. 이미지는 `<작업폴더>/out/assets/`에 두고 `assets/파일명`으로 참조.
 
