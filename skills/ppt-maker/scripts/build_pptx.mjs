@@ -373,12 +373,11 @@ function fragKv(rows, hl, k, w) {
   return { h, draw: (slide, x, y) => {
     const gap = em * 1.2, tw = hl ? (w - gap) * 1.4 / 2.4 : w, hw = w - gap - tw;
     const lw = tw * 0.38;
-    // shadcn/ui Table 과 같은 모양(HTML 의 .rt): 칸 상자 없이 행 아래 1px 선, 마지막 행은 연회색 footer
+    // 카드 안 작은 표 = shadcn 카드의 값 목록(HTML 의 .rt.kvt): 라벨 회색, 값 오른쪽·굵게, 행 사이 1px 선, 띠 없음
     rows.forEach((r, i) => {
       const ry = y + i * rowH, last = i === rows.length - 1;
-      if (last) rect(slide, x, ry, tw, rowH, { fill: P.bgSoft });
-      text(slide, r[0] ?? '', x + fs * 0.8, ry, lw - fs * 1.6, rowH, { size: D.table, k, bold: true, color: P.text, valign: 'middle' });
-      text(slide, r[1] ?? '', x + lw + fs * 0.8, ry, tw - lw - fs * 1.6, rowH, { size: D.table, k, bold: last, color: P.text, align: 'left', valign: 'middle' });
+      text(slide, r[0] ?? '', x + fs * 0.4, ry, lw - fs * 0.8, rowH, { size: D.table, k, color: P.textMid, valign: 'middle' });
+      text(slide, r[1] ?? '', x + lw, ry, tw - lw - fs * 0.4, rowH, { size: D.table, k, bold: true, color: P.text, align: 'right', valign: 'middle' });
       if (!last) rect(slide, x, ry + rowH - 1, tw, 1, { fill: P.border });
     });
     if (hl) {
@@ -447,6 +446,14 @@ function chartPanel(slide, c, x, y, w, h, k) {
   if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
   else slide.addChart(pres.charts.LINE, data, { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 6, lineDataSymbolLineSize: 1, dataLabelPosition: 't', lineSmooth: true });
 }
+/** 숫자 칸인가 / 합계 행인가 — build_html.mjs 와 같은 규칙 */
+function isNumCell(c) {
+  const t = String(c ?? '').replace(/\*\*/g, '').trim();
+  if (!/\d/.test(t)) return false;
+  const letters = (t.match(/[가-힣a-zA-Z]/g) || []).length;
+  return letters <= 4 && !/\s[가-힣a-zA-Z]{3,}/.test(t);
+}
+function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
 /** 이미지 상자 비율. 기본 16:9. 'original' 이면 원본 비율 그대로(contain). HTML 의 IMAGE_RATIOS 와 같은 값. */
 const IMAGE_RATIOS = { '16:9': 16 / 9, '4:3': 4 / 3, '1:1': 1, '9:16': 9 / 16, '3:4': 3 / 4 };
 function fragImage(src, caption, k, w, ratio) {
@@ -552,6 +559,27 @@ const B = {
       else if (s.desc) text(slide, s.desc, x + px, y, w, rest, { size: D.small, k, color: dk ? 'rgba(255,255,255,.85)' : P.textMid, align: 'center', valign: 'middle', lineSpacing: 1.45 });
     });
   },
+  /** 간트 — HTML 의 .gantt 와 같은 모양: 왼쪽 항목 열(24%), 위 기간 라벨 + 밑줄, 세로 격자선, 가로 막대(살짝 둥글게) */
+  gantt(slide, b, box, k) {
+    const inner = labeledCard(slide, box, k, b.heading);
+    const cols = b.cols || [], n = Math.max(1, cols.length), tasks = b.tasks || [];
+    const fs = D.small * k, em = D.body * k;
+    const nameW = inner.w * 0.24, gx = inner.x + nameW, gw = inner.w - nameW, hdrH = fs * 2;
+    cols.forEach((c, i) => text(slide, String(c), gx + gw * i / n, inner.y, gw / n, hdrH, { size: D.small, k, color: P.textMid, align: 'center', valign: 'middle' }));
+    rect(slide, gx, inner.y + hdrH - 1, gw, 1, { fill: P.border });
+    const rowsY = inner.y + hdrH, rowsH = Math.max(1, inner.h - hdrH), rowH = rowsH / Math.max(1, tasks.length);
+    for (let i = 0; i <= n; i++) rect(slide, gx + gw * i / n - (i === n ? 1 : 0), rowsY, 1, rowsH, { fill: P.border });
+    const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
+    const tone = t => t.tone === 'muted' ? P.borderStrong : t.tone === 'accent' ? P.teal : t.tone === 'second' ? P.primary2 : P.primary;
+    tasks.forEach((t, i) => {
+      const y = rowsY + rowH * i;
+      text(slide, String(t.name || '').replace(/\*\*/g, ''), inner.x, y, nameW - em * 0.5, rowH, { size: D.small, k, color: P.text, valign: 'middle' });
+      const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
+      const bx = gx + gw * (s - 1) / n, bw = Math.max(3, gw * (e - s + 1) / n), bh = Math.min(rowH * 0.4, fs * 1.1);   // 두께는 글자 기준 상한
+      rect(slide, bx, y + (rowH - bh) / 2, bw, bh, { fill: tone(t), radius: 3 });
+      if (t.label) text(slide, String(t.label), bx + bw + em * 0.4, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.4), rowH, { size: D.small * 0.9, k, color: P.textMid, valign: 'middle' });
+    });
+  },
   timeline(slide, b, box, k) {
     return B.process(slide, { steps: (b.phases || []).map(p => ({ period: p.period, title: p.title, items: p.items, desc: p.desc, highlight: p.highlight, dark: p.dark })), darkLast: b.darkLast }, box, k);
   },
@@ -566,6 +594,8 @@ const B = {
     } else colW = Array(ncol).fill(box.w / ncol);
     const leftCols = new Set(b.leftAlign || [0]);
     const clean = c => String(c ?? '').replace(/\*\*/g, '');
+    // HTML 과 같은 규칙: 숫자 칸이 절반 넘는 열은 오른쪽 정렬, 첫 칸이 합계·평균이면 footer 행(연회색·굵게)
+    const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
     let kk = k, hdrH, rowHs;
     for (let tries = 0; tries < 8; tries++) {
       const fs = D.table * kk, fsh = D.tableH * kk, padY = fs * 0.6, padX = fs * 0.8;
@@ -584,18 +614,18 @@ const B = {
     let y = box.y, x = box.x;
     // shadcn/ui Table: 세로선·칸 배경 없이 머리글 아래 1px 선. 강조 열 머리글은 포인트 컬러 글자 + 2px 선
     headers.forEach((h, i) => {
-      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: true, color: i === em ? P.primary : P.text, align: 'left', valign: 'middle', lineSpacing: 1.2 });
+      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: true, color: i === em ? P.primary : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.2 });
       if (i === em) rect(slide, x, y + hdrH - 2, colW[i], 2, { fill: P.primary });
       x += colW[i];
     });
     rect(slide, box.x, y + hdrH - 1, box.w, 1, { fill: P.border });
     y += hdrH;
     rows.forEach((r, ri) => {
-      x = box.x; const h = rowHs[ri]; const last = ri === rows.length - 1;
+      x = box.x; const h = rowHs[ri]; const last = ri === rows.length - 1, tot = isTotalRow(r);
       r.forEach((c, i) => {
         const isEm = i === em;
         if (isEm) rect(slide, x, y, colW[i], h, { fill: P.softerBlue });
-        else if (last) rect(slide, x, y, colW[i], h, { fill: P.bgSoft });
+        else if (tot) rect(slide, x, y, colW[i], h, { fill: P.bgSoft });
         const t = clean(c).trim();
         const badge = /^(달성|완료|충족|조기달성|초과달성|초과|진행중|진행 중|예정|계획|미달|보류|중단)$/.test(t);
         if (badge && !isEm) {
@@ -604,7 +634,7 @@ const B = {
           rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
           text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
         } else {
-          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || i === 0 || last, color: isEm ? P.primary : P.text, align: 'left', valign: 'middle', lineSpacing: 1.3 });
+          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || i === 0 || tot, color: isEm ? P.primary : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
         }
         x += colW[i];
       });

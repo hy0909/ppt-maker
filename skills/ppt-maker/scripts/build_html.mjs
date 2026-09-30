@@ -120,7 +120,13 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .rt tbody td:first-child{font-weight:500;}
 .rt tbody td.em{background:var(--primary-softer);font-weight:600;color:var(--primary);}
 .rt tbody td.l{text-align:left;}
-.rt tbody tr:last-child td{border-bottom:0;background:var(--bg-soft);font-weight:500;}
+.rt tbody tr:last-child td{border-bottom:0;}
+.rt tbody tr.tot td{background:var(--bg-soft);font-weight:600;}   /* 합계·평균 행 = shadcn TableFooter */
+.rt th.n,.rt td.n{text-align:right;font-variant-numeric:tabular-nums;}   /* 숫자 칸은 오른쪽 정렬 */
+/* 카드 안 작은 표(라벨·값 두 칸): shadcn 카드의 값 목록처럼 — 라벨 회색, 값 오른쪽·중간 굵기, 띠 없음 */
+.rt.kvt td{padding:.55em .3em;}
+.rt.kvt td:first-child{color:var(--text-mid);font-weight:500;}
+.rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
 .badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
 .badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.prog{background:#FFF6E1;color:var(--warning);} .badge.n{background:var(--bg-soft);color:var(--text-mid);}
@@ -182,6 +188,18 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .card .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.45em;line-height:1.4;margin-bottom:.9em;}
 .sec2+.sec2{margin-top:1em;padding-top:1em;border-top:1px solid #E6E9EE;}
 /* chart */
+/* gantt — 왼쪽 항목 이름 · 위 기간 라벨 · 세로 격자선(연한 테두리색) · 가로 막대(포인트 컬러, muted 회색). 가로 구분선 없음 */
+.card.grow{flex:1 1 0%;}   /* 간트처럼 남은 높이를 다 쓰는 블록의 카드 */
+.gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
+.gantt .gh,.gantt .gr{display:grid;grid-template-columns:var(--gl) 1fr;min-height:0;}
+.gantt .gh{flex:0 0 auto;} .gantt .gr{flex:1;}
+.gantt .gcols{display:grid;grid-template-columns:repeat(var(--n),1fr);text-align:center;color:var(--text-mid);padding-bottom:.4em;border-bottom:1px solid var(--border);}
+.gantt .gcols span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 .2em;}
+.gantt .gname{display:flex;align-items:center;padding-right:.8em;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gantt .gtrack{position:relative;min-height:1.7em;background-image:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:calc(100% / var(--n)) 100%;border-right:1px solid var(--border);}
+.gantt .gbar{position:absolute;top:50%;height:.85em;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;}   /* 두께는 글자 기준 고정 — 행이 커져도 막대는 가늘게 */
+.gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--accent);} .gantt .gbar.muted{background:var(--border-strong);}
+.gantt .gbar span{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:.5em;white-space:nowrap;font-size:.9em;color:var(--text-mid);}
 /* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
@@ -266,7 +284,7 @@ function subSections(secs) {
   return (secs || []).map(x => `<div class="sec2">${x.heading ? `<div class="sh2">${rich(x.heading)}</div>` : ''}${x.items ? listItems(x.items) : ''}${x.text ? `<div class="cd">${rich(x.text)}</div>` : ''}</div>`).join('');
 }
 function kvTable(rows) {
-  return `<div class="tbl"><table class="rt"><tbody>${(rows || []).map(r => `<tr>${r.map((c, i) => `<td${i ? '' : ' style="width:38%"'}>${rich(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return `<div class="tbl"><table class="rt kvt"><tbody>${(rows || []).map(r => `<tr>${r.map((c, i) => `<td${i ? '' : ' style="width:38%"'}>${rich(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 function statFrag(st) {
   const m = String(st.value ?? '').match(/^([\d.,~\-–]+)\s*(.*)$/);
@@ -349,6 +367,15 @@ function imgOrPh(src, alt, ratio) {
   if (!ok) return `<div class="ph${ra ? ' ib' : ''}"${ra ? ra.replace(' class="ib"', '') : ''}>${/^\[.*\]$/.test(label) ? esc(label) : `[ ${esc(label)} ]`}</div>`;
   return `<img src="${esc(src)}" alt="${esc(alt || '')}"${ra}>`;
 }
+/** 숫자 칸인가 — 숫자가 있고 글자는 단위 정도(4자 이하)만. "2억 7,500만 원", "18%", "1,540명" 은 숫자, "3개 기능 구성" 은 글 */
+export function isNumCell(c) {
+  const t = String(c ?? '').replace(/\*\*/g, '').trim();
+  if (!/\d/.test(t)) return false;
+  const letters = (t.match(/[가-힣a-zA-Z]/g) || []).length;
+  return letters <= 4 && !/\s[가-힣a-zA-Z]{3,}/.test(t);
+}
+/** 합계·평균 같은 마무리 행인가 (첫 칸으로 판단) */
+export function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
 function badgeCell(txt) {
   const t = String(txt).replace(/\*\*/g, '');
   if (/^(달성|완료|충족)$/.test(t)) return `<span class="badge ok">${esc(t)}</span>`;
@@ -391,16 +418,31 @@ const BLOCKS = {
         <div class="step${s.highlight ? ' hl' : ''}${s.dark || (b.darkLast && i === n - 1) ? ' dk' : ''}"><div class="per">${esc(s.period || `STEP ${i + 1}`)}</div><div class="pt">${rich(s.title || '')}</div>
         <div class="pd">${s.desc ? `<div>${rich(s.desc)}</div>` : ''}${s.items ? listItems(s.items) : ''}</div></div>`).join('')}</div></div>`;
   },
+  /** 간트: cols(기간 라벨) × tasks(name, start, end 는 1부터 세는 칸 번호·끝 포함·2.5 처럼 반 칸 가능, tone, label) */
+  gantt(b) {
+    const cols = b.cols || [], n = Math.max(1, cols.length), tasks = b.tasks || [];
+    const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
+    const rows = tasks.map(t => {
+      const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
+      const left = ((s - 1) / n * 100).toFixed(2), width = ((e - s + 1) / n * 100).toFixed(2);
+      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}" style="left:${left}%;width:${width}%">${t.label ? `<span>${esc(t.label)}</span>` : ''}</i></div></div>`;
+    }).join('');
+    return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div></div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
+  },
   timeline(b) {
     return BLOCKS.process({ steps: (b.phases || []).map(p => ({ period: p.period, title: p.title, items: p.items, desc: p.desc, highlight: p.highlight, dark: p.dark })), darkLast: b.darkLast });
   },
   table(b) {
-    const em = b.emphasize; const widths = b.widths || [];
+    const em = b.emphasize; const widths = b.widths || []; const rows = b.rows || [];
     const leftCols = new Set(b.leftAlign || [0]);
+    // 숫자 칸이 절반 넘는 열(첫 열 제외)은 오른쪽 정렬, 첫 칸이 합계·평균이면 footer 행
+    const ncol = (b.headers || []).length || (rows[0] || []).length;
+    const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
+    const cls = (i, extra = '') => [i === em ? 'em' : '', numCol[i] ? 'n' : '', extra].filter(Boolean).join(' ');
     return `<div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt">
       ${widths.length ? `<colgroup>${widths.map(w => `<col style="width:${w}">`).join('')}</colgroup>` : ''}
-      <thead><tr>${(b.headers || []).map((h, i) => `<th class="${i === em ? 'em' : ''}">${rich(h)}</th>`).join('')}</tr></thead>
-      <tbody>${(b.rows || []).map(r => `<tr>${r.map((c, i) => `<td class="${i === em ? 'em' : ''}${leftCols.has(i) ? ' l' : ''}">${i === em ? rich(c) : badgeCell(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+      <thead><tr>${(b.headers || []).map((h, i) => `<th class="${cls(i)}">${rich(h)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr${isTotalRow(r) ? ' class="tot"' : ''}>${r.map((c, i) => `<td class="${cls(i, leftCols.has(i) && i > 0 ? 'l' : '')}">${i === em ? rich(c) : badgeCell(c)}</td>`).join('')}</tr>`).join('')}</tbody>
     </table></div>`;
   },
   compare(b) {

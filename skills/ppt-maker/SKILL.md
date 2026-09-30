@@ -71,7 +71,7 @@ python3 <skill>/scripts/prepare_cover_bg.py <원본이미지> <키> --label "이
 ### 2. 아웃라인 작성 — `references/outline-schema.md`
 1. 유형 템플릿의 섹션 순서를 따르되, 원문에 근거가 없는 섹션은 넣지 않는다(빈 자리는 `[입력 필요: …]`).
 2. 장표마다 `title`(주제)과 `lead`(결론 1~2문장)를 새로 쓴다. 원문을 그대로 붙이지 않는다.
-3. 본문은 `columns / cards / process / table / stats / compare / image / timeline / callout` 중 구조에 맞는 블록으로. `bullets`는 최후의 수단.
+3. 본문은 `columns / cards / process / table / stats / compare / image / timeline / gantt / callout` 중 구조에 맞는 블록으로. 여러 일이 겹치는 일정은 `gantt`(왼쫙 항목 · 위 기간 · 가로 막대). `bullets`는 최후의 수단.
 4. **표를 넣을 때는 강조할 열을 사용자에게 먼저 묻는다.**
 5. 수치·시장규모·고객명은 원문에 있는 것만. 같은 개념은 문서 전체에서 한 표현으로 통일.
 6. 사용자에게 보여주고 확인받는다: 섹션 목록, 장표별 제목+리드+블록 타입, `[입력 필요]` 목록.

@@ -94,7 +94,13 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .rt tbody td:first-child{font-weight:500;}
 .rt tbody td.em{background:var(--primary-softer);font-weight:600;color:var(--primary);}
 .rt tbody td.l{text-align:left;}
-.rt tbody tr:last-child td{border-bottom:0;background:var(--bg-soft);font-weight:500;}
+.rt tbody tr:last-child td{border-bottom:0;}
+.rt tbody tr.tot td{background:var(--bg-soft);font-weight:600;}   /* 합계·평균 행 = shadcn TableFooter */
+.rt th.n,.rt td.n{text-align:right;font-variant-numeric:tabular-nums;}   /* 숫자 칸은 오른쪽 정렬 */
+/* 카드 안 작은 표(라벨·값 두 칸): shadcn 카드의 값 목록처럼 — 라벨 회색, 값 오른쪽·중간 굵기, 띠 없음 */
+.rt.kvt td{padding:.55em .3em;}
+.rt.kvt td:first-child{color:var(--text-mid);font-weight:500;}
+.rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
 .badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
 .badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.prog{background:#FFF6E1;color:var(--warning);} .badge.n{background:var(--bg-soft);color:var(--text-mid);}
@@ -217,20 +223,20 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
       <div class="cbadge">브리즈홈 마케팅 월간 보고</div>
     </div>
   </section>
-<section class="slide" data-label="1-1 매출 · ROAS · 신규 고객 · 도달 네 항목 모두 **8월 목표치를 초과 달성**" id="s2" data-fit="1" style="--k: 0.9970703125000001;" style="--k:0.99">
+<section class="slide" data-label="1-1 매출 · ROAS · 신규 고객 · 도달 네 항목 모두 **8월 목표치를 초과 달성**" id="s2" data-fit="1" style="--k: 1.0150390625;" style="--k:1.01">
     <div class="top"><div class="eyebrow"><span>8월 성과 요약</span><span class="pgno">2</span></div><div class="stitle">매출 · ROAS · 신규 고객 · 도달 네 항목 모두 <b>8월 목표치를 초과&nbsp;달성</b></div><div class="rule"></div><div class="slead">집계 기간: 2026.08.01 – 2026.08.31</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:repeat(2,1fr)">
       <div class="card "><div class="cap">매출</div><div class="bd">
-        <div class="fill"><div class="kv"><div class="tbl"><table class="rt"><tbody><tr><td style="width:38%">7월</td><td>2억 7,500만&nbsp;원</td></tr><tr><td style="width:38%">8월</td><td>3억 2,400만&nbsp;원</td></tr></tbody></table></div><div class="hbox"><div class="hl">전월대비</div><div class="hv">18%&nbsp;증가</div></div></div></div>
+        <div class="fill"><div class="kv"><div class="tbl"><table class="rt kvt"><tbody><tr><td style="width:38%">7월</td><td>2억 7,500만&nbsp;원</td></tr><tr><td style="width:38%">8월</td><td>3억 2,400만&nbsp;원</td></tr></tbody></table></div><div class="hbox"><div class="hl">전월대비</div><div class="hv">18%&nbsp;증가</div></div></div></div>
       </div></div>
       <div class="card "><div class="cap">신규&nbsp;고객</div><div class="bd">
-        <div class="fill"><div class="kv"><div class="tbl"><table class="rt"><tbody><tr><td style="width:38%">7월</td><td>4,342명</td></tr><tr><td style="width:38%">8월</td><td>4,820명</td></tr></tbody></table></div><div class="hbox"><div class="hl">전월대비</div><div class="hv">11%&nbsp;증가</div></div></div></div>
+        <div class="fill"><div class="kv"><div class="tbl"><table class="rt kvt"><tbody><tr><td style="width:38%">7월</td><td>4,342명</td></tr><tr><td style="width:38%">8월</td><td>4,820명</td></tr></tbody></table></div><div class="hbox"><div class="hl">전월대비</div><div class="hv">11%&nbsp;증가</div></div></div></div>
       </div></div>
       <div class="card "><div class="cap">도달</div><div class="bd">
-        <div class="fill"><div class="kv"><div class="tbl"><table class="rt"><tbody><tr><td style="width:38%">7월</td><td>172만&nbsp;명</td></tr><tr><td style="width:38%">8월</td><td>187만&nbsp;명</td></tr></tbody></table></div><div class="hbox"><div class="hl">전월대비</div><div class="hv">9%&nbsp;증가</div></div></div></div>
+        <div class="fill"><div class="kv"><div class="tbl"><table class="rt kvt"><tbody><tr><td style="width:38%">7월</td><td>172만&nbsp;명</td></tr><tr><td style="width:38%">8월</td><td>187만&nbsp;명</td></tr></tbody></table></div><div class="hbox"><div class="hl">전월대비</div><div class="hv">9%&nbsp;증가</div></div></div></div>
       </div></div>
       <div class="card "><div class="cap">ROAS</div><div class="bd">
-        <div class="fill"><div class="kv"><div class="tbl"><table class="rt"><tbody><tr><td style="width:38%">목표</td><td>380%</td></tr><tr><td style="width:38%">8월</td><td>412%</td></tr></tbody></table></div><div class="hbox"><div class="hl">목표대비</div><div class="hv">8%&nbsp;초과</div></div></div></div>
+        <div class="fill"><div class="kv"><div class="tbl"><table class="rt kvt"><tbody><tr><td style="width:38%">목표</td><td>380%</td></tr><tr><td style="width:38%">8월</td><td>412%</td></tr></tbody></table></div><div class="hbox"><div class="hl">목표대비</div><div class="hv">8%&nbsp;초과</div></div></div></div>
       </div></div></div></div></div><div class="blk" style="flex:0 0 auto"><div class="inner"><div class="banner"><div class="lead">특이사항</div><div class="msg"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g4"><li>성수기 막바지 프로모션과 신제품 미니 제습기 출시 효과가 맞물리며 주요 지표가 모두 목표치 초과&nbsp;달성</li><li>특정 채널에 편중되지 않고 유튜브, 인스타그램, 블로그 세 채널이 고르게&nbsp;성장</li></ul></div></div></div></div></div>
     
   </section>
