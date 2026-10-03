@@ -615,10 +615,9 @@ const B = {
     rect(slide, box.x, box.y, box.w, hdrH, { fill: P.bgSoft });
     if (rh) rect(slide, box.x, box.y + hdrH, colW[0], tblH - hdrH, { fill: P.bgSoft });
     let y = box.y, x = box.x;
-    // 강조 열 머리글은 포인트 컬러 글자 + 2px 선
+    // 강조 열 머리글은 포인트 컬러 글자(밑줄은 다른 열과 같은 1px 연회색 선)
     headers.forEach((h, i) => {
-      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: i === em, color: i === em ? P.primary : P.textMid, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.2 });
-      if (i === em) rect(slide, x, y + hdrH - 2, colW[i], 2, { fill: P.primary });
+      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: true, color: i === em ? P.primary : P.textLight, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.2 });
       x += colW[i];
     });
     rect(slide, box.x, y + hdrH - 1, box.w, 1, { fill: P.border });
@@ -637,7 +636,7 @@ const B = {
           rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
           text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
         } else {
-          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || (i === 0 && !rh) || tot, color: isEm ? P.primary : rh && i === 0 ? P.textMid : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
+          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || (rh && i === 0) || tot, color: isEm ? P.primary : rh && i === 0 ? P.textLight : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
         }
         x += colW[i];
       });
