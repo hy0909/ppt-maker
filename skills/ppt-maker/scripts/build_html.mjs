@@ -112,18 +112,22 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
 .stat .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.5em;line-height:1.4;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
-/* 표 — shadcn/ui Table(new-york) 을 따른다: 세로선 없음, 행 아래 1px 구분선, 머리글 중간 굵기·왼쪽 정렬, 첫 칸 중간 굵기, 마지막 행은 TableFooter(연회색·중간 굵기). 강조 열만 연파랑 */
-table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;text-align:left;}
-.rt thead th{background:transparent;color:var(--text);font-weight:500;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
+/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 2px 검정 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
+   머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열만 연파랑 */
+table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;text-align:left;border-top:2px solid var(--title);border-bottom:2px solid var(--title);}
+.rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:500;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
 .rt thead th.em{color:var(--primary);font-weight:600;border-bottom:2px solid var(--primary);}
 .rt tbody td{padding:.6em .8em;border:0;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
 .rt tbody td:first-child{font-weight:500;}
+.rt.rh thead th:first-child{border-right:1px solid var(--border);}
+.rt.rh tbody td:first-child{background:var(--bg-soft);color:var(--text-mid);border-right:1px solid var(--border);}
 .rt tbody td.em{background:var(--primary-softer);font-weight:600;color:var(--primary);}
 .rt tbody td.l{text-align:left;}
 .rt tbody tr:last-child td{border-bottom:0;}
-.rt tbody tr.tot td{background:var(--bg-soft);font-weight:600;}   /* 합계·평균 행 = shadcn TableFooter */
+.rt tbody tr.tot td{background:var(--bg-soft);font-weight:600;}   /* 합계·평균 행 */
 .rt th.n,.rt td.n{text-align:right;font-variant-numeric:tabular-nums;}   /* 숫자 칸은 오른쪽 정렬 */
 /* 카드 안 작은 표(라벨·값 두 칸): shadcn 카드의 값 목록처럼 — 라벨 회색, 값 오른쪽·중간 굵기, 띠 없음 */
+.rt.kvt{border-top:0;border-bottom:0;}
 .rt.kvt td{padding:.55em .3em;}
 .rt.kvt td:first-child{color:var(--text-mid);font-weight:500;}
 .rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
@@ -439,7 +443,7 @@ const BLOCKS = {
     const ncol = (b.headers || []).length || (rows[0] || []).length;
     const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
     const cls = (i, extra = '') => [i === em ? 'em' : '', numCol[i] ? 'n' : '', extra].filter(Boolean).join(' ');
-    return `<div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt">
+    return `<div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt${b.rowHeader ? ' rh' : ''}">
       ${widths.length ? `<colgroup>${widths.map(w => `<col style="width:${w}">`).join('')}</colgroup>` : ''}
       <thead><tr>${(b.headers || []).map((h, i) => `<th class="${cls(i)}">${rich(h)}</th>`).join('')}</tr></thead>
       <tbody>${rows.map(r => `<tr${isTotalRow(r) ? ' class="tot"' : ''}>${r.map((c, i) => `<td class="${cls(i, leftCols.has(i) && i > 0 ? 'l' : '')}">${i === em ? rich(c) : badgeCell(c)}</td>`).join('')}</tr>`).join('')}</tbody>

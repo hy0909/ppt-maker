@@ -609,12 +609,15 @@ const B = {
       kk *= 0.9;
     }
     const fs = D.table * kk, padX = fs * 0.8;
-    // white card behind the table
-    card(slide, box.x, box.y, box.w, hdrH + rowHs.reduce((a, c) => a + c, 0), P.white, 6);
+    const rh = !!b.rowHeader, tblH = hdrH + rowHs.reduce((a, c) => a + c, 0);
+    // SAFE AI Data Table: 흰 바탕, 머리글(타이틀 영역) 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역
+    rect(slide, box.x, box.y, box.w, tblH, { fill: P.white });
+    rect(slide, box.x, box.y, box.w, hdrH, { fill: P.bgSoft });
+    if (rh) rect(slide, box.x, box.y + hdrH, colW[0], tblH - hdrH, { fill: P.bgSoft });
     let y = box.y, x = box.x;
-    // shadcn/ui Table: 세로선·칸 배경 없이 머리글 아래 1px 선. 강조 열 머리글은 포인트 컬러 글자 + 2px 선
+    // 강조 열 머리글은 포인트 컬러 글자 + 2px 선
     headers.forEach((h, i) => {
-      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: true, color: i === em ? P.primary : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.2 });
+      text(slide, clean(h), x + padX, y, colW[i] - padX * 2, hdrH, { size: D.tableH, k: kk, bold: i === em, color: i === em ? P.primary : P.textMid, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.2 });
       if (i === em) rect(slide, x, y + hdrH - 2, colW[i], 2, { fill: P.primary });
       x += colW[i];
     });
@@ -634,13 +637,17 @@ const B = {
           rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
           text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
         } else {
-          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || i === 0 || tot, color: isEm ? P.primary : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
+          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || (i === 0 && !rh) || tot, color: isEm ? P.primary : rh && i === 0 ? P.textMid : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
         }
         x += colW[i];
       });
       if (!last) rect(slide, box.x, y + h - 1, box.w, 1, { fill: P.border });
       y += h;
     });
+    if (rh) rect(slide, box.x + colW[0] - 1, box.y, 1, tblH, { fill: P.border });
+    // 시작·끝 = 2px 검정 선
+    rect(slide, box.x, box.y, box.w, 2, { fill: P.title });
+    rect(slide, box.x, box.y + tblH - 2, box.w, 2, { fill: P.title });
   },
   compare(slide, b, box, k) {
     const em = D.body * k, mid = em * 3, w = (box.w - mid) / 2;
