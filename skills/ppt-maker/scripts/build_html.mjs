@@ -115,12 +115,12 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 /* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 2px 검정 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
    머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열만 연파랑 */
 table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;text-align:left;border-top:2px solid var(--title);border-bottom:2px solid var(--title);}
-.rt thead th{background:var(--bg-soft);color:var(--text-light);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
+.rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
 .rt thead th.em{color:var(--primary);}
 .rt tbody td{padding:.6em .8em;border:0;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
 .rt tbody td{font-weight:400;}   /* 본문 = regular·검정, 타이틀 영역 = bold·연회색 */
 .rt.rh thead th:first-child{border-right:1px solid var(--border);}
-.rt.rh tbody td:first-child{background:var(--bg-soft);color:var(--text-light);font-weight:700;border-right:1px solid var(--border);}
+.rt.rh tbody td:first-child{background:var(--bg-soft);color:var(--text-mid);font-weight:700;border-right:1px solid var(--border);}
 .rt tbody td.em{background:var(--primary-softer);font-weight:600;color:var(--primary);}
 .rt tbody td.l{text-align:left;}
 .rt tbody tr:last-child td{border-bottom:0;}
