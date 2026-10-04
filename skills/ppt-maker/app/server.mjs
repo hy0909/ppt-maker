@@ -427,20 +427,8 @@ function cancelJob(j) {
 setInterval(() => { const t = Date.now() - 30 * 60e3; for (const [k, j] of JOBS) if (j.endedAt && j.endedAt < t) JOBS.delete(k); }, 60e3).unref();
 
 // ─── server ─────────────────────────────────────────────────────
-// 이 서버를 불러 쓸 수 있는 웹 주소. 더 붙이려면 PPT_MAKER_ALLOW_ORIGIN 에 쉼표로 적는다.
-const ALLOW_ORIGINS = ['https://hy0909.github.io', ...(process.env.PPT_MAKER_ALLOW_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean)];
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
-  // 웹 화면(GitHub Pages)이 이 서버를 불러 쓸 수 있게 한다. 허락한 주소만 받는다.
-  const origin = req.headers.origin;
-  if (origin && ALLOW_ORIGINS.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204, { 'Access-Control-Allow-Methods': 'GET, POST, HEAD, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type', 'Access-Control-Allow-Private-Network': 'true', 'Access-Control-Max-Age': '600' });
-      return res.end();
-    }
-  }
   try {
     if (req.method === 'GET' && url.pathname === '/') {
       res.writeHead(200, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-store' });
