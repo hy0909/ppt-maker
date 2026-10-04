@@ -30,7 +30,7 @@ const DIVIDER_BG = dividerBgFile(meta.coverBg);   // 표지에 짝이 되는 간
 
 // ─── CSS ────────────────────────────────────────────────────────
 function css() {
-  const K = meta.density === 'airy' ? 1.5 : 1.9;
+  const K = 1.3;   // 본문 배율 최대값(dense·airy 같음). 내용이 적어도 글자가 지나치게 커지지 않게
   const C = COVER_BOX, A = AGENDA_BOX;
   return `
 ${PAPERLOGY_FONT_FACE}
