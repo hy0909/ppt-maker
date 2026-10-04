@@ -113,7 +113,7 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .stat .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.5em;line-height:1.4;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
 /* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 2px 검정 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
-   머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열만 연파랑 */
+   머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열은 글자색만 포인트 컬러 */
 table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;text-align:left;border-top:2px solid var(--title);border-bottom:2px solid var(--title);}
 .rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
 .rt thead th.em{color:var(--primary);}
@@ -121,7 +121,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);backgroun
 .rt tbody td{font-weight:400;}   /* 본문 = regular·검정, 타이틀 영역 = bold·연회색 */
 .rt.rh thead th:first-child{border-right:1px solid var(--border);}
 .rt.rh tbody td:first-child{background:var(--bg-soft);color:var(--text-mid);font-weight:700;border-right:1px solid var(--border);}
-.rt tbody td.em{background:var(--primary-softer);font-weight:600;color:var(--primary);}
+.rt tbody td.em{color:var(--primary);}   /* 강조 열은 글자색만 — 바탕·굵기는 그대로 */
 .rt tbody td.l{text-align:left;}
 .rt tbody tr:last-child td{border-bottom:0;}
 .rt tbody tr.tot td{background:var(--bg-soft);font-weight:600;}   /* 합계·평균 행 */

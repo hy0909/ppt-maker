@@ -626,8 +626,7 @@ const B = {
       x = box.x; const h = rowHs[ri]; const last = ri === rows.length - 1, tot = isTotalRow(r);
       r.forEach((c, i) => {
         const isEm = i === em;
-        if (isEm) rect(slide, x, y, colW[i], h, { fill: P.softerBlue });
-        else if (tot) rect(slide, x, y, colW[i], h, { fill: P.bgSoft });
+        if (tot) rect(slide, x, y, colW[i], h, { fill: P.bgSoft });
         const t = clean(c).trim();
         const badge = /^(달성|완료|충족|조기달성|초과달성|초과|진행중|진행 중|예정|계획|미달|보류|중단)$/.test(t);
         if (badge && !isEm) {
@@ -636,7 +635,7 @@ const B = {
           rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
           text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
         } else {
-          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: isEm || (rh && i === 0) || tot, color: isEm ? P.primary : rh && i === 0 ? P.textMid : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
+          text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: (rh && i === 0) || tot, color: isEm ? P.primary : rh && i === 0 ? P.textMid : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
         }
         x += colW[i];
       });
