@@ -93,8 +93,8 @@ const DEFAULT_TOKENS = {
   head:    { eyebrow: 15, pgno: 13, stitle: 42, lead: 16, ruleColor: '#CFD4DC' },
   frame:   { pad: 40, safeBottom: 44, bodyTop: 220 },
   shape:   { card: 19, banner: 14, label: 8, pill: 999, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
-  density: { dense: { body: 18, small: 16, cardTitle: 26, stat: 34, table: 20, tableH: 20, gap: 12 },
-             airy:  { body: 18, small: 16, cardTitle: 26, stat: 34, table: 20, tableH: 20, gap: 12 } },
+  density: { dense: { body: 18, small: 16, cardTitle: 26, stat: 34, table: 24, tableH: 24, gap: 12 },
+             airy:  { body: 18, small: 16, cardTitle: 26, stat: 34, table: 24, tableH: 24, gap: 12 } },
 };
 /** 읽어 온 값을 기본값 위에 덮는다. 빠진 칸은 기본값이 남는다. */
 const overlay = (base, over) => {

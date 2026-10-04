@@ -1,0 +1,633 @@
+{
+ "meta": {
+  "type": "client-proposal",
+  "density": "dense",
+  "coverBg": "cube",
+  "pill": "템플릿",
+  "event": "레이아웃 24종 견본",
+  "docType": "템플릿 견본",
+  "title": "장표 템플릿 24종 견본",
+  "subtitle": "ppt-maker 가 실제로 그리는 레이아웃을 한 덱에 모았습니다",
+  "company": "예시 회사",
+  "fileCompany": "templates",
+  "orgs": [
+   {
+    "role": "작성",
+    "name": "ppt-maker"
+   },
+   {
+    "role": "용도",
+    "name": "레이아웃 견본"
+   }
+  ],
+  "brand": {
+   "primary": "#2B0CDD",
+   "secondary": "#CBD5E1"
+  },
+  "contact": {
+   "email": "hello@example.com",
+   "web": "example.com"
+  },
+  "agenda": true,
+  "dividers": true,
+  "pageNumbers": true
+ },
+ "sections": [
+  {
+   "no": 1,
+   "title": "사업 개요",
+   "subtitle": "회사와 과제를 소개하는 장표",
+   "slides": [
+    {
+     "notes": "TPL 20",
+     "title": "냉장 물류 관제 **한 가지에 집중**하는 회사",
+     "lead": "회사 소개서 첫 본문. 왼쪽은 소개, 오른쪽은 규모를 보여 주는 수치.",
+     "blocks": [
+      {
+       "type": "columns",
+       "columns": [
+        {
+         "heading": "회사 소개",
+         "items": [
+          {
+           "k": "설립",
+           "v": "2019년, 냉장 물류 관제 전문"
+          },
+          {
+           "k": "거점",
+           "v": "서울 본사 · 부산 연구소"
+          },
+          {
+           "k": "한 줄 소개",
+           "v": "온도 기록을 판단으로 바꾸는 관제 서비스"
+          }
+         ]
+        },
+        {
+         "heading": "주요 지표",
+         "stat": {
+          "sub": "함께하는 고객사",
+          "value": "120곳",
+          "desc": "전년 대비 30곳 늘어남"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 23",
+     "title": "과제 배경과 **목표 네 가지**",
+     "lead": "과제 배경을 목표 네 개로 묶고, 아래 배너에 기술 태그를 둔다.",
+     "blocks": [
+      {
+       "type": "cards",
+       "cols": 2,
+       "cards": [
+        {
+         "title": "정확도",
+         "desc": "상한 판정 오류를 절반으로 줄인다"
+        },
+        {
+         "title": "속도",
+         "desc": "이상 감지부터 알림까지 1분 안에"
+        },
+        {
+         "title": "확장",
+         "desc": "차량 1,000대까지 같은 구조로"
+        },
+        {
+         "title": "근거",
+         "desc": "모든 판정에 근거 기록을 남긴다"
+        }
+       ]
+      },
+      {
+       "type": "callout",
+       "label": "기술 태그",
+       "items": [
+        "시계열 이상 탐지 · 규칙 엔진 · 경량 모델"
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 06",
+     "title": "관제 화면 하나로 **차량 상태를 한눈에**",
+     "lead": "글을 먼저 읽히고 오른쪽 화면으로 확인시킨다.",
+     "blocks": [
+      {
+       "type": "image",
+       "side": "right",
+       "src": "",
+       "alt": "관제 화면",
+       "text": {
+        "heading": "관제 화면 구성",
+        "items": [
+         "차량별 온도 곡선",
+         "위험 점수와 판정 근거",
+         "알림 이력"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "notes": "TPL 09",
+     "title": "운용 환경의 **세 가지 특성**",
+     "lead": "대등한 세 가지를 카드 한 줄로.",
+     "blocks": [
+      {
+       "type": "cards",
+       "cards": [
+        {
+         "title": "온도 변화",
+         "items": [
+          "문 열림마다 급변",
+          "여름철 편차 큼"
+         ]
+        },
+        {
+         "title": "통신 환경",
+         "items": [
+          "터널·지하 구간 끊김",
+          "배치 전송 필요"
+         ]
+        },
+        {
+         "title": "운영 인력",
+         "items": [
+          "관제 인원 소수",
+          "야간 대응 어려움"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "no": 2,
+   "title": "해결 방안",
+   "subtitle": "무엇을 어떻게 바꾸는지",
+   "slides": [
+    {
+     "notes": "TPL 05",
+     "title": "도입 전에 **결정이 필요한 세 가지**",
+     "lead": "대등하고 짧은 항목을 순서대로. 최후의 수단으로 쓴다.",
+     "blocks": [
+      {
+       "type": "bullets",
+       "items": [
+        "시범 운영할 차량 범위",
+        "판정 기준 온도와 허용 시간",
+        "알림을 받을 담당자와 채널"
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 15",
+     "title": "수기 점검에서 **자동 판정**으로",
+     "lead": "같은 기준으로 두 상태를 맞댄다.",
+     "blocks": [
+      {
+       "type": "compare",
+       "left": {
+        "tag": "AS-IS",
+        "heading": "수기 점검",
+        "items": [
+         "하루 두 번 기록지 확인",
+         "이상은 다음 날 발견",
+         "판단 근거가 남지 않음"
+        ]
+       },
+       "right": {
+        "tag": "TO-BE",
+        "heading": "자동 판정",
+        "items": [
+         "1분 간격 자동 수집",
+         "이상 즉시 알림",
+         "판정 근거 자동 기록"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "notes": "TPL 11",
+     "title": "수집부터 판정까지의 **시스템 구성**",
+     "lead": "구성도 전체를 크게 놓고 관계를 보인다.",
+     "blocks": [
+      {
+       "type": "image",
+       "side": "full",
+       "src": "",
+       "alt": "시스템 구성도",
+       "caption": "차량 센서 → 수집 서버 → 판정 엔진 → 관제 화면"
+      }
+     ]
+    },
+    {
+     "notes": "TPL 21",
+     "title": "위험도 산출 모듈의 **세 가지 특징**",
+     "lead": "기술 모듈 하나를 깊게. 오른쪽 그림과 아래 배너.",
+     "blocks": [
+      {
+       "type": "image",
+       "side": "right",
+       "src": "",
+       "alt": "위험도 산출 흐름",
+       "text": {
+        "heading": "위험도 산출",
+        "items": [
+         "구간별 상태를 점수로",
+         "외기 온도 가중치 반영",
+         "판정 근거를 문장으로"
+        ]
+       }
+      },
+      {
+       "type": "callout",
+       "label": "적용 산업",
+       "items": [
+        "식품 냉장 운송 · 의약품 콜드체인"
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 22",
+     "title": "기술 난제와 **대응 방안**",
+     "lead": "난제와 해법을 맞대고 근거를 표로 받친다.",
+     "blocks": [
+      {
+       "type": "compare",
+       "left": {
+        "tag": "난제",
+        "heading": "짧은 이상 구간",
+        "items": [
+         "문 열림 1~2분",
+         "평균값에 묻힘"
+        ]
+       },
+       "right": {
+        "tag": "해법",
+        "heading": "구간 단위 판정",
+        "items": [
+         "1분 단위 구간 분리",
+         "구간별 누적 점수"
+        ]
+       }
+      },
+      {
+       "type": "table",
+       "headers": [
+        "지표",
+        "기존",
+        "제안"
+       ],
+       "rows": [
+        [
+         "감지율",
+         "62%",
+         "94%"
+        ],
+        [
+         "오탐률",
+         "18%",
+         "5%"
+        ]
+       ],
+       "emphasize": 2
+      }
+     ]
+    },
+    {
+     "notes": "TPL 16",
+     "title": "도입부터 운영까지 **네 단계**",
+     "lead": "순서가 핵심인 절차.",
+     "blocks": [
+      {
+       "type": "process",
+       "steps": [
+        {
+         "title": "설치",
+         "desc": "차량 센서 부착"
+        },
+        {
+         "title": "수집",
+         "desc": "2주간 기준 데이터"
+        },
+        {
+         "title": "조정",
+         "desc": "판정 기준 맞춤"
+        },
+        {
+         "title": "운영",
+         "desc": "관제 시작"
+        }
+       ],
+       "darkLast": true
+      }
+     ]
+    },
+    {
+     "notes": "TPL 07",
+     "title": "센서 장비 **외형과 부착 위치**",
+     "lead": "그림이 주인공이고 글은 보조.",
+     "blocks": [
+      {
+       "type": "image",
+       "side": "left",
+       "src": "",
+       "alt": "센서 장비 사진",
+       "text": {
+        "heading": "부착 위치",
+        "items": [
+         "적재함 안쪽 상단",
+         "문 가까운 쪽 1개 추가"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "notes": "TPL 08",
+     "title": "자금 사용처와 **다음 계획**",
+     "lead": "두 항목을 같은 비중으로 나란히.",
+     "blocks": [
+      {
+       "type": "columns",
+       "columns": [
+        {
+         "heading": "자금 사용처",
+         "items": [
+          "연구 인력 확충",
+          "센서 양산 준비"
+         ]
+        },
+        {
+         "heading": "다음 계획",
+         "items": [
+          "지방 거점 확대",
+          "의약품 물류 진출"
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "no": 3,
+   "title": "추진 계획",
+   "subtitle": "언제, 누가, 얼마나",
+   "slides": [
+    {
+     "notes": "TPL 14",
+     "title": "1년 안에 **전국 거점으로 확대**",
+     "lead": "시점과 그때 끝낼 일을 보인다.",
+     "blocks": [
+      {
+       "type": "timeline",
+       "phases": [
+        {
+         "period": "1분기",
+         "title": "시범 운영",
+         "items": [
+          "차량 20대"
+         ]
+        },
+        {
+         "period": "2분기",
+         "title": "기준 조정",
+         "items": [
+          "판정 기준 확정"
+         ]
+        },
+        {
+         "period": "3분기",
+         "title": "수도권 확대",
+         "items": [
+          "차량 200대"
+         ]
+        },
+        {
+         "period": "4분기",
+         "title": "전국 확대",
+         "items": [
+          "5개 거점"
+         ]
+        }
+       ],
+       "darkLast": true
+      }
+     ]
+    },
+    {
+     "notes": "TPL 12",
+     "title": "기존 방식 대비 **모든 지표 개선**",
+     "lead": "여러 기준으로 맞대어 비교한다.",
+     "blocks": [
+      {
+       "type": "table",
+       "headers": [
+        "지표",
+        "기존 방식",
+        "제안 방식",
+        "상태"
+       ],
+       "rows": [
+        [
+         "감지 시간",
+         "다음 날",
+         "1분 이내",
+         "달성"
+        ],
+        [
+         "판정 근거",
+         "없음",
+         "자동 기록",
+         "달성"
+        ],
+        [
+         "관제 인원",
+         "4명",
+         "2명",
+         "진행중"
+        ]
+       ],
+       "emphasize": 2
+      }
+     ]
+    },
+    {
+     "notes": "TPL 18",
+     "title": "과제를 맡을 **핵심 인력 네 명**",
+     "lead": "사람과 역할을 한 줄로. 사진은 넣지 않는다.",
+     "blocks": [
+      {
+       "type": "cards",
+       "cols": 4,
+       "cards": [
+        {
+         "title": "홍길동",
+         "desc": "총괄 · 물류 관제 10년"
+        },
+        {
+         "title": "김영희",
+         "desc": "판정 엔진 · 시계열 분석"
+        },
+        {
+         "title": "이철수",
+         "desc": "센서 · 임베디드"
+        },
+        {
+         "title": "박민지",
+         "desc": "관제 화면 · 서비스 디자인"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "no": 4,
+   "title": "성과",
+   "subtitle": "무엇이 달라졌는지",
+   "slides": [
+    {
+     "notes": "TPL 10",
+     "title": "시범 운영 3개월 **핵심 수치**",
+     "lead": "핵심 숫자를 크게 보여 한 번에 읽힌다.",
+     "blocks": [
+      {
+       "type": "stats",
+       "stats": [
+        {
+         "label": "상한 반품",
+         "value": "1건",
+         "desc": "이전 분기 9건"
+        },
+        {
+         "label": "감지 시간",
+         "value": "48초",
+         "desc": "평균, 알림까지"
+        },
+        {
+         "label": "관제 인원",
+         "value": "2명",
+         "desc": "4명에서 절반으로"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 13",
+     "title": "고객이 말한 **가장 큰 변화**",
+     "lead": "한 문장을 배너로 남긴다.",
+     "blocks": [
+      {
+       "type": "callout",
+       "label": "고객 의견",
+       "text": "아침마다 기록지를 넘기던 일이 없어졌고, 문제가 생기면 바로 압니다."
+      }
+     ]
+    },
+    {
+     "notes": "TPL 17",
+     "title": "현장 적용 **사례 네 곳**",
+     "lead": "사례와 시연 장면을 여러 개 한 장에.",
+     "blocks": [
+      {
+       "type": "columns",
+       "columns": [
+        {
+         "heading": "수도권 센터",
+         "image": "",
+         "caption": "현장 사진"
+        },
+        {
+         "heading": "부산 센터",
+         "image": "",
+         "caption": "현장 사진"
+        }
+       ]
+      },
+      {
+       "type": "columns",
+       "columns": [
+        {
+         "heading": "의약품 창고",
+         "image": "",
+         "caption": "현장 사진"
+        },
+        {
+         "heading": "전시회 시연",
+         "image": "",
+         "caption": "현장 사진"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 24",
+     "title": "함께하는 **고객과 파트너**",
+     "lead": "로고를 한 번에. 파일이 없으면 자리표시자.",
+     "blocks": [
+      {
+       "type": "columns",
+       "columns": [
+        {
+         "heading": "고객사",
+         "image": "",
+         "caption": "로고"
+        },
+        {
+         "heading": "고객사",
+         "image": "",
+         "caption": "로고"
+        },
+        {
+         "heading": "고객사",
+         "image": "",
+         "caption": "로고"
+        }
+       ]
+      },
+      {
+       "type": "columns",
+       "columns": [
+        {
+         "heading": "파트너",
+         "image": "",
+         "caption": "로고"
+        },
+        {
+         "heading": "파트너",
+         "image": "",
+         "caption": "로고"
+        },
+        {
+         "heading": "파트너",
+         "image": "",
+         "caption": "로고"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "closing": {
+  "message": "감사합니다",
+  "sub": "템플릿 견본 덱"
+ }
+}

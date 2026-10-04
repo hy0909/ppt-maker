@@ -145,6 +145,18 @@ section.blk:first-of-type{margin-top:0}
 .blk>.note{color:var(--ink2);font-size:13px;max-width:62ch;margin:0 0 18px}
 .blk>.note code,.inl{font-family:var(--mono);font-size:.88em;background:var(--sunk);padding:1px 5px;border-radius:4px}
 
+/* ── 템플릿 24종 (실제 렌더 썸네일) ── */
+.g24{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.g24 .c{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--pg);display:flex;flex-direction:column}
+.g24 a.th{display:block;aspect-ratio:16/9;background:#E9ECF0;border-bottom:1px solid var(--line)}
+.g24 a.th img{width:100%;height:100%;object-fit:cover;display:block}
+.g24 .th.none{display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:12px}
+.g24 .b{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px}
+.g24 .n{font-size:13px;font-weight:700;color:var(--ink)}
+.g24 .n span{color:var(--acc);margin-right:6px;font-variant-numeric:tabular-nums}
+.g24 .w{font-size:12px;color:var(--ink2);line-height:1.45}
+.g24 .k{font-size:11.5px;color:var(--ink3);line-height:1.45}
+.g24 code{font-family:ui-monospace,Menlo,monospace;font-size:.95em;background:var(--acc-soft);color:var(--acc);padding:0 .3em;border-radius:3px}
 /* ── token table ── */
 .tt{width:100%;border-collapse:collapse;table-layout:fixed}
 .ttwrap{overflow-x:auto;margin:0 -16px;padding:0 16px}
@@ -491,6 +503,13 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
       <div id="s-templates"></div>
     </section>
 
+    <section class="blk"><h2>템플릿 24종</h2>
+      <p class="note">레퍼런스 레이아웃 24종을 <b>실제 렌더러</b>(build_html)로 그린 견본이다. 번호는 레이아웃 번호,
+        아래 줄은 언제 쓰는지와 아웃라인에 쓰는 블록. <b>썸네일을 누르면 견본 덱의 그 장이 새 탭으로 열린다.</b>
+        위에서 고친 값은 여기에 바로 반영되지 않는다 — 견본 덱을 다시 만들면 바뀐다(<span class="inl">docs/templates</span>).</p>
+      <div class="g24" id="s-t24"></div>
+    </section>
+
     <section class="blk"><h2>부속</h2>
       <p class="note">어느 판에나 들어가는 덩어리다. 아래 미리보기도 위에서 고친 값을 그대로 따른다.</p>
       <div class="demos" id="s-demos"></div>
@@ -540,8 +559,8 @@ function derive(primary,secondary){
 
 /* ── state ── */
 var DENSITY={
-  dense:{body:18,small:16,cardTitle:26,stat:34,table:20,tableH:20,gap:12},
-  airy: {body:18,small:16,cardTitle:26,stat:34,table:20,tableH:20,gap:12}
+  dense:{body:18,small:16,cardTitle:26,stat:34,table:24,tableH:24,gap:12},
+  airy: {body:18,small:16,cardTitle:26,stat:34,table:24,tableH:24,gap:12}
 };
 var DEFAULTS={
   density:'dense', k:1,
@@ -1531,8 +1550,25 @@ $('#pwNewGo').addEventListener('click',function(){
 });
 $('#admOut').addEventListener('click',function(){ leaveAdmin(); DLG.close() });
 
+/* ── 템플릿 24종 ── */
+var T24=[["01", "Cover — Dark Brand", "표지", "자동. 다크 표지 한 종만 쓴다", 1], ["02", "Cover — Clean Light", "밝은 표지", "쓰지 않는다 (01로 통일)", 0], ["03", "Agenda", "목차", "자동", 2], ["04", "Section Divider", "단원 시작 간지", "자동", 3], ["05", "Title + Bullet Points", "항목 3~5개 나열", "`bullets`. 4개 넘으면 `columns`/`cards`", 9], ["06", "Title + Image Right", "텍스트 설명 + 화면·사진", "`image` (`side:\"right\"`, `text:{heading, items}`)", 6], ["07", "Title + Image Left", "이미지가 주인공", "`image` (`side:\"left\"`)", 15], ["08", "Two Columns — Equal", "두 항목을 같은 비중으로", "`columns` 2개. 전·후 대비면 `compare`", 16], ["09", "Three Column Cards", "세 가지 설명", "`cards` 3개", 7], ["10", "Stats / Metrics", "성과·수치 강조", "`stats` 2~4개. 추이는 `chart`, 근거는 `table`", 22], ["11", "Full Bleed Image", "구성도·시연 화면 전면", "`image` (`side:\"full\"`)", 11], ["12", "Table — Comparison", "비교, 평가지표 대응, 예산", "`table` (`emphasize`로 강조 열)", 19], ["13", "Quote / Testimonial", "고객 발언, 인용", "`callout` (`text`, `label:\"고객 의견\"` 등)", 23], ["14", "Timeline", "일정·연혁", "`timeline`. 간트형은 `table`", 18], ["15", "Problem → Solution", "문제와 해결을 맞대어", "`compare` (`tag` AS-IS/TO-BE 또는 문제/해결)", 10], ["16", "Process Steps", "절차·파이프라인", "`process` 3~5단계. 분기·반복은 `image` 흐름도", 14], ["17", "2×2 Image Grid", "사진 4장", "`columns` 2개(`image` 포함)를 위아래 2개", 24], ["18", "Team Members", "팀·조직", "`cards` 4개 (`cols:4`, 제목=이름, 설명=역할). 사진 없음", 20], ["19", "Closing / Thank You", "마무리", "자동", 26], ["20", "Company Overview", "회사 소개 + 지표", "`columns` 2개(좌 소개, 우 `stat`) 또는 `columns` + 아래 `stats`", 4], ["21", "Solution Feature (A-type)", "기술 모듈 하나를 깊게", "`image` (`side:\"right\"`) + 아래 `callout`", 12], ["22", "Technical Proposal (Split)", "도전과제와 솔루션을 맞대어", "`compare`. 표가 필요하면 `columns` + `table`", 13], ["23", "R&D Project Background", "과제 배경 + 목표 4개 + 기술 태그", "`cards` 4개 (`cols:2`) + `callout`", 5], ["24", "Client / Partner Logos", "고객·파트너 로고", "`columns` 3개(`image`) 블록 2개. 파일 없으면 자리표시자", 25]];
+/* 디자인 화면이 docs/design/ 에서 열렸으면 옆 폴더, 아니면(로컬 앱) 웹에 올라간 견본을 본다 */
+var T24BASE=/\/design\/(index\.html)?$/.test(location.pathname)?'../templates/':'https://hy0909.github.io/ppt-maker/templates/';
+function buildT24(){
+  var h=$('#s-t24'); if(!h)return;
+  var code=function(t){ return esc(t).replace(/`([^`]+)`/g,'<code>$1</code>') };
+  h.innerHTML=T24.map(function(r){
+    var pad=('0'+r[4]).slice(-2);
+    var th=r[4]?'<a class="th" href="'+T24BASE+'deck.html#'+r[4]+'" target="_blank" rel="noopener" title="견본 덱 '+r[4]+'번째 장 열기">'+
+        '<img loading="lazy" src="'+T24BASE+'thumbs/'+pad+'.png" alt="'+esc(r[1])+' 견본"></a>'
+      :'<div class="th none">쓰지 않음 · 01로 통일</div>';
+    return '<div class="c">'+th+'<div class="b"><div class="n"><span>'+r[0]+'</span>'+esc(r[1])+'</div>'+
+      '<div class="w">'+esc(r[2])+'</div><div class="k">'+code(r[3])+'</div></div></div>';
+  }).join('');
+}
+
 /* ── boot ── */
-buildSections(); buildDemos(); buildTabs(); buildTemplates(); apply(); render(); loadCoverSpec();
+buildT24(); buildSections(); buildDemos(); buildTabs(); buildTemplates(); apply(); render(); loadCoverSpec();
 document.fonts&&document.fonts.ready.then(fit);
 })();
 </script>
