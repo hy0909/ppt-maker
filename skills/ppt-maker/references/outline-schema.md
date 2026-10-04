@@ -67,7 +67,7 @@
 | `process` | `steps:[{title, desc?, items?, period?, highlight?, dark?}]`, `darkLast?` | 좌→우 절차·로드맵(선 + 번호 원 + 단계 카드). `period` 는 "1단계 · 2026 상" 같은 위 라벨 | 3~5 |
 | `timeline` | `phases:[{period, title, items?, desc?, highlight?}]`, `darkLast?` | process 와 같은 모양, 기간 중심 | 3~5 |
 | `gantt` | `cols:["1월",…], tasks:[{name, start, end, tone?:"primary"\|"second"\|"accent"\|"muted", label?}], heading?` | **여러 일이 겹치는 일정표.** 왼쪽 항목 이름, 위 기간 라벨, 세로 격자선, 가로 막대. `start`·`end` 는 1부터 세는 칸 번호(끝 포함, 2.5 처럼 반 칸 가능). 막대 색은 tone(기본 포인트 컬러, muted 회색). 겹치지 않는 단계 나열은 timeline | 행 3~8 · 칸 4~12 |
-| `table` | `headers, rows, emphasize?(열 index), leftAlign?([열 index]), widths?(["20%",…]), rowHeader?(true)` | 비교표, 평가지표 대응표, 예산. 강조 열은 글자색만 포인트 컬러(바탕·굵기는 그대로). 첫 열이 각 행의 항목 이름(세로 타이틀)이면 `rowHeader: true` → 첫 열도 머리글처럼 연회색 바탕·회색 글자. 셀에 `**굵게**` 가능. "달성/조기달성/진행중" 은 배지로 표시 | 행 3~7 |
+| `table` | `headers, rows, emphasize?(열 index), leftAlign?([열 index]), widths?(["20%",…]), rowHeader?(true)` | 비교표, 평가지표 대응표, 예산. 강조 열은 글자색만 포인트 컬러(바탕·굵기는 그대로). `widths` 를 안 주면 열 너비는 칸 글자 양에 맞춰 자동으로 나뉜다. 한 장에 다 안 들어가는 표는 빌드할 때 행을 고르게 나눠 여러 장으로 편다(머리글 반복, 제목 뒤 "(계속)"). 첫 열이 각 행의 항목 이름(세로 타이틀)이면 `rowHeader: true` → 첫 열도 머리글처럼 연회색 바탕·회색 글자. 셀에 `**굵게**` 가능. "달성/조기달성/진행중" 은 배지로 표시 | 행 3~7 |
 | `stats` | `stats:[{label, sub?, value, desc?}]` | 핵심 수치 카드(`label` = 라벨 칩, `sub` = 작은 지표명, `value` 큰 숫자+단위, `desc` 파란 보조 문장 "전월 31만 회 · 35% 성장") | 2~4 |
 | `chart` | `kind:"line"\|"bar", title, unit?, labels:[…], series:[{name, values:[…]}], heading?` | **월별 추이 등 수치는 표로 나열하지 말고 그래프로**. 시리즈 1~3개. 채널별 추이 그래프는 형식을 통일 | 1 |
 | `compare` | `left:{tag?, heading, items}, right:{tag?, heading, items}` | AS-IS→TO-BE, 난제→해법. `tag` 기본 AS-IS/TO-BE, 오른쪽이 연파랑 강조 | 항목 3~4 |

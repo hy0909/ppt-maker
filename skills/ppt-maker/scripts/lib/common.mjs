@@ -147,10 +147,12 @@ export function flattenSlides(outline) {
   if (meta.agenda && sections.length) out.push({ kind: 'agenda' });
   for (const sec of sections) {
     if (meta.dividers) out.push({ kind: 'divider', section: sec });
-    sec.slides.forEach((sl, i) => out.push({ kind: 'content', section: sec, slide: sl, idx: i + 1 }));
+    let idx = 0;
+    sec.slides.forEach(sl => splitTableSlide(sl, meta.density).forEach(part => out.push({ kind: 'content', section: sec, slide: part, idx: ++idx })));
   }
   if (closing) out.push({ kind: 'closing' });
-  appendix.forEach((sl, i) => out.push({ kind: 'appendix', slide: sl, idx: i + 1 }));
+  let ai = 0;
+  appendix.forEach(sl => splitTableSlide(sl, meta.density).forEach(part => out.push({ kind: 'appendix', slide: part, idx: ++ai })));
   // page numbers: cover counts as 1, only content/appendix pages show numbers
   let n = 0;
   for (const s of out) {
@@ -159,6 +161,69 @@ export function flattenSlides(outline) {
     s.pageNo = (s.kind === 'content' || s.kind === 'appendix') ? String(n).padStart(2, '0') : null;
   }
   return out;
+}
+
+/** 표가 한 장에 다 안 들어가면 행을 나눠 여러 장으로 편다(머리글은 장마다 반복, 제목 뒤에 "(계속)").
+ *  가장 작게 줄였을 때(본문 0.75 × 표 0.75 ≈ 10pt)의 높이로 어림해, 그래도 넘칠 표만 나눈다.
+ *  나눈 장들의 행 수는 고르게 맞춘다. 표 위 블록은 첫 장, 표 아래 블록(배너 등)은 마지막 장에만 둔다. */
+export function splitTableSlide(sl, density = 'dense') {
+  const blocks = sl.blocks || [];
+  const tis = blocks.map((b, i) => b.type === 'table' ? i : -1).filter(i => i >= 0);
+  if (tis.length !== 1) return [sl];
+  const ti = tis[0], tb = blocks[ti], rows = tb.rows || [];
+  if (rows.length < 4) return [sl];
+  const D = DENSITY[density] || DENSITY.dense;
+  const f = D.table * 0.75 * 0.75, fh = D.tableH * 0.75 * 0.75;
+  const W = SLIDE_W - 2 * FRAME.pad;
+  const leadExtra = sl.lead && String(sl.lead).length > 70 ? 24 : 0;
+  const H = (SLIDE_H - FRAME.bodyTop - FRAME.safeBottom - leadExtra - (blocks.length - 1) * 110) * 0.9;
+  if (H < 140) return [sl];
+  const headers = tb.headers || [];
+  const ncol = headers.length || (rows[0] || []).length;
+  const pct = ((tb.widths || []).length === ncol ? tb.widths : tableColWidths(headers, rows)).map(w => parseFloat(w));
+  const pt = pct.reduce((a, v) => a + v, 0), colW = pct.map(p => W * p / pt);
+  const lines = (c, w, fs) => {
+    const t = String(c ?? '').replace(/\*\*/g, '').split(/<br\s*\/?>|\n/i);
+    return t.reduce((a, l) => a + Math.max(1, Math.ceil([...l].reduce((s, ch) => s + (/[\u3131-\uD79D]/.test(ch) ? fs : fs * 0.55), 0) / Math.max(fs * 2, w - fs * 1.6))), 0);
+  };
+  const hdrH = Math.max(1, ...headers.map((h, i) => lines(h, colW[i], fh))) * fh * 1.3 + fh * 1.1;
+  const rowH = r => Math.max(1, ...r.map((c, i) => lines(c, colW[i] || W / ncol, f))) * f * 1.45 + f * 1.2;
+  const hs = rows.map(rowH);
+  if (hdrH + hs.reduce((a, v) => a + v, 0) <= H) return [sl];
+  // 장 수를 정한 뒤 행을 고르게 나눈다. 고르게 나눈 묶음이 넘치면 장을 하나 늘린다.
+  const fits = g => g.every(([a, b]) => hdrH + hs.slice(a, b).reduce((s, v) => s + v, 0) <= H || b - a === 1);
+  let n = 2, groups;
+  for (; n <= rows.length; n++) {
+    const per = rows.length / n;
+    groups = Array.from({ length: n }, (_, i) => [Math.round(i * per), Math.round((i + 1) * per)]);
+    if (fits(groups)) break;
+  }
+  return groups.map(([a, b], i) => Object.assign({}, sl, {
+    title: i ? `${sl.title || ''} (계속)` : sl.title,
+    notes: i ? '' : sl.notes,
+    blocks: blocks.flatMap((bl, j) => j === ti ? [Object.assign({}, tb, { rows: rows.slice(a, b) })]
+      : (j < ti ? i === 0 : i === groups.length - 1) ? [bl] : []),
+  }));
+}
+
+/** 표 열 너비(%)를 칸 글자 양에 맞춰 나눈다 — `widths` 를 안 준 표에 쓴다. HTML·PPTX 가 같은 값을 쓴다.
+ *  열마다 머리글·칸 중 가장 긴 글자 수(영문·숫자는 0.55자)를 재고, 28자에서 자른다(그 이상은 줄바꿈이 낫다).
+ *  너무 좁은 열이 생기지 않게 최소 8%(열이 많으면 그보다 작게)를 둔다. */
+export function tableColWidths(headers = [], rows = []) {
+  const n = Math.max(headers.length, ...rows.map(r => (r || []).length), 1);
+  const vlen = c => { const t = String(c ?? '').replace(/\*\*/g, '').replace(/<br\s*\/?>/gi, '\n');
+    return Math.max(0, ...t.split('\n').map(l => [...l].reduce((a, ch) => a + (/[\u3131-\uD79D]/.test(ch) ? 1 : 0.55), 0))); };
+  const need = Array.from({ length: n }, (_, i) =>
+    Math.min(28, Math.max(3, vlen(headers[i]), ...rows.map(r => vlen((r || [])[i])))) + 2.5);
+  const min = Math.min(8, 60 / n);
+  let pct = need.map(v => v / need.reduce((a, c) => a + c, 0) * 100);
+  for (let t = 0; t < 4; t++) {           // 최소 너비를 채운 만큼 넓은 열에서 덜어 낸다
+    const low = pct.map(p => p < min), lack = pct.reduce((a, p, i) => a + (low[i] ? min - p : 0), 0);
+    if (!lack) break;
+    const rest = pct.reduce((a, p, i) => a + (low[i] ? 0 : p), 0);
+    pct = pct.map((p, i) => low[i] ? min : p - lack * p / rest);
+  }
+  return pct.map(p => Math.round(p * 10) / 10);
 }
 
 export function esc(s) {

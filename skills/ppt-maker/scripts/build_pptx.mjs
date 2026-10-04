@@ -11,7 +11,7 @@ const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // �
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -587,22 +587,21 @@ const B = {
     // Drawn with native rects + text boxes (not addTable) for exact control over the emphasized column / alignment.
     const headers = b.headers || [], rows = b.rows || [], em = b.emphasize;
     const ncol = headers.length || (rows[0] || []).length;
-    let colW;
-    if (b.widths && b.widths.length === ncol) {
-      const pct = b.widths.map(w => parseFloat(w)); const tot = pct.reduce((a, c) => a + c, 0);
-      colW = pct.map(pc => box.w * pc / tot);
-    } else colW = Array(ncol).fill(box.w / ncol);
+    // 열 너비: widths 가 있으면 그대로, 없으면 칸 글자 양에 맞춰(HTML 과 같은 값)
+    const pct = (b.widths && b.widths.length === ncol ? b.widths : tableColWidths(headers, rows)).map(w => parseFloat(w));
+    const pctTot = pct.reduce((a, c) => a + c, 0);
+    const colW = pct.map(pc => box.w * pc / pctTot);
     const leftCols = new Set(b.leftAlign || [0]);
     const clean = c => String(c ?? '').replace(/\*\*/g, '');
     // HTML 과 같은 규칙: 숫자 칸이 절반 넘는 열은 오른쪽 정렬, 첫 칸이 합계·평균이면 footer 행(연회색·굵게)
     const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
     let kk = k, hdrH, rowHs;
-    for (let tries = 0; tries < 8; tries++) {
+    for (let tries = 0; tries < 14; tries++) {
       const fs = D.table * kk, fsh = D.tableH * kk, padY = fs * 0.6, padX = fs * 0.8;
       hdrH = Math.max(1, ...headers.map((h, i) => lines(clean(h), fsh, colW[i] - padX * 2))) * fsh * 1.3 + padY * 2;
       rowHs = rows.map(r => Math.max(1, ...r.map((c, i) => lines(clean(c), fs, colW[i] - padX * 2))) * fs * 1.45 + padY * 2);
       const total = hdrH + rowHs.reduce((a, c) => a + c, 0);
-      if (total <= box.h || kk <= 0.6) {
+      if (total <= box.h || kk <= 0.56) {   // HTML 과 같은 바닥: 본문 0.75 × 표 0.75 ≈ 10pt
         const extra = Math.max(0, box.h - total); if (rows.length) rowHs = rowHs.map(h => h + extra / rows.length);
         break;
       }

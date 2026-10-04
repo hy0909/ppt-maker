@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel,
+import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
@@ -114,10 +114,10 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
 /* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 2px 검정 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
    머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열은 글자색만 포인트 컬러 */
-table.rt{width:100%;border-collapse:collapse;font-size:var(--fs-table);background:#fff;table-layout:fixed;text-align:left;border-top:2px solid var(--title);border-bottom:2px solid var(--title);}
-.rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:var(--fs-tableh);line-height:1.3;white-space:nowrap;vertical-align:middle;}
+table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:2px solid var(--title);border-bottom:2px solid var(--title);}
+.rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:calc(var(--fs-tableh) * var(--kt, 1));line-height:1.3;word-break:keep-all;overflow-wrap:anywhere;vertical-align:middle;}   /* 머리글도 칸이 좁으면 줄바꿈 */
 .rt thead th.em{color:var(--primary);}
-.rt tbody td{padding:.6em .8em;border:0;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
+.rt tbody td{padding:.6em .8em;border:0;word-break:keep-all;overflow-wrap:anywhere;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
 .rt tbody td{font-weight:400;}   /* 본문 = regular·검정, 타이틀 영역 = bold·연회색 */
 .rt.rh thead th:first-child{border-right:1px solid var(--border);}
 .rt.rh tbody td:first-child{background:var(--bg-soft);color:var(--text-mid);font-weight:700;border-right:1px solid var(--border);}
@@ -437,10 +437,12 @@ const BLOCKS = {
     return BLOCKS.process({ steps: (b.phases || []).map(p => ({ period: p.period, title: p.title, items: p.items, desc: p.desc, highlight: p.highlight, dark: p.dark })), darkLast: b.darkLast });
   },
   table(b) {
-    const em = b.emphasize; const widths = b.widths || []; const rows = b.rows || [];
+    const em = b.emphasize; const rows = b.rows || [];
     const leftCols = new Set(b.leftAlign || [0]);
     // 숫자 칸이 절반 넘는 열(첫 열 제외)은 오른쪽 정렬, 첫 칸이 합계·평균이면 footer 행
     const ncol = (b.headers || []).length || (rows[0] || []).length;
+    // 열 너비: widths 를 주지 않았으면 칸 글자 양에 맞춰 나눈다(PPTX 와 같은 값)
+    const widths = (b.widths || []).length === ncol ? b.widths : tableColWidths(b.headers, rows).map(p => p + '%');
     const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
     const cls = (i, extra = '') => [i === em ? 'em' : '', numCol[i] ? 'n' : '', extra].filter(Boolean).join(' ');
     return `<div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt${b.rowHeader ? ' rh' : ''}">

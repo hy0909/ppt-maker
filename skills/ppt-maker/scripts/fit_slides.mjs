@@ -113,6 +113,22 @@ const gaps = await page.evaluate(({ MING, MAXG }) => {
     }
     out['k:' + sec.id.replace(/^s/, '')] = k;
   });
+  // 표 안전장치: 본문 배율을 최소로 내려도 넘치는 장표는 표 글자만 더 줄인다(--kt, 0.75까지 ≈ 10pt).
+  // 행이 너무 많은 표는 빌드할 때 이미 여러 장으로 나뉜다(common.mjs splitTableSlide).
+  // 그래도 넘치면 내용을 나눠야 한다는 경고로 남긴다.
+  document.querySelectorAll('section.slide[data-fit]').forEach(sec => {
+    const id = sec.id.replace(/^s/, '');
+    const tbls = [...sec.querySelectorAll('table.rt:not(.kvt)')];
+    if (tbls.length && secOver(sec)) {
+      let kt = 1;
+      while (secOver(sec) && kt > 0.75) {
+        kt = Math.max(0.75, Math.round((kt - 0.05) * 100) / 100);
+        tbls.forEach(t => t.style.setProperty('--kt', String(kt))); void sec.offsetHeight;
+      }
+      out['kt:' + id] = kt;
+    }
+    if (secOver(sec)) out['over:' + id] = 1;
+  });
   return out;
 }, { MING: 0.4, MAXG: 0.9 });
 
@@ -143,5 +159,7 @@ fs.writeFileSync(fitFile, JSON.stringify(fits, null, 2));
 
 const vals = Object.values(fits);
 console.log(`fit: ${vals.length} slides, k range ${Math.min(...vals)} – ${Math.max(...vals)} (kmin ${kmin}, kmax ${kmax}) → ${path.basename(deck)}, fit.json`);
-const tight = Object.entries(fits).filter(([, k]) => k <= kmin + 0.01);
+const shrunk = Object.entries(gaps).filter(([key]) => key.startsWith('kt:'));
+if (shrunk.length) console.log(`표 글자를 더 줄여 맞춘 장표: ${shrunk.map(([key, v]) => '#' + key.slice(3) + ' (표 ×' + v + ')').join(', ')}`);
+const tight = Object.keys(gaps).filter(key => key.startsWith('over:')).map(key => [key.slice(5)]);
 if (tight.length) console.log(`⚠ still overflowing at kmin (content too long, split the slide): #${tight.map(([o]) => o).join(', #')}`);
