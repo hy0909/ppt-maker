@@ -688,17 +688,18 @@ const B = {
     chartPanel(slide, b, inner.x, inner.y, inner.w, inner.h, k);
   },
   callout(slide, b, box, k) {
-    // 어두운 둥근 박스 하나. 왼쪽에 라벨(연한 컬러), 오른쪽에 본문 — 모두 박스 안에 들어간다.
+    // 연하늘 바탕 + 연하늘 테두리 둥근 박스 하나. 왼쪽에 라벨(포인트 컬러), 오른쪽에 본문 — 모두 박스 안에 들어간다.
     // 글자는 카드보다 한 단계 작게(원본: 라벨 15pt · 본문 14pt), 본문색은 라벨보다 죽인 톤.
     const light = b.tone === 'light', em = D.small * k, fs = D.small * 1.05 * k;
     const label = b.label || '핵심 요약';
     const h = box.h;
-    card(slide, box.x, box.y, box.w, h, light ? P.white : P.banner, 14);
+    if (light) card(slide, box.x, box.y, box.w, h, P.white, 14);
+    else rect(slide, box.x, box.y, box.w, h, { fill: P.banner, line: { color: P.bannerBorder, width: 1.1 }, radius: 14 });
     const padX = em * 1.6, padY = em * 0.75, gap = em * 1.6;
     const lw = Math.max(estW(label, fs), fs * 3.2);
     text(slide, label, box.x + padX, box.y + padY, lw, h - padY * 2, { size: D.small * 1.05, k, color: light ? P.primary : P.bannerLabel, bold: true, align: 'center', valign: 'middle', lineSpacing: 1.3 });
     const tx = box.x + padX + lw + gap, tw = Math.max(1, box.x + box.w - padX - tx);
-    if (b.items && b.items.length) listBox(slide, b.items, tx, box.y + padY, tw, h - padY * 2, k, { dark: !light, valign: 'middle', availH: h - padY * 2, tight: true, size: D.small, plainColor: light ? P.text : P.bannerText });
+    if (b.items && b.items.length) listBox(slide, b.items, tx, box.y + padY, tw, h - padY * 2, k, { dark: false, valign: 'middle', availH: h - padY * 2, tight: true, size: D.small, plainColor: light ? P.text : P.bannerText });
     else if (b.text) text(slide, b.text, tx, box.y + padY, tw, h - padY * 2, { size: D.small, k, color: light ? P.text : P.bannerText, valign: 'middle', lineSpacing: 1.3 });
   },
 };
