@@ -549,10 +549,10 @@ function derive(primary,secondary){
   var readable=function(c){for(var t=0;t<=1.001;t+=0.1){var c2=mix(c,primary,t);if(contrast(c2)>=3)return c2}return primary};
   var sec=secondary&&/^#?[0-9a-f]{6}$/i.test(secondary)?secondary.toUpperCase():'';
   var primary2=(sec&&luminance(sec)>luminance(primary))?readable(sec):mix(primary,'#4E8DF5',0.55);
-  var banner='#F3F9FF', bannerLabel=primary;   // 배너는 연하늘 바탕 + 연하늘 테두리(장표와 같은 값)
+  var banner='#E6F3FF', bannerLabel=primary;   // 배너는 연하늘 바탕 + 연하늘 테두리(장표와 같은 값)
   return {primary:primary,primary2:primary2,primaryDeep:mix(primary,'#000000',0.28),
     softBlue:mix(primary2,'#FFFFFF',0.86),softerBlue:mix(primary2,'#FFFFFF',0.94),
-    banner:banner,bannerBorder:'#BCDDF5',bannerLabel:bannerLabel,bannerText:'#515B75',
+    banner:banner,bannerBorder:'#8EC6EE',bannerLabel:bannerLabel,bannerText:'#515B75',
     coverBadge:mix(mix(primary,'#000000',0.28),'#FFFFFF',0.17),dark:dark,
     usedSecondary:!!(sec&&luminance(sec)>luminance(primary))};
 }

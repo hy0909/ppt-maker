@@ -64,8 +64,8 @@ export function derivePalette(brand = {}) {
     softerBlue: mix(primary2, '#FFFFFF', 0.94),
     border: '#D9DEE6', borderStrong: '#B9C3D2', text: '#1A2438', textMid: '#4A5568', textLight: '#8B95A7', bgSoft: '#F5F7FA',
     body: '#515B75',                                   // 카드 안 본문 글자(제목보다 연하게)
-    banner: '#F3F9FF',                                 // 참고·특이사항 배너 바탕(아주 연한 하늘색) — 2026-10-08 어두운 네이비에서 밝게 반전
-    bannerBorder: '#BCDDF5',                           // 그 배너의 테두리(연하늘색) — 연회색 장표 바탕과 구분
+    banner: '#E6F3FF',                                 // 참고·특이사항 배너 바탕(아주 연한 하늘색) — 2026-10-08 어두운 네이비에서 밝게 반전
+    bannerBorder: '#8EC6EE',                           // 그 배너의 테두리(연하늘색) — 연회색 장표 바탕과 구분
     bannerLabel: primary,                              // 배너 라벨 글자(포인트 컬러, 굵게)
     bannerText: '#515B75',                             // 배너 본문 글자(카드 본문과 같은 회색)
     coverBadge: mix(mix(primary, '#000000', 0.28), '#FFFFFF', 0.17),  // 표지 오른쪽 아래 상자(원본 #3C34A1)
