@@ -88,7 +88,7 @@ export function derivePalette(brand = {}) {
 // 값의 원본은 design-tokens.json 한 곳이다. 웹 디자인 시스템 화면에서 저장하면 그 파일이 바뀐다.
 // 아래 기본값은 파일이 없거나 칸이 빠졌을 때만 쓴다.
 const DEFAULT_TOKENS = {
-  color:   { primary: '#2B0CDD', secondary: '#CBD5E1' },
+  color:   { primary: '#6D28D9', secondary: '#A78BFA' },
   type:    { h0: { size: 48, line: 58.6, spc: -1 }, h1: { size: 40, line: 48, spc: -1 },
              h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
   head:    { eyebrow: 15, pgno: 13, stitle: 42, lead: 16, ruleColor: '#CFD4DC' },
