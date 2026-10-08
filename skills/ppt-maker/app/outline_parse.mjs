@@ -29,6 +29,46 @@ function dropTrailingCommas(s) {
   return s.replace(/,(\s*[}\]])/g, '$1');
 }
 
+/** 괄호를 빠뜨리거나 잘못 닫은 JSON 을 고친다.
+ *  - 배열 안에서 "키": 가 나오면 그 앞 쉼표 전에 배열을 닫는다 (…}]},"closing":… → …}]}],"closing":…)
+ *  - 닫는 괄호 종류가 어긋나면 모자란 괄호를 채워 넣는다
+ *  - 짝 없는 닫는 괄호는 버린다 */
+function repairBrackets(str) {
+  const stack = [];
+  let out = '', inStr = false, esc = false, strStart = -1;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (inStr) {
+      out += c;
+      if (esc) esc = false;
+      else if (c === '\\') esc = true;
+      else if (c === '"') {
+        inStr = false;
+        // 배열 안의 문자열 뒤에 ':' → 사실은 객체 키다. 키 앞 쉼표 직전에 배열을 닫는다.
+        if (stack.at(-1) === ']' && /^\s*:/.test(str.slice(i + 1))) {
+          const before = out.slice(0, strStart);
+          const comma = before.search(/,\s*$/);
+          if (comma >= 0) {
+            let close = '';
+            while (stack.at(-1) === ']') close += stack.pop();
+            out = before.slice(0, comma) + close + before.slice(comma) + out.slice(strStart);
+          }
+        }
+      }
+      continue;
+    }
+    if (c === '"') { inStr = true; strStart = out.length; out += c; continue; }
+    if (c === '{' || c === '[') { stack.push(c === '{' ? '}' : ']'); out += c; continue; }
+    if (c === '}' || c === ']') {
+      if (!stack.includes(c)) continue;                 // 짝 없는 닫는 괄호
+      while (stack.at(-1) !== c) out += stack.pop();    // 빠진 괄호 채우기
+      stack.pop(); out += c; continue;
+    }
+    out += c;
+  }
+  return out;
+}
+
 /** 잘린 JSON 을 마지막으로 닫힌 괄호까지 자르고 남은 괄호를 닫아 되살린다. */
 function salvage(str) {
   const { lastClose } = scan(str);
@@ -65,14 +105,14 @@ export function parseOutlineText(raw) {
   const e = t.lastIndexOf('}');
   const body = e > s ? t.slice(s, e + 1) : t.slice(s);
 
-  // 1) 그대로  2) 꼬리 쉼표만 보정
-  for (const [cand, note] of [[body, null], [dropTrailingCommas(body), null]]) {
+  // 1) 그대로  2) 꼬리 쉼표만 보정  3) 빠지거나 어긋난 괄호 보정
+  for (const [cand, note] of [[body, null], [dropTrailingCommas(body), null], [dropTrailingCommas(repairBrackets(body)), null]]) {
     try {
       const o = JSON.parse(cand);
       if (o && o.sections) return { outline: o, note };
     } catch { /* 다음 후보 */ }
   }
-  // 3) 잘린 응답 복구
+  // 4) 잘린 응답 복구
   const fixed = salvage(t.slice(s));
   if (fixed) {
     try {
@@ -87,7 +127,7 @@ export function parseOutlineText(raw) {
       }
     } catch { /* 복구 실패 */ }
   }
-  // 4) 실패: 어디서 깨졌는지 알려준다
+  // 5) 실패: 어디서 깨졌는지 알려준다
   let where = '';
   try { JSON.parse(body); } catch (err) {
     const m = /position (\d+)/.exec(err.message);
