@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths,
+import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
@@ -41,11 +41,11 @@ deck-stage:not(:defined){visibility:hidden;}
   --accent:${P.teal};--gold:${P.gold};--gold-light:${P.goldLight};
   --success:${P.success};--warning:${P.warning};--danger:${P.danger};
   --bg-soft:${P.bgSoft};--border:${P.border};--border-strong:${P.borderStrong};
-  --text:${P.text};--title:#10141C;--body:#515B75;--banner:${P.banner};--banner-border:${P.bannerBorder};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
-  --pad:${FRAME.pad}px;--hdr:0px;--foot:0px;--safe-bottom:${FRAME.safeBottom}px;--page:#E9ECF0;--card-shadow:${SHAPE.shadowCss};
+  --text:${P.text};--title:${COLORS.gray.title};--body:${P.body};--banner:${P.banner};--banner-border:${P.bannerBorder};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
+  --pad:${FRAME.pad}px;--hdr:0px;--foot:0px;--safe-bottom:${FRAME.safeBottom}px;--page:${COLORS.gray.page};--card-shadow:${SHAPE.shadowCss};
   --font:'${meta.font}','Pretendard','Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
-  --font-title:'Paperlogy 6 SemiBold',${FALLBACK_FACES};
-  --font-title-b:'Paperlogy 8 ExtraBold',${FALLBACK_FACES};
+  --font-title:'${FONTS.face.headline}',${FALLBACK_FACES};
+  --font-title-b:'${FONTS.face.headlineBold}',${FALLBACK_FACES};
   --cover-badge:${P.coverBadge};
   --kmax:${K};
 }
@@ -234,8 +234,8 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .tocp .it{display:grid;grid-template-columns:${A.itemH - 10}px 1fr;column-gap:${+(A.cols[0].t - A.cols[0].n - A.itemH + 10).toFixed(1)}px;min-height:${A.itemH}px;}
 .tocp .it .n{text-align:center;align-self:start;font-family:'${TYPE.h0.face}',${FALLBACK_FACES};font-weight:400;font-size:${px(A.numSize)}px;line-height:${A.itemH}px;letter-spacing:${A.numSpc}pt;color:var(--primary);}
 .tocp .it .t{${typeCss(TYPE.h2)}color:var(--title);word-break:keep-all;margin:${+((A.itemH - px(TYPE.h2.line)) / 2).toFixed(2)}px 0;}
-.tocp .it.apx .n{font-family:'Paperlogy 4 Regular',${FALLBACK_FACES};font-size:${px(20)}px;}
-.tocp .it.apx .t{font-family:'Paperlogy 4 Regular',${FALLBACK_FACES};}
+.tocp .it.apx .n{font-family:'${FONTS.face.regular}',${FALLBACK_FACES};font-size:${px(20)}px;}
+.tocp .it.apx .t{font-family:'${FONTS.face.regular}',${FALLBACK_FACES};}
 .tocp .ft{position:absolute;left:${A.foot.x}px;top:${A.foot.y}px;width:${A.foot.w}px;height:${A.foot.h}px;font-size:${px(A.foot.size)}px;line-height:${A.foot.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
 .tocp .pn{position:absolute;left:${A.pageNo.x}px;top:${A.pageNo.y}px;width:${A.pageNo.w}px;height:${A.pageNo.h}px;text-align:right;font-size:${px(A.foot.size)}px;line-height:${A.pageNo.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
 /* 간지: 포인트 컬러 한 면 + 좌상단 라벨·큰 제목 + 우하단 로고 워터마크 + 하단 정보줄 */
@@ -549,7 +549,9 @@ function renderContent(s) {
   const eyebrow = s.kind === 'appendix' ? 'APPENDIX' : esc(s.section.title);
   const headline = sl.headline || sl.title || '';
   const leadLines = sl.lead ? estLines(sl.lead, HEAD.lead, 1100) : 0;
-  const bodyTop = headline ? (sl.lead ? FRAME.bodyTop + Math.max(0, leadLines - 1) * 24 : FRAME.bodyTop - 30) : 96;
+  // 헤드라인이 두 줄 이상이면 그만큼 본문 시작을 내린다(리드·구분선이 본문과 겹치지 않게)
+  const titleExtra = headline ? (estLines(headline, HEAD.stitle, 1100) - 1) * HEAD.stitle * 1.2 : 0;
+  const bodyTop = titleExtra + (headline ? (sl.lead ? FRAME.bodyTop + Math.max(0, leadLines - 1) * HEAD.lead * 1.5 : FRAME.bodyTop - 30) : 96);
   const foot = footLines(sl);
   const safeBottom = footSafeBottom(foot);
   return `<section class="slide" data-label="${esc(slideLabel(s))}" id="s${s.order}" data-fit="1"${fitStyle(s.order)}>

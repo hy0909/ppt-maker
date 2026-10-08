@@ -1,0 +1,36 @@
+{
+  "_": "SAFE AI 디자인 시스템 컬러. 장표 생성(build_html·build_pptx)과 디자인 시스템 화면이 이 파일을 읽는다. 크기·여백은 ../design-tokens.json.",
+  "primary": {
+    "800": "#2815B0",
+    "700": "#2A14C8",
+    "600": "#2B0CDD",
+    "400": "#5D48FF",
+    "300": "#7B69FF",
+    "200": "#9B8EFF"
+  },
+  "role": {
+    "_": "장표에서 쓰는 자리 → primary 단계",
+    "main": "600",
+    "secondary": "400",
+    "deep": "800",
+    "mid": "700"
+  },
+  "gray": {
+    "title": "#10141C",
+    "text": "#1A2438",
+    "textMid": "#4A5568",
+    "body": "#515B75",
+    "textLight": "#8B95A7",
+    "borderStrong": "#B9C3D2",
+    "rule": "#CFD4DC",
+    "border": "#D9DEE6",
+    "page": "#E9ECF0",
+    "bgSoft": "#F5F7FA",
+    "white": "#FFFFFF"
+  },
+  "status": {
+    "success": "#138A4E",
+    "warning": "#C97A1F",
+    "danger": "#C9302C"
+  }
+}

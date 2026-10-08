@@ -11,7 +11,7 @@ const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // �
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -22,16 +22,16 @@ const outline = loadOutline(outlineFile);
 const outdir = path.resolve(outdirArg || path.dirname(outline._file));
 const { meta } = outline;
 const P_base = derivePalette(meta.brand);
-const P = { ...P_base, page: '#E9ECF0', title: '#10141C' };  // minimal card design: light grey page, near-black headline
+const P = { ...P_base, page: COLORS.gray.page, title: COLORS.gray.title };  // minimal card design: light grey page, near-black headline
 const D = DENSITY[meta.density] || DENSITY.dense;
 const slides = flattenSlides(outline);
 const fitFile = path.join(outdir, 'fit.json');
 const K_DAMP = 0.92;
 const PAD = FRAME.pad; // --pad in build_html.mjs (사용자 원본 PPTX 기준 좌우 40px)
 const FIT = fs.existsSync(fitFile) ? JSON.parse(fs.readFileSync(fitFile, 'utf8')) : {};
-const FONT = meta.font || 'Pretendard';
-const FONT_TITLE = 'Paperlogy 6 SemiBold';      // 본문 장표 헤드라인
-const FONT_TITLE_B = 'Paperlogy 8 ExtraBold';   // 헤드라인 안 **강조**, 간지·마무리 큰 제목
+const FONT = meta.font || FONTS.face.body;
+const FONT_TITLE = FONTS.face.headline;         // 본문 장표 헤드라인 (design-system/fonts.json)
+const FONT_TITLE_B = FONTS.face.headlineBold;   // 헤드라인 안 **강조**, 간지·마무리 큰 제목
 const NUM = n => String(n); // 목차·간지 번호는 항상 1·2·3 숫자
 const plainTitle = String(meta.title || '').replace(/<br\s*\/?>/gi, ' ').replace(/\*\*/g, '');
 const TOTAL = slides.length;   // 간지 하단의 'N/Mp' 표기용
@@ -718,23 +718,25 @@ function topSection(slide, eyebrowRuns, headline, lead, pageNo) {
   const W = SLIDE_W - PAD * 2;
   slide.addText(eyebrowRuns, { x: IN(PAD), y: IN(30), w: IN(W - 80), h: IN(22), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
   if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 30, 80, 22, { size: HEAD.pgno, color: P.textLight, align: 'right', valign: 'middle' });
-  let ruleY = 68;
+  let ruleY = 68, titleExtra = 0;
   if (headline) {
-    // .stitle: 31.5pt(42px), weight 600, **강조** 는 같은 색 굵게
+    // .stitle: HEAD.stitle px, **강조** 는 같은 색 굵게. 두 줄 이상이면 구분선·리드·본문을 그만큼 내린다
     const runs = String(headline).split(/(\*\*.+?\*\*)/g).filter(Boolean).map(p => {
       const m = p.match(/^\*\*(.+)\*\*$/);
       return m ? { text: m[1], options: { fontFace: FONT_TITLE_B, fontSize: HEAD.stitle * 0.75, color: colorToHex(P.title), charSpacing: -0.8 } } : { text: p, options: { fontFace: FONT_TITLE, fontSize: HEAD.stitle * 0.75, color: colorToHex(P.title), charSpacing: -0.8 } };
     });
-    slide.addText(runs, { x: IN(PAD), y: IN(61), w: IN(Math.min(W, 1100)), h: IN(51), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
-    ruleY = 116;
+    const tn = lines(headline, HEAD.stitle, 1100);
+    titleExtra = (tn - 1) * HEAD.stitle * 1.2;
+    slide.addText(runs, { x: IN(PAD), y: IN(61), w: IN(Math.min(W, 1100)), h: IN(Math.max(51, HEAD.stitle * 1.2) + titleExtra), align: 'left', valign: 'middle', margin: 0, lineSpacingMultiple: 1.2, fit: 'none', autoFit: false });
+    ruleY = 116 + titleExtra;
   }
   rect(slide, PAD, ruleY, W, 1, { fill: HEAD.ruleColor });
-  let bodyTop = headline ? FRAME.bodyTop - 30 : 96;
+  let bodyTop = (headline ? FRAME.bodyTop - 30 : 96) + titleExtra;
   if (lead) {
     const n = lines(lead, HEAD.lead, 1100);
     const runs = richRuns(lead, { fontFace: FONT, fontSize: PT(HEAD.lead), color: colorToHex(P.textMid), charSpacing: -0.8 }).map(r => r.options.bold ? { ...r, options: { ...r.options, color: colorToHex(P.text) } } : r);
-    slide.addText(runs, { x: IN(PAD), y: IN(ruleY + 27), w: IN(Math.min(W, 1100)), h: IN(24 * n + 2), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.5, fit: 'none', autoFit: false });
-    bodyTop = FRAME.bodyTop + (n - 1) * 24;
+    slide.addText(runs, { x: IN(PAD), y: IN(ruleY + 27), w: IN(Math.min(W, 1100)), h: IN(HEAD.lead * 1.5 * n + 2), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.5, fit: 'none', autoFit: false });
+    bodyTop = FRAME.bodyTop + (n - 1) * HEAD.lead * 1.5 + titleExtra;
   }
   return bodyTop;
 }
@@ -802,10 +804,10 @@ function agenda() {
     const col = A.cols[Math.min(Math.floor(i / nrow), A.cols.length - 1)];
     const ry = rowY[i % nrow];
     text(s, it.n, col.n, ry, A.itemH - 10, A.itemH,
-      { size: PXL(it.apx ? 20 : A.numSize), face: it.apx ? 'Paperlogy 4 Regular' : TYPE.h0.face,
+      { size: PXL(it.apx ? 20 : A.numSize), face: it.apx ? FONTS.face.regular : TYPE.h0.face,
         color: P.primary, align: 'center', valign: 'middle', letterSpacing: A.numSpc });
     text(s, it.t, col.t, ry - trim, A.itemW, nlines(i) * lh,
-      { size: PXL(TYPE.h2.size), face: it.apx ? 'Paperlogy 4 Regular' : TYPE.h2.face,
+      { size: PXL(TYPE.h2.size), face: it.apx ? FONTS.face.regular : TYPE.h2.face,
         color: P.title, valign: 'top', lineSpacingPt: TYPE.h2.line, letterSpacing: TYPE.h2.spc });
   });
   text(s, plainTitle, A.foot.x, A.foot.y, A.foot.w, A.foot.h,

@@ -53,24 +53,28 @@ export function derivePalette(brand = {}) {
   const secRaw = brand.secondary || TOKENS.color.secondary || '';
   const sec = /^#?[0-9a-f]{6}$/i.test(secRaw) ? secRaw.toUpperCase() : '';
   const primary2 = sec && luminance(sec) > luminance(primary) ? readable(sec) : mix(primary, '#4E8DF5', 0.55);
+  // 메인 컬러가 디자인 시스템 스케일의 메인과 같으면 진한 단계는 스케일 값을 쓰고, 아니면 섞어서 만든다
+  const scale = primary === String(C_MAIN).toUpperCase() ? COLORS.primary : null;
+  const G = COLORS.gray, ST = COLORS.status;
   return {
     primary,
     primary2,
-    primaryDeep: mix(primary, '#000000', 0.28),
+    scale: scale || {},
+    primaryDeep: scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.28),
     gold: (brand.gold || '#C8A24B').toUpperCase(),
     goldLight: '#F2D78E',
     teal: (brand.accentDot || '#00A89D').toUpperCase(),
     softBlue: mix(primary2, '#FFFFFF', 0.86),
     softerBlue: mix(primary2, '#FFFFFF', 0.94),
-    border: '#D9DEE6', borderStrong: '#B9C3D2', text: '#1A2438', textMid: '#4A5568', textLight: '#8B95A7', bgSoft: '#F5F7FA',
-    body: '#515B75',                                   // 카드 안 본문 글자(제목보다 연하게)
-    banner: '#E6F3FF',                                 // 참고·특이사항 배너 바탕(아주 연한 하늘색) — 2026-10-08 어두운 네이비에서 밝게 반전
-    bannerBorder: '#8EC6EE',                           // 그 배너의 테두리(연하늘색) — 연회색 장표 바탕과 구분
+    border: G.border, borderStrong: G.borderStrong, text: G.text, textMid: G.textMid, textLight: G.textLight, bgSoft: G.bgSoft,
+    body: G.body,                                      // 카드 안 본문 글자(제목보다 연하게)
+    banner: mix(primary, '#FFFFFF', 0.88),             // 참고·특이사항 배너 바탕(메인 컬러를 아주 연하게, 보라면 연보라) — 2026-10-08 밝게 반전
+    bannerBorder: mix(primary, '#FFFFFF', 0.6),        // 그 배너의 테두리(메인 컬러 연하게) — 연회색 장표 바탕과 구분
     bannerLabel: primary,                              // 배너 라벨 글자(포인트 컬러, 굵게)
-    bannerText: '#515B75',                             // 배너 본문 글자(카드 본문과 같은 회색)
+    bannerText: G.body,                                // 배너 본문 글자(카드 본문과 같은 회색)
     coverBadge: mix(mix(primary, '#000000', 0.28), '#FFFFFF', 0.17),  // 표지 오른쪽 아래 상자(원본 #3C34A1)
-    primaryDark: mix(primary, '#000000', 0.22),
-    primaryMid: mix(primary, '#000000', 0.10),
+    primaryDark: scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.22),
+    primaryMid: scale ? scale[COLORS.role.mid] : mix(primary, '#000000', 0.10),
     primaryLight: mix(primary, '#FFFFFF', 0.88),
     primaryTint: mix(primary, '#FFFFFF', 0.94),
     accent,
@@ -79,19 +83,38 @@ export function derivePalette(brand = {}) {
     ink: '#222A35',
     g9: '#1E293B', g8: '#334155', g7: '#475569', g6: '#64748B', g5: '#94A3B8',
     g4: '#CBD5E1', g3: '#E2E8F0', g2: '#F1F5F9', g1: '#F8FAFC',
-    white: '#FFFFFF',
-    success: '#138A4E', warning: '#C97A1F', danger: '#C9302C',
+    white: G.white,
+    success: ST.success, warning: ST.warning, danger: ST.danger,
   };
 }
 
+// ─── design system: 컬러·글꼴 ────────────────────────────────────
+// 컬러는 design-system/colors.json, 글꼴은 design-system/fonts.json 이 원본이다. 크기·여백은 design-tokens.json.
+const DS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'design-system');
+const readJson = (f, fallback) => { try { return JSON.parse(fs.readFileSync(path.join(DS_DIR, f), 'utf8')); }
+  catch (e) { console.warn(`design-system/${f} 을 읽지 못해 기본값을 썼습니다: ${e.message}`); return fallback; } };
+export const COLORS = readJson('colors.json', {
+  primary: { 800: '#2815B0', 700: '#2A14C8', 600: '#2B0CDD', 400: '#5D48FF', 300: '#7B69FF', 200: '#9B8EFF' },
+  role: { main: '600', secondary: '400', deep: '800', mid: '700' },
+  gray: { title: '#10141C', text: '#1A2438', textMid: '#4A5568', body: '#515B75', textLight: '#8B95A7', borderStrong: '#B9C3D2',
+          rule: '#CFD4DC', border: '#D9DEE6', page: '#E9ECF0', bgSoft: '#F5F7FA', white: '#FFFFFF' },
+  status: { success: '#138A4E', warning: '#C97A1F', danger: '#C9302C' },
+});
+export const FONTS = readJson('fonts.json', {
+  face: { coverTitle: 'Paperlogy 7 Bold', agendaTitle: 'Paperlogy 7 Bold', h2: 'Paperlogy 5 Medium', body2: 'Pretendard Light',
+          headline: 'Paperlogy 6 SemiBold', headlineBold: 'Paperlogy 8 ExtraBold', regular: 'Paperlogy 4 Regular', body: 'Pretendard' },
+  fallback: `'Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif`,
+});
+const C_MAIN = COLORS.primary[COLORS.role.main], C_SECOND = COLORS.primary[COLORS.role.secondary];
+
 // ─── design tokens ──────────────────────────────────────────────
-// 값의 원본은 design-tokens.json 한 곳이다. 웹 디자인 시스템 화면에서 저장하면 그 파일이 바뀐다.
+// 크기·여백 값의 원본은 design-tokens.json 한 곳이다. 웹 디자인 시스템 화면에서 저장하면 그 파일이 바뀐다.
 // 아래 기본값은 파일이 없거나 칸이 빠졌을 때만 쓴다.
 const DEFAULT_TOKENS = {
-  color:   { primary: '#6D28D9', secondary: '#A78BFA' },
+  color:   { primary: C_MAIN, secondary: C_SECOND },
   type:    { h0: { size: 48, line: 58.6, spc: -1 }, h1: { size: 40, line: 48, spc: -1 },
              h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
-  head:    { eyebrow: 15, pgno: 13, stitle: 42, lead: 16, ruleColor: '#CFD4DC' },
+  head:    { eyebrow: 15, pgno: 13, stitle: 46, lead: 24, ruleColor: '#CFD4DC' },
   frame:   { pad: 40, safeBottom: 44, bodyTop: 220 },
   shape:   { card: 19, banner: 14, label: 8, pill: 999, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
   density: { dense: { body: 18, small: 16, cardTitle: 26, stat: 34, table: 24, tableH: 24, gap: 12 },
@@ -295,11 +318,11 @@ export const roman = n => ROMAN[n - 1] || String(n);
 // ─── 글자 규격 (사용자 원본 PPTX 에서 그대로 옮김) ──────────────────────
 // size = pt, line = 고정 줄간격(pt), spc = 자간(pt, 음수가 '좁게'), face = 글꼴 이름.
 // Paperlogy·Pretendard 는 굵기마다 패밀리가 따로 있다 → bold 속성을 켜지 않는다(가짜 굵기 방지).
-const FACE = {
-  h0: 'Paperlogy 7 Bold',
-  h1: 'Paperlogy 7 Bold',
-  h2: 'Paperlogy 5 Medium',
-  body2: 'Pretendard Light'
+const FACE = {   // 이름은 design-system/fonts.json
+  h0: FONTS.face.coverTitle,
+  h1: FONTS.face.agendaTitle,
+  h2: FONTS.face.h2,
+  body2: FONTS.face.body2
 };
 export const TYPE = {
   h0:    { size: TOKENS.type.h0.size, line: TOKENS.type.h0.line, spc: TOKENS.type.h0.spc,   face: FACE.h0 },
@@ -309,7 +332,7 @@ export const TYPE = {
 };
 export const TITLE_FACE = FACE.h0;
 export const BODY_FACE = FACE.body2;
-export const FALLBACK_FACES = `'Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif`;
+export const FALLBACK_FACES = FONTS.fallback;
 /** pt → px (1280×720 화면 기준, 96dpi) */
 export const px = pt => +(pt * 96 / 72).toFixed(2);
 /** TYPE 한 칸을 CSS 선언으로 */

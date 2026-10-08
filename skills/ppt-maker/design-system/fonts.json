@@ -1,0 +1,14 @@
+{
+  "_": "SAFE AI 디자인 시스템 글꼴. Paperlogy·Pretendard 는 굵기마다 패밀리가 따로라 굵기는 이름으로 고른다(bold 속성 안 씀). 크기는 ../design-tokens.json.",
+  "face": {
+    "coverTitle": "Paperlogy 7 Bold",
+    "agendaTitle": "Paperlogy 7 Bold",
+    "h2": "Paperlogy 5 Medium",
+    "body2": "Pretendard Light",
+    "headline": "Paperlogy 6 SemiBold",
+    "headlineBold": "Paperlogy 8 ExtraBold",
+    "regular": "Paperlogy 4 Regular",
+    "body": "Pretendard"
+  },
+  "fallback": "'Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif"
+}
