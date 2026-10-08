@@ -5,6 +5,7 @@
 - 소스는 항상 `outline.json`. `deck.html`/`deck.pptx`는 재생성 산출물이므로 직접 고치지 않는다.
 - `assets/deck-stage.js`, `deck-editor.js`는 safeai-deck-template 레퍼런스와 동일하게 유지(수정 금지).
 - 디자인 값: 컬러 `skills/ppt-maker/design-system/colors.json`, 글꼴 `design-system/fonts.json`, 크기·여백 `design-tokens.json`. 코드에 색·글꼴 이름을 직접 쓰지 않는다.
+- 템플릿 견본: 원본 `skills/ppt-maker/templates/outline.json`, 다시 만들기 `skills/ppt-maker/templates/build.sh` → `docs/templates/`(웹 결과물, 직접 고치지 않음). 디자인 값을 바꾸면 한 번 돌린다.
 - 빌드 순서: build_html → fit_slides → check_overflow → export_pdf → build_pptx → verify_pptx.
 - 완료 선언 전: 오버플로 0, 썸네일 직접 확인, PPTX out-of-bounds 0, 번호 정합성.
 - 원문에 없는 수치·로고·회사 정보를 만들지 않는다.
