@@ -133,6 +133,7 @@ const gaps = await page.evaluate(({ MING, MAXG }) => {
 }, { MING: 0.4, MAXG: 0.9 });
 
 // 계산한 간격을 HTML 에 새겨 넣는다
+await page.evaluate(() => { if (window.__drawCharts) window.__drawCharts(); });   // 그래프를 칸 크기에 맞춰 다시 그린 뒤 굽는다
 const gapHtml = await page.evaluate(() => document.querySelector('deck-stage, body').innerHTML);
 await browser.close();
 

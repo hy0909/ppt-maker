@@ -251,7 +251,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
 .chart .chh b{color:var(--text);font-weight:700;font-size:var(--fs-body);} .chart .chh span{color:var(--text-mid);}
-.chart svg{flex:1;min-height:0;width:100%;height:100%;display:block;margin-top:.5em;}
+.chart .cplot{flex:1;min-height:0;margin-top:.5em;display:flex;} .chart .cplot svg{width:100%;height:100%;display:block;}
 .chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--text);margin-top:.35em;} .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
 /* cover / toc / divider / closing */
 /* 표지 배경 — meta.coverBg 로 고른 이미지. 마무리 장표는 브랜드 그라디언트로 따로 간다 */
@@ -312,67 +312,57 @@ function statFrag(st) {
   return `${st.sub ? `<div class="sl">${rich(st.sub)}</div>` : ''}<div class="sv">${val}</div>${st.desc ? `<div class="sn">${rich(st.desc)}</div>` : ''}`;
 }
 function chartPanel(b) {
-  return `<div class="chart"><div class="chh"><b>${rich(b.title || '')}</b><span>${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div>${chartSvg(b)}${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS()[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
+  const data = esc(JSON.stringify({ kind: b.kind, labels: b.labels || [], series: (b.series || []).slice(0, 4).map(sr => ({ values: sr.values || [] })) }));
+  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span>${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS()[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
 }
 const SERIES_COLORS = () => [P.primary2, P.primary, P.teal, P.gold];
-/** 그래프 — shadcn/ui Charts(recharts) 모양을 따른다: 가로 격자선만(CartesianGrid vertical=false), 축선·눈금선 없음,
- *  막대는 위 모서리만 둥글게(Bar radius), 선은 부드러운 곡선(type=monotone) + 선 색으로 채운 점, 값 라벨은 위(LabelList top). 색은 브랜드 팔레트(SERIES_COLORS). */
-function chartSvg(b) {
-  const labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = SERIES_COLORS();
-  const all = series.flatMap(sr => sr.values || []).filter(v => typeof v === 'number');
-  const max = Math.max(1, ...all) * 1.25, min = Math.min(0, ...all);
-  // 좌표계 = 장표 본문 너비(1200). 좌우 여백 20px(2026-10-10), 위는 값 라벨 자리, 아래는 축 라벨 자리
-  const W = 1200, H = 416, padL = 20, padR = 20, padT = 70, padB = 84;
-  const n = Math.max(labels.length, ...series.map(sr => (sr.values || []).length));
-  const inset = b.kind === 'bar' ? 0 : 12;   // 선 그래프는 끝 점이 잘리지 않게 점 반지름만큼 안쪽
-  const x = i => padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1));
-  const y = v => padT + (H - padT - padB) * (1 - (v - min) / (max - min));
-  const num = v => esc(String(v));
-  let out = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">`;
-  for (let g = 0; g <= 4; g++) {   // 가로 격자선 4칸, 연한 테두리색
-    const gy = (padT + (H - padT - padB) * g / 4).toFixed(1);
-    out += `<line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="${P.border}" stroke-opacity=".6" stroke-width="1"/>`;
-  }
-  labels.forEach((l, i) => { out += `<text x="${x(i)}" y="${H - padB + 56}" text-anchor="middle" font-size="34" fill="${P.textMid}">${esc(l)}</text>`; });
+/** 그래프 — shadcn/ui Charts(recharts) 모양을 따른다: 가로 격자선만, 축선·눈금선 없음, 막대는 위 모서리만 둥글게, 선은 부드러운 곡선 + 점, 값 라벨은 위.
+ *  그리는 코드는 CHART_DRAW_SRC 하나다. 서버는 기본 높이로 먼저 그려 두고(스크립트 없이도 보이게), 브라우저는 그래프 칸의 실제 가로세로 비율에 맞춰
+ *  같은 함수로 다시 그린다(2026-10-10 — 그래야 가로를 꽉 채운다. viewBox 비율이 칸과 다르면 meet 때문에 좌우가 비었다). */
+const CHART_DRAW_SRC = `function(b, W, H, C) {
+  var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
+  var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = C.series;
+  var all = [].concat.apply([], series.map(function(sr) { return sr.values || []; })).filter(function(v) { return typeof v === 'number'; });
+  var max = Math.max.apply(null, [1].concat(all)) * 1.25, min = Math.min.apply(null, [0].concat(all));
+  var padL = 20, padR = 20, padT = 70, padB = 84;   // 좌우 여백 20px(장표 기준), 위는 값 라벨, 아래는 축 라벨 자리
+  var n = Math.max.apply(null, [labels.length].concat(series.map(function(sr) { return (sr.values || []).length; })));
+  var inset = b.kind === 'bar' ? 0 : 12;
+  var x = function(i) { return padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1)); };
+  var y = function(v) { return padT + (H - padT - padB) * (1 - (v - min) / (max - min)); };
+  var smooth = function(pts) {
+    if (pts.length < 2) return pts.length ? 'M' + pts[0][0] + ',' + pts[0][1] : '';
+    var k = pts.length, dx = [], m = [], t = [], i;
+    for (i = 0; i < k - 1; i++) { dx[i] = pts[i + 1][0] - pts[i][0]; m[i] = dx[i] ? (pts[i + 1][1] - pts[i][1]) / dx[i] : 0; }
+    t[0] = m[0]; t[k - 1] = m[k - 2];
+    for (i = 1; i < k - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
+    for (i = 0; i < k - 1; i++) { if (!m[i]) { t[i] = 0; t[i + 1] = 0; continue; } var a = t[i] / m[i], c = t[i + 1] / m[i], q = a * a + c * c; if (q > 9) { var tau = 3 / Math.sqrt(q); t[i] = tau * a * m[i]; t[i + 1] = tau * c * m[i]; } }
+    var d = 'M' + pts[0][0] + ',' + pts[0][1];
+    for (i = 0; i < k - 1; i++) { var hh = dx[i] / 3; d += ' C' + (pts[i][0] + hh).toFixed(1) + ',' + (pts[i][1] + t[i] * hh).toFixed(1) + ' ' + (pts[i + 1][0] - hh).toFixed(1) + ',' + (pts[i + 1][1] - t[i + 1] * hh).toFixed(1) + ' ' + pts[i + 1][0] + ',' + pts[i + 1][1]; }
+    return d;
+  };
+  var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
+  for (var g = 0; g <= 4; g++) { var gy = (padT + (H - padT - padB) * g / 4).toFixed(1); out += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="' + C.border + '" stroke-opacity=".6" stroke-width="1"/>'; }
+  labels.forEach(function(l, i) { out += '<text x="' + x(i) + '" y="' + (H - padB + 56) + '" text-anchor="middle" font-size="34" fill="' + C.textMid + '">' + esc(l) + '</text>'; });
   if (b.kind === 'bar') {
-    const gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(110, gw * 0.72 / series.length), r = series.length > 1 ? 10 : 16;   // 막대는 묶음 너비의 72%
-    series.forEach((sr, si) => (sr.values || []).forEach((v, i) => {
-      const bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
-      const top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
-      out += `<path d="M${bx},${bot} V${top + rr} Q${bx},${top} ${bx + rr},${top} H${bx + w - rr} Q${bx + w},${top} ${bx + w},${top + rr} V${bot} Z" fill="${cols[si]}"/>`;
-      out += `<text x="${bx + w / 2}" y="${top - 20}" text-anchor="middle" font-size="34" font-weight="600" fill="${P.text}">${num(v)}</text>`;
-    }));
+    var gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(110, gw * 0.72 / series.length), r = series.length > 1 ? 10 : 16;
+    series.forEach(function(sr, si) { (sr.values || []).forEach(function(v, i) {
+      var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
+      var top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
+      out += '<path d="M' + bx + ',' + bot + ' V' + (top + rr) + ' Q' + bx + ',' + top + ' ' + (bx + rr) + ',' + top + ' H' + (bx + w - rr) + ' Q' + (bx + w) + ',' + top + ' ' + (bx + w) + ',' + (top + rr) + ' V' + bot + ' Z" fill="' + cols[si] + '"/>';
+      out += '<text x="' + (bx + w / 2) + '" y="' + (top - 20) + '" text-anchor="middle" font-size="34" font-weight="600" fill="' + C.text + '">' + esc(v) + '</text>';
+    }); });
   } else {
-    series.forEach((sr, si) => {
-      const pts = (sr.values || []).map((v, i) => [x(i), y(v)]);
-      out += `<path d="${smoothPath(pts)}" fill="none" stroke="${cols[si]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>`;
-      pts.forEach(([px, py], i) => {
-        out += `<circle cx="${px}" cy="${py}" r="11" fill="${cols[si]}"/>`;
-        out += `<text x="${px}" y="${py - 30}" text-anchor="middle" font-size="38" font-weight="600" fill="${P.text}">${num((sr.values || [])[i])}</text>`;
-      });
+    series.forEach(function(sr, si) {
+      var pts = (sr.values || []).map(function(v, i) { return [x(i), y(v)]; });
+      out += '<path d="' + smooth(pts) + '" fill="none" stroke="' + cols[si] + '" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>';
+      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="11" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - 30) + '" text-anchor="middle" font-size="38" font-weight="600" fill="' + C.text + '">' + esc((sr.values || [])[i]) + '</text>'; });
     });
   }
   return out + '</svg>';
-}
-/** 점들을 지나는 부드러운 곡선(monotone cubic — recharts type="monotone"). 값 사이에서 위아래로 튀지 않는다. */
-function smoothPath(pts) {
-  if (pts.length < 2) return pts.length ? `M${pts[0][0]},${pts[0][1]}` : '';
-  const n = pts.length, dx = [], m = [], t = [];
-  for (let i = 0; i < n - 1; i++) { dx[i] = pts[i + 1][0] - pts[i][0]; m[i] = dx[i] ? (pts[i + 1][1] - pts[i][1]) / dx[i] : 0; }
-  t[0] = m[0]; t[n - 1] = m[n - 2];
-  for (let i = 1; i < n - 1; i++) t[i] = m[i - 1] * m[i] <= 0 ? 0 : (m[i - 1] + m[i]) / 2;
-  for (let i = 0; i < n - 1; i++) {
-    if (!m[i]) { t[i] = 0; t[i + 1] = 0; continue; }
-    const a = t[i] / m[i], c = t[i + 1] / m[i], q = a * a + c * c;
-    if (q > 9) { const tau = 3 / Math.sqrt(q); t[i] = tau * a * m[i]; t[i + 1] = tau * c * m[i]; }
-  }
-  let d = `M${pts[0][0]},${pts[0][1]}`;
-  for (let i = 0; i < n - 1; i++) {
-    const h = dx[i] / 3;
-    d += ` C${(pts[i][0] + h).toFixed(1)},${(pts[i][1] + t[i] * h).toFixed(1)} ${(pts[i + 1][0] - h).toFixed(1)},${(pts[i + 1][1] - t[i + 1] * h).toFixed(1)} ${pts[i + 1][0]},${pts[i + 1][1]}`;
-  }
-  return d;
-}
+}`;
+const chartDraw = new Function('return (' + CHART_DRAW_SRC + ')')();
+const chartColors = () => ({ series: SERIES_COLORS(), border: P.border, textMid: P.textMid, text: P.text });
+function chartSvg(b, H = 416) { return chartDraw(b, 1200, H, chartColors()); }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
 /** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */
 export const IMAGE_RATIOS = { '16:9': [16, 9], '4:3': [4, 3], '1:1': [1, 1], '9:16': [9, 16], '3:4': [3, 4] };
@@ -639,6 +629,26 @@ const html = `<!DOCTYPE html>
 <deck-stage width="1280" height="720" style="--deck-rail-w:200px;">
 ${sectionsHtml}
 </deck-stage>
+<script>
+/* 그래프를 그래프 칸의 실제 가로세로 비율로 다시 그린다 — 가로를 꽉 채우기 위해. fit_slides 는 배율을 정한 뒤 window.__drawCharts() 를 부른다 */
+(function () {
+  var draw = ${CHART_DRAW_SRC};
+  var C = ${JSON.stringify(chartColors())};
+  function redraw() {
+    document.querySelectorAll('.chart[data-chart]').forEach(function (el) {
+      var plot = el.querySelector('.cplot'); if (!plot) return;
+      var w = plot.clientWidth, h = plot.clientHeight; if (w < 20 || h < 20) return;
+      var H = Math.max(220, Math.min(900, Math.round(1200 * h / w)));
+      var b = JSON.parse(el.getAttribute('data-chart'));
+      plot.innerHTML = draw(b, 1200, H, C);
+    });
+  }
+  window.__drawCharts = redraw;
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', redraw); else redraw();
+  window.addEventListener('load', redraw);
+  window.addEventListener('resize', redraw);
+})();
+</script>
 <script src="deck-stage.js"></script>
 <script src="deck-editor.js"></script>
 <script>
