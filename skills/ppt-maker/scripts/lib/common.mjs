@@ -102,7 +102,7 @@ export const COLORS = readJson('colors.json', {
   role: { main: '600', secondary: '400', deep: '800', mid: '700' },
   gray: { title: '#10141C', text: '#1A2438', textMid: '#4A5568', body: '#515B75', textLight: '#8B95A7', borderStrong: '#B9C3D2',
           rule: '#CFD4DC', border: '#D9DEE6', page: '#E9ECF0', bgSoft: '#F5F7FA', white: '#FFFFFF' },
-  accent: { glow: '#19E68C', glowMix: 0.45 },
+  accent: { glow: '#19E68C', glowMix: 0.6 },
   status: { success: '#138A4E', warning: '#C97A1F', danger: '#C9302C' },
 });
 export const FONTS = readJson('fonts.json', {
@@ -121,7 +121,7 @@ const DEFAULT_TOKENS = {
              h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
   head:    { eyebrow: 17, pgno: 13, stitle: 46, lead: 24, ruleColor: '#CFD4DC' },
   frame:   { pad: 40, safeBottom: 44, bodyTop: 220 },
-  shape:   { card: 19, banner: 14, label: 8, pill: 8, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
+  shape:   { card: 19, banner: 14, label: 8, pill: 12, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
   density: { dense: { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, gap: 12 },
              airy:  { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, gap: 12 } },
 };
