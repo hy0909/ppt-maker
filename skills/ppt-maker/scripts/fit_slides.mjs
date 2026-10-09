@@ -95,7 +95,7 @@ const gaps = await page.evaluate(({ MING, MAXG }) => {
     if (items < 2) { out[id] = MING; return; }
     // 남는 높이를 항목 사이로 나눠 준다(최대 MAXG). 배너는 조금 촘촘하게.
     const free = bd.clientHeight - bd.scrollHeight;
-    const cap = bd.classList.contains('msg') ? 0.5 : MAXG;   // 배너는 촘촘하게
+    const cap = Math.min(bd.classList.contains('msg') ? 0.5 : MAXG, 12 / em);   // 배너는 촘촘하게. 항목 사이는 최대 12px
     let g = MING + (free / (items - 1)) / em * 0.8;
     g = Math.max(MING, Math.min(cap, g));
     setGap(g);

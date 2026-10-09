@@ -37,7 +37,7 @@ ${PAPERLOGY_FONT_FACE}
 deck-stage:not(:defined){visibility:hidden;}
 :root{
   --primary:${P.primary};--primary-2:${P.primary2};--primary-deep:${P.primaryDeep};
-  --primary-soft:${P.softBlue};--primary-softer:${P.softerBlue};
+  --primary-soft:${P.softBlue};--pill-glow:${P.pillGlow};--primary-softer:${P.softerBlue};
   --accent:${P.teal};--gold:${P.gold};--gold-light:${P.goldLight};
   --success:${P.success};--warning:${P.warning};--danger:${P.danger};
   --bg-soft:${P.bgSoft};--border:${P.border};--border-strong:${P.borderStrong};
@@ -79,7 +79,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .slabel{display:inline-flex;align-items:center;height:2.1em;padding:0 1.05em;background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;border-radius:${SHAPE.label}px;white-space:nowrap;line-height:1;margin-bottom:.8em;align-self:flex-start;}
 /* card: 제목 피약 + 흰 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .card{position:relative;background:transparent;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
-.card>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
+.card>.cap{background:linear-gradient(225deg,var(--pill-glow) 0%,var(--primary) 58%);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
 .card>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 /* 강조 카드도 본문 박스는 흰색이다. 한 장표 안에서 카드 바탕이 서로 달라 보이면
    어느 쪽이 중요한지가 아니라 "왜 색이 다르지" 로 읽힌다. 강조는 알약 제목으로만 한다. */
@@ -89,7 +89,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .card.dark .ct{color:#fff;}
 .card .cd{font-size:var(--fs-small);color:var(--body);line-height:1.55;}
 .card.dark .cd{color:rgba(255,255,255,.85);}
-.card .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;}
+.card .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;}   /* 위에서부터 채움, 덩어리 사이 12px */
 /* sub heading inside card: "| 채널 전체" */
 .sh2{font-size:calc(var(--fs-body) * .94);font-weight:700;color:var(--body);line-height:1.3;margin-bottom:.5em;}
 /* list */
@@ -105,8 +105,8 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .grid{display:grid;gap:calc(var(--gap) * 1.6);flex:1;min-height:0;}
 /* stat card: 제목 피약 + 수치 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .stat{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
-.stat>.cap{background:var(--primary);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
-.stat>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;justify-content:center;flex:1;min-height:0;overflow:hidden;}
+.stat>.cap{background:linear-gradient(225deg,var(--pill-glow) 0%,var(--primary) 58%);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
+.stat>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;justify-content:flex-start;flex:1;min-height:0;overflow:hidden;}
 .stat .sl{font-size:var(--fs-small);color:var(--body);font-weight:500;}
 .stat .sv{font-size:var(--fs-stat);font-weight:800;color:var(--text);line-height:1.05;margin-top:.1em;letter-spacing:-.04em;font-variant-numeric:tabular-nums;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
@@ -154,11 +154,11 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .cmp{display:grid;grid-template-columns:1fr 3em 1fr;align-items:stretch;flex:1;min-height:0;font-size:var(--fs-body);}
 .side{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;}
 .side>.cap{background:var(--text-mid);color:#fff;font-size:var(--fs-card);font-weight:700;text-align:center;padding:.325em 1em;line-height:1.3;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
-.side.to>.cap{background:var(--primary);}
+.side.to>.cap{background:linear-gradient(225deg,var(--pill-glow) 0%,var(--primary) 58%);}
 .side>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 .side.to>.bd{background:var(--primary-softer);}
 .side .sh{font-size:var(--fs-card);font-weight:700;margin:.1em 0 .6em;color:var(--text);}
-.side .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;}
+.side .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;}
 .cmp .arr{display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:2.2em;font-weight:800;}
 /* roadmap (process / timeline) */
 .rm{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-body);}
@@ -171,7 +171,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .rm .step.hl{background:var(--primary-softer);} .rm .step.dk{background:var(--primary);color:#fff;}
 .rm .step .per{font-size:var(--fs-small);font-weight:700;color:var(--primary-2);letter-spacing:.02em;} .rm .step.dk .per{color:rgba(255,255,255,.8);}
 .rm .step .pt{font-size:var(--fs-card);font-weight:700;color:var(--text);margin:.2em 0 .45em;line-height:1.3;} .rm .step.dk .pt{color:#fff;}
-.rm .step .pd{font-size:var(--fs-small);color:var(--text-mid);line-height:1.45;flex:1;display:flex;flex-direction:column;justify-content:center;gap:.3em;} .rm .step.dk .pd{color:rgba(255,255,255,.85);}
+.rm .step .pd{font-size:var(--fs-small);color:var(--text-mid);line-height:1.45;flex:1;display:flex;flex-direction:column;justify-content:flex-start;gap:.3em;} .rm .step.dk .pd{color:rgba(255,255,255,.85);}
 .rm .step ul.rl{text-align:left;} .rm .step ul.rl li{font-size:var(--fs-small);}
 .rm .step.dk ul.rl li,.rm .step.dk ul.rl li .k{color:#fff;} .rm .step.dk ul.rl li::before{color:rgba(255,255,255,.7);} .rm .step.dk ul.rl li .v{color:rgba(255,255,255,.8);}
 /* image */

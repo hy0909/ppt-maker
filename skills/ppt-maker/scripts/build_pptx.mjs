@@ -274,9 +274,9 @@ function bandCard(slide, box, k, label, { body = P.white, band = P.primary, labe
   const em = D.body * k, fs = D.cardTitle * k, pillH = fs * 1.95, gap = em * 0.3;
   let contentY = box.y;
   if (label) {
-    // 알약 제목: 카드 너비 전체, 완전히 둥근 모양(HTML 의 .card>.cap 과 같게)
+    // 알약 제목: 카드 너비 전체, 모서리 SHAPE.pill(HTML 의 .card>.cap 과 같게). HTML 의 초록 그라데이션은 pptxgenjs 가 못 그려 단색
     const w = box.w, x = box.x;
-    const rr = radiusPx(pillH / 2, w, pillH);
+    const rr = radiusPx(Math.min(SHAPE.pill, pillH / 2), w, pillH);
     slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
       x: IN(x), y: IN(box.y), w: IN(w), h: IN(pillH),
       fill: { color: colorToHex(band) }, line: { type: 'none' }, rectRadius: IN(rr)
@@ -334,7 +334,7 @@ function listBox(slide, items, x, y, w, h, k, opts = {}) {
   // 남는 높이를 항목 사이로 나눠 카드 안을 고르게 채운다(넘치면 최소 간격).
   const n = (items || []).length;
   if (n > 1 && (opts.availH || h) > contentH) {
-    const extra = Math.min(((opts.availH || h) - contentH) / (n - 1) * 0.8, em * (opts.tight ? 0.15 : 0.9));
+    const extra = Math.min(((opts.availH || h) - contentH) / (n - 1) * 0.8, em * (opts.tight ? 0.15 : 0.9), 12);   // 항목 사이 벌림 최대 12px
     if (extra > 0) paras.forEach(p => { if (p.spaceAfter) p.spaceAfter += extra * 0.75; });
   }
   const runs = [];
@@ -469,12 +469,11 @@ function fragImage(src, caption, k, w, ratio) {
 function stack(slide, box, k, frags) {
   frags = frags.filter(Boolean);
   if (!frags.length) return;
-  const gap = D.body * k * 0.9;
+  const gap = Math.min(D.body * k * 0.9, 12);   // 덩어리 사이 최대 12px
   const fixed = frags.reduce((a, f) => a + (f.flex ? 0 : f.h), 0), nflex = frags.filter(f => f.flex).length;
   let free = box.h - fixed - gap * (frags.length - 1);
   const flexH = nflex ? Math.max(40, free / nflex) : 0;
-  let y = box.y;
-  if (!nflex && free > 0) { const pad = free / (frags.length + 1); y += pad; frags.forEach(f => { f._gap = pad + gap; }); }
+  let y = box.y;   // 위에서부터 채운다(HTML .fill 과 같게). 남는 공간은 아래 여백
   frags.forEach((f, i) => {
     const h = f.flex ? flexH : f.h;
     f.draw(slide, box.x, y, h);
@@ -527,7 +526,7 @@ const B = {
     st.forEach((s, i) => {
       const inner = bandCard(slide, { x: box.x + i * (w + gap), y: box.y, w, h: box.h }, k, s.label);
       const f = fragStat(s, k, inner.w);
-      f.draw(slide, inner.x, inner.y + Math.max(0, (inner.h - f.h) / 2));
+      f.draw(slide, inner.x, inner.y);   // 위에서부터
     });
   },
   process(slide, b, box, k) {
@@ -549,7 +548,7 @@ const B = {
       text(slide, s.title || '', x + px, y, w, th, { size: D.cardTitle, k, bold: true, color: dk ? P.white : P.text, align: 'center', valign: 'top', lineSpacing: 1.3 });
       y += th + em * 0.45;
       const rest = Math.max(1, cardY + ch - py - y);
-      if (s.items && s.items.length) listBox(slide, s.items, x + px, y, w, rest, k, { dark: dk, size: D.small, valign: 'middle' });
+      if (s.items && s.items.length) listBox(slide, s.items, x + px, y, w, rest, k, { dark: dk, size: D.small, valign: 'top' });
       else if (s.desc) text(slide, s.desc, x + px, y, w, rest, { size: D.small, k, color: dk ? 'rgba(255,255,255,.85)' : P.textMid, align: 'center', valign: 'middle', lineSpacing: 1.45 });
     });
   },
