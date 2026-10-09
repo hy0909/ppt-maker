@@ -729,12 +729,12 @@ function topSection(slide, eyebrowRuns, headline, lead, pageNo) {
     slide.addText(runs, { x: IN(PAD), y: IN(61), w: IN(Math.min(W, 1100)), h: IN(Math.max(51, HEAD.stitle * 1.2) + titleExtra), align: 'left', valign: 'middle', margin: 0, lineSpacingMultiple: 1.2, fit: 'none', autoFit: false });
     ruleY = 116 + titleExtra;
   }
-  rect(slide, PAD, ruleY, W, 1, { fill: HEAD.ruleColor });
+  // 헤드라인·리드 사이 구분선은 2026-10-09 없앰. ruleY 는 헤드라인 아래 기준점으로만 쓴다
   let bodyTop = (headline ? FRAME.bodyTop - 30 : 96) + titleExtra;
   if (lead) {
     const n = lines(lead, HEAD.lead, 1100);
     const runs = richRuns(lead, { fontFace: FONT, fontSize: PT(HEAD.lead), color: colorToHex(P.textMid), charSpacing: -0.8 }).map(r => r.options.bold ? { ...r, options: { ...r.options, color: colorToHex(P.text) } } : r);
-    slide.addText(runs, { x: IN(PAD), y: IN(ruleY + 27), w: IN(Math.min(W, 1100)), h: IN(HEAD.lead * 1.5 * n + 2), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.5, fit: 'none', autoFit: false });
+    slide.addText(runs, { x: IN(PAD), y: IN(ruleY + 8), w: IN(Math.min(W, 1100)), h: IN(HEAD.lead * 1.5 * n + 2), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.5, fit: 'none', autoFit: false });
     bodyTop = FRAME.bodyTop + (n - 1) * HEAD.lead * 1.5 + titleExtra;
   }
   return bodyTop;

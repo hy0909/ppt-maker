@@ -68,8 +68,8 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .eyebrow .pgno{position:absolute;top:-8px;right:0;font-size:${HEAD.pgno}px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}   /* 몇 번째 장인지 — 오른쪽 위 모서리에 따로 띄운다 */
 .stitle{font-family:var(--font-title);font-size:${HEAD.stitle}px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
 .stitle b{font-family:var(--font-title-b);font-weight:400;color:var(--title);}
-.rule{height:1px;background:${HEAD.ruleColor};margin-top:13px;}
-.slead{font-size:${HEAD.lead}px;color:var(--text-mid);line-height:1.5;margin-top:26px;max-width:1100px;}
+.rule{display:none;}   /* 2026-10-09 헤드라인·리드 사이 구분선 없앰 */
+.slead{font-size:${HEAD.lead}px;color:var(--text-mid);line-height:1.5;margin-top:12px;max-width:1100px;}   /* 헤드라인 바로 아래 */
 .slead b{color:var(--text);font-weight:700;}
 /* body */
 .body{position:absolute;left:var(--pad);right:var(--pad);top:var(--body-top,238px);bottom:var(--safe-bottom);display:flex;flex-direction:column;gap:var(--gap);z-index:3;}

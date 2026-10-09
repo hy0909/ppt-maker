@@ -100,6 +100,7 @@ for (let i = 0; i < n; i++) {
       const pad = parseFloat(cs.getPropertyValue('--pad')) || 44;
       const sb = parseFloat(cs.getPropertyValue('--safe-bottom')) || 48;
       for (const el of leaves) {
+        if (el.closest('.foot')) continue;   // 출처·각주는 원래 아래 여백 안에 놓인다 — 침범이 아니다
         const b = el.getBoundingClientRect();
         const l = sr.left + pad - b.left, rgt = b.right - (sr.right - pad), bot = b.bottom - (sr.bottom - sb);
         const worst = Math.max(l, rgt, bot);

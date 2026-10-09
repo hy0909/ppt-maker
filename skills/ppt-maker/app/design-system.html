@@ -340,8 +340,8 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .sl-body .stitle{font-family:var(--deck-semi);font-weight:400;font-size:var(--stitle);color:#10141C;
   line-height:1.2;margin-top:9px;max-width:1100px;word-break:keep-all}
 .sl-body .stitle b{font-family:var(--deck-xbold);font-weight:400}
-.sl-body .rule{height:1px;background:#CFD4DC;margin-top:13px}
-.sl-body .slead{font-size:var(--lead);color:#4A5568;line-height:1.5;margin-top:26px;max-width:1100px}
+.sl-body .rule{display:none}
+.sl-body .slead{font-size:var(--lead);color:#4A5568;line-height:1.5;margin-top:12px;max-width:1100px}
 .sl-body .bodyarea{position:absolute;left:var(--pad);right:var(--pad);top:var(--body-top);bottom:var(--safe-bottom);
   display:flex;flex-direction:column;gap:calc(var(--gap)*var(--k))}
 .sl-body .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--gap)*var(--k)*1.6);flex:1;min-height:0}
@@ -500,7 +500,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 
     <section class="blk"><h2>템플릿 12종</h2>
       <p class="note">판형마다 그려야 할 상태를 다 펼쳐 놓았다. 위에서 값을 고치면 여기 29장이 한꺼번에 바뀐다.
-        본문 판형은 머리(아이브로우·헤드라인·구분선·리드)를 똑같이 쓰고 <span class="inl">본문 시작 y</span> 아래만 다르다.
+        본문 판형은 머리(아이브로우·헤드라인·리드)를 똑같이 쓰고 <span class="inl">본문 시작 y</span> 아래만 다르다.
         <b>장표를 누르면 크게 열린다.</b> 열린 뒤에는 ← → 로 옮겨 다니고 Esc 로 닫는다.</p>
       <div id="s-templates"></div>
     </section>
@@ -765,7 +765,7 @@ function buildSections(){
     {tok:'.stitle', name:'헤드라인', sub:'y61 · Paperlogy 6 SemiBold · 한 줄 한글 34자',
       fields:[{key:'stitle',unit:'px',step:0.01,min:12,max:90,alt:function(v){return '· '+(v/PT).toFixed(0)+'pt'}}],
       preview:pvType('현 체계는 세 곳에서 끊긴다','--stitle','--deck-semi',null,'#10141C')},
-    {tok:'.rule', name:'구분선', sub:'y116 · 여백 안쪽 전체 너비', fixed:'1px · #CFD4DC',
+    {tok:'.rule', name:'구분선', sub:'2026-10-09 없앰 — 리드가 헤드라인 바로 아래(12px)', fixed:'없음',
       preview:pvBox(function(d){d.innerHTML='<div style="height:1px;background:#CFD4DC"></div>'})},
     {tok:'.slead', name:'리드', sub:'y143 · 한 줄 한글 74자',
       fields:[{key:'lead',unit:'px',min:8,max:40}],
