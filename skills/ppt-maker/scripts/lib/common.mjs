@@ -72,8 +72,8 @@ export function derivePalette(brand = {}) {
     bannerBorder: mix(primary, '#FFFFFF', 0.68),       // 그 배너의 테두리(메인 컬러 32%) — 연회색 장표 바탕과 구분
     bannerLabel: primary,                              // 배너 라벨 글자(포인트 컬러, 굵게)
     bannerText: G.body,                                // 배너 본문 글자(카드 본문과 같은 회색)
-    // 배너 위계 — 주의(warn): 밝은 빨강 바탕(#FF5F5B)·어두운 글자(흰 글자는 대비 2.9:1 로 모자람) / 강조(strong): 검정 바탕·흰 라벨·연회색 본문
-    bannerWarn: '#FF5F5B', bannerWarnLabel: G.title, bannerWarnText: G.text,
+    // 배너 위계 — 주의(warn): 빨간 바탕(--danger)·흰 라벨·연분홍 본문 / 강조(strong): 검정 바탕·흰 라벨·연회색 본문
+    bannerWarn: ST.danger, bannerWarnLabel: G.white, bannerWarnText: mix('#FFFFFF', ST.danger, 0.12),
     bannerStrong: G.title, bannerStrongText: G.border,
     coverBadge: mix(mix(primary, '#000000', 0.28), '#FFFFFF', 0.17),  // 표지 오른쪽 아래 상자(원본 #3C34A1)
     primaryDark: scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.22),
