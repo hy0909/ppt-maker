@@ -86,9 +86,9 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
 .stat .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.5em;line-height:1.4;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
-/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 4px 회색(--border-strong) 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
+/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 4px 회색(--text-light) 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
    머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열은 글자색만 포인트 컬러 */
-table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:4px solid var(--border-strong);border-bottom:4px solid var(--border-strong);}
+table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:4px solid var(--text-light);border-bottom:4px solid var(--text-light);}
 .rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:calc(var(--fs-tableh) * var(--kt, 1));line-height:1.3;word-break:keep-all;overflow-wrap:anywhere;vertical-align:middle;}   /* 머리글도 칸이 좁으면 줄바꿈 */
 .rt thead th.em{color:var(--primary);}
 .rt tbody td{padding:.6em .8em;border:0;word-break:keep-all;overflow-wrap:anywhere;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
@@ -107,7 +107,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
 .badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
-.badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.prog{background:#FFF6E1;color:var(--warning);} .badge.n{background:var(--bg-soft);color:var(--text-mid);}
+.badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.wip{background:#FFF6E1;color:var(--warning);}   /* .prog 는 표지 진행 줄이 쓰는 이름이라 겹치지 않게 wip */ .badge.n{background:var(--bg-soft);color:var(--text-mid);}
 /* highlight box (used by kv/stat pairs) */
 .hbox{background:var(--primary-softer);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.8em 1em;text-align:center;}
 .hbox .hl{font-size:var(--fs-small);color:var(--text);} .hbox .hv{font-size:calc(var(--fs-stat) * .62);font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
@@ -259,7 +259,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     </div>
   </section>
 <section class="slide" data-label="1-1 냉장 물류 관제 **한 가지에 집중**하는 회사" id="s4" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">4</span></div><div class="stitle">냉장 물류 관제 <b>한 가지에 집중</b>하는&nbsp;회사</div><div class="rule"></div><div class="slead">회사 소개서 첫 본문. 왼쪽은 소개, 오른쪽은 규모를 보여 주는&nbsp;수치.</div></div>
+    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">4</span></div><div class="stitle">냉장 물류 관제 <b>한 가지에 집중</b>하는&nbsp;회사</div><div class="rule"></div><div class="slead">회사 소개서의 첫 본문입니다. 왼쪽은 소개, 오른쪽은 규모를 보여 주는 수치입니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:1fr 1fr">
       <div class="card "><div class="cap">회사&nbsp;소개</div><div class="bd">
         <div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g0"><li><span class="k">설립</span><span class="v">2019년, 냉장 물류 관제&nbsp;전문</span></li><li><span class="k">거점</span><span class="v">서울 본사 · 부산 연구소</span></li><li><span class="k">한 줄&nbsp;소개</span><span class="v">온도 기록을 판단으로 바꾸는 관제 서비스</span></li></ul>
@@ -272,7 +272,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     
   </section>
 <section class="slide" data-label="1-2 과제 배경과 **목표 네 가지**" id="s5" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">5</span></div><div class="stitle">과제 배경과 <b>목표 네&nbsp;가지</b></div><div class="rule"></div><div class="slead">과제 배경을 목표 네 개로 묶고, 아래 배너에 기술 태그를&nbsp;둔다.</div></div>
+    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">5</span></div><div class="stitle">과제 배경과 <b>목표 네&nbsp;가지</b></div><div class="rule"></div><div class="slead">과제 배경을 목표 네 개로 묶고, 아래 배너에 기술 태그를 둡니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:repeat(2,1fr)">
       <div class="card "><div class="cap">정확도</div><div class="bd">
         <div class="fill"><div class="cd">상한 판정 오류를 절반으로 줄인다</div></div>
@@ -289,12 +289,12 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     
   </section>
 <section class="slide" data-label="1-3 관제 화면 하나로 **차량 상태를 한눈에**" id="s6" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">6</span></div><div class="stitle">관제 화면 하나로 <b>차량 상태를 한눈에</b></div><div class="rule"></div><div class="slead">글을 먼저 읽히고 오른쪽 화면으로 확인시킨다.</div></div>
+    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">6</span></div><div class="stitle">관제 화면 하나로 <b>차량 상태를 한눈에</b></div><div class="rule"></div><div class="slead">글을 먼저 읽히고 오른쪽 화면으로 확인시킵니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="imgblk"><div class="txt"><div class="card tint"><div class="cap">관제 화면&nbsp;구성</div><div class="bd"><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g7"><li>차량별 온도&nbsp;곡선</li><li>위험 점수와 판정&nbsp;근거</li><li>알림&nbsp;이력</li></ul></div></div></div></div><div class="pic"><div class="fr"><div class="ph ib" style="--arw:16;--arh:9">[ 관제 화면 ]</div></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="1-4 운용 환경의 **세 가지 특성**" id="s7" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">7</span></div><div class="stitle">운용 환경의 <b>세 가지&nbsp;특성</b></div><div class="rule"></div><div class="slead">대등한 세 가지를 카드 한&nbsp;줄로.</div></div>
+    <div class="top"><div class="eyebrow"><span>사업 개요</span><span class="pgno">7</span></div><div class="stitle">운용 환경의 <b>세 가지&nbsp;특성</b></div><div class="rule"></div><div class="slead">대등한 세 가지를 카드 한 줄로 보여 줍니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="card "><div class="cap">온도&nbsp;변화</div><div class="bd">
         <div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g8"><li>문 열림마다&nbsp;급변</li><li>여름철 편차&nbsp;큼</li></ul></div>
@@ -319,27 +319,27 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     </div>
   </section>
 <section class="slide" data-label="2-1 도입 전에 **결정이 필요한 세 가지**" id="s9" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">9</span></div><div class="stitle">도입 전에 <b>결정이 필요한 세&nbsp;가지</b></div><div class="rule"></div><div class="slead">대등하고 짧은 항목을 순서대로. 최후의 수단으로&nbsp;쓴다.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">9</span></div><div class="stitle">도입 전에 <b>결정이 필요한 세&nbsp;가지</b></div><div class="rule"></div><div class="slead">대등하고 짧은 항목을 순서대로 나열합니다. 최후의 수단으로 씁니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="card "><div class="bd"><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g11"><li>시범 운영할 차량&nbsp;범위</li><li>판정 기준 온도와 허용&nbsp;시간</li><li>알림을 받을 담당자와&nbsp;채널</li></ul></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="2-2 수기 점검에서 **자동 판정**으로" id="s10" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">10</span></div><div class="stitle">수기 점검에서 <b>자동 판정</b>으로</div><div class="rule"></div><div class="slead">같은 기준으로 두 상태를 맞댄다.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">10</span></div><div class="stitle">수기 점검에서 <b>자동 판정</b>으로</div><div class="rule"></div><div class="slead">같은 기준으로 두 상태를 맞댑니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="cmp"><div class="side from"><div class="cap">AS-IS</div><div class="bd"><div class="sh">수기&nbsp;점검</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g12"><li>하루 두 번 기록지&nbsp;확인</li><li>이상은 다음 날&nbsp;발견</li><li>판단 근거가 남지&nbsp;않음</li></ul></div></div></div><div class="arr">›</div><div class="side to"><div class="cap">TO-BE</div><div class="bd"><div class="sh">자동&nbsp;판정</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g13"><li>1분 간격 자동&nbsp;수집</li><li>이상 즉시&nbsp;알림</li><li>판정 근거 자동&nbsp;기록</li></ul></div></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="2-3 수집부터 판정까지의 **시스템 구성**" id="s11" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">11</span></div><div class="stitle">수집부터 판정까지의 <b>시스템&nbsp;구성</b></div><div class="rule"></div><div class="slead">구성도 전체를 크게 놓고 관계를 보인다.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">11</span></div><div class="stitle">수집부터 판정까지의 <b>시스템&nbsp;구성</b></div><div class="rule"></div><div class="slead">구성도 전체를 크게 놓고 관계를 보입니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="imgblk"><div class="pic"><div class="fr"><div class="ph ib" style="--arw:16;--arh:9">[ 차량 센서 → 수집 서버 → 판정 엔진 → 관제 화면 ]</div></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="2-4 위험도 산출 모듈의 **세 가지 특징**" id="s12" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">12</span></div><div class="stitle">위험도 산출 모듈의 <b>세 가지&nbsp;특징</b></div><div class="rule"></div><div class="slead">기술 모듈 하나를 깊게. 오른쪽 그림과 아래&nbsp;배너.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">12</span></div><div class="stitle">위험도 산출 모듈의 <b>세 가지&nbsp;특징</b></div><div class="rule"></div><div class="slead">기술 모듈 하나를 깊게 다룹니다. 오른쪽 그림과 아래 배너로 구성합니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="imgblk"><div class="txt"><div class="card tint"><div class="cap">위험도&nbsp;산출</div><div class="bd"><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g14"><li>구간별 상태를 점수로</li><li>외기 온도 가중치&nbsp;반영</li><li>판정 근거를 문장으로</li></ul></div></div></div></div><div class="pic"><div class="fr"><div class="ph ib" style="--arw:16;--arh:9">[ 위험도 산출 흐름 ]</div></div></div></div></div></div><div class="blk" style="flex:0 0 auto"><div class="inner"><div class="banner"><div class="lead">적용 산업</div><div class="msg"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g15"><li>식품 냉장 운송 · 의약품 콜드체인</li></ul></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="2-5 기술 난제와 **대응 방안**" id="s13" data-fit="1" style="--k: 1.1044921875;" style="--k:1.1">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">13</span></div><div class="stitle">기술 난제와 <b>대응&nbsp;방안</b></div><div class="rule"></div><div class="slead">난제와 해법을 맞대고 근거를 표로 받친다.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">13</span></div><div class="stitle">기술 난제와 <b>대응&nbsp;방안</b></div><div class="rule"></div><div class="slead">난제와 해법을 맞대고 근거를 표로 받칩니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="cmp"><div class="side from"><div class="cap">난제</div><div class="bd"><div class="sh">짧은 이상&nbsp;구간</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g16"><li>문 열림 1~2분</li><li>평균값에&nbsp;묻힘</li></ul></div></div></div><div class="arr">›</div><div class="side to"><div class="cap">해법</div><div class="bd"><div class="sh">구간 단위&nbsp;판정</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g17"><li>1분 단위 구간&nbsp;분리</li><li>구간별 누적&nbsp;점수</li></ul></div></div></div></div></div></div><div class="blk" style="flex:1 1 0"><div class="inner"><div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt">
       <colgroup><col style="width:33.3%"><col style="width:33.3%"><col style="width:33.3%"></colgroup>
       <thead><tr><th class="">지표</th><th class="n">기존</th><th class="em n">제안</th></tr></thead>
@@ -348,7 +348,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     
   </section>
 <section class="slide" data-label="2-6 도입부터 운영까지 **네 단계**" id="s14" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">14</span></div><div class="stitle">도입부터 운영까지 <b>네&nbsp;단계</b></div><div class="rule"></div><div class="slead">순서가 핵심인&nbsp;절차.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">14</span></div><div class="stitle">도입부터 운영까지 <b>네&nbsp;단계</b></div><div class="rule"></div><div class="slead">순서가 핵심인 절차입니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="rm"><div class="line"></div>
       <div class="nums" style="grid-template-columns:repeat(4,1fr)"><div class="num">1</div><div class="num">2</div><div class="num">3</div><div class="num last">4</div></div>
       <div class="steps" style="grid-template-columns:repeat(4,1fr)">
@@ -363,12 +363,12 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     
   </section>
 <section class="slide" data-label="2-7 센서 장비 **외형과 부착 위치**" id="s15" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">15</span></div><div class="stitle">센서 장비 <b>외형과 부착&nbsp;위치</b></div><div class="rule"></div><div class="slead">그림이 주인공이고 글은&nbsp;보조.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">15</span></div><div class="stitle">센서 장비 <b>외형과 부착&nbsp;위치</b></div><div class="rule"></div><div class="slead">그림이 주인공이고 글은 보조입니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="imgblk"><div class="pic"><div class="fr"><div class="ph ib" style="--arw:16;--arh:9">[ 센서 장비 사진 ]</div></div></div><div class="txt"><div class="card tint"><div class="cap">부착&nbsp;위치</div><div class="bd"><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g18"><li>적재함 안쪽&nbsp;상단</li><li>문 가까운 쪽 1개&nbsp;추가</li></ul></div></div></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="2-8 자금 사용처와 **다음 계획**" id="s16" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">16</span></div><div class="stitle">자금 사용처와 <b>다음&nbsp;계획</b></div><div class="rule"></div><div class="slead">두 항목을 같은 비중으로 나란히.</div></div>
+    <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">16</span></div><div class="stitle">자금 사용처와 <b>다음&nbsp;계획</b></div><div class="rule"></div><div class="slead">두 항목을 같은 비중으로 나란히 둡니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:1fr 1fr">
       <div class="card "><div class="cap">자금 사용처</div><div class="bd">
         <div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g19"><li>연구 인력&nbsp;확충</li><li>센서 양산&nbsp;준비</li></ul>
@@ -392,7 +392,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     </div>
   </section>
 <section class="slide" data-label="3-1 1년 안에 **전국 거점으로 확대**" id="s18" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>추진 계획</span><span class="pgno">18</span></div><div class="stitle">1년 안에 <b>전국 거점으로&nbsp;확대</b></div><div class="rule"></div><div class="slead">시점과 그때 끝낼 일을 보인다.</div></div>
+    <div class="top"><div class="eyebrow"><span>추진 계획</span><span class="pgno">18</span></div><div class="stitle">1년 안에 <b>전국 거점으로&nbsp;확대</b></div><div class="rule"></div><div class="slead">시점과 그때 끝낼 일을 보입니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="rm"><div class="line"></div>
       <div class="nums" style="grid-template-columns:repeat(4,1fr)"><div class="num">1</div><div class="num">2</div><div class="num">3</div><div class="num last">4</div></div>
       <div class="steps" style="grid-template-columns:repeat(4,1fr)">
@@ -407,16 +407,16 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     
   </section>
 <section class="slide" data-label="3-2 기존 방식 대비 **모든 지표 개선**" id="s19" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>추진 계획</span><span class="pgno">19</span></div><div class="stitle">기존 방식 대비 <b>모든 지표&nbsp;개선</b></div><div class="rule"></div><div class="slead">여러 기준으로 맞대어 비교한다.</div></div>
+    <div class="top"><div class="eyebrow"><span>추진 계획</span><span class="pgno">19</span></div><div class="stitle">기존 방식 대비 <b>모든 지표&nbsp;개선</b></div><div class="rule"></div><div class="slead">여러 기준으로 맞대어 비교합니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt">
       <colgroup><col style="width:26.5%"><col style="width:26.5%"><col style="width:26.5%"><col style="width:20.6%"></colgroup>
-      <thead><tr><th class="">지표</th><th class="">기존&nbsp;방식</th><th class="em n">제안&nbsp;방식</th><th class="">상태</th></tr></thead>
-      <tbody><tr><td class="">감지&nbsp;시간</td><td class="">다음&nbsp;날</td><td class="em n">1분&nbsp;이내</td><td class=""><span class="badge ok">달성</span></td></tr><tr><td class="">판정&nbsp;근거</td><td class="">없음</td><td class="em n">자동&nbsp;기록</td><td class=""><span class="badge ok">달성</span></td></tr><tr><td class="">관제&nbsp;인원</td><td class="">4명</td><td class="em n">2명</td><td class=""><span class="badge prog">진행중</span></td></tr></tbody>
+      <thead><tr><th class="">지표</th><th class="">기존&nbsp;방식</th><th class="em">제안&nbsp;방식</th><th class="">상태</th></tr></thead>
+      <tbody><tr><td class="">감지&nbsp;시간</td><td class="">다음&nbsp;날</td><td class="em">1분&nbsp;이내</td><td class=""><span class="badge ok">달성</span></td></tr><tr><td class="">판정&nbsp;근거</td><td class="">없음</td><td class="em">자동&nbsp;기록</td><td class=""><span class="badge ok">달성</span></td></tr><tr><td class="">관제&nbsp;인원</td><td class="">4명</td><td class="em">2명</td><td class=""><span class="badge wip">진행중</span></td></tr></tbody>
     </table></div></div></div></div>
     
   </section>
 <section class="slide" data-label="3-3 과제를 맡을 **핵심 인력 네 명**" id="s20" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>추진 계획</span><span class="pgno">20</span></div><div class="stitle">과제를 맡을 <b>핵심 인력 네&nbsp;명</b></div><div class="rule"></div><div class="slead">사람과 역할을 한 줄로. 사진은 넣지 않는다.</div></div>
+    <div class="top"><div class="eyebrow"><span>추진 계획</span><span class="pgno">20</span></div><div class="stitle">과제를 맡을 <b>핵심 인력 네&nbsp;명</b></div><div class="rule"></div><div class="slead">사람과 역할을 한 줄로 보여 줍니다. 사진은 넣지 않습니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:repeat(4,1fr)">
       <div class="card "><div class="cap">홍길동</div><div class="bd">
         <div class="fill"><div class="cd">총괄 · 물류 관제 10년</div></div>
@@ -444,17 +444,17 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     </div>
   </section>
 <section class="slide" data-label="4-1 시범 운영 3개월 **핵심 수치**" id="s22" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">22</span></div><div class="stitle">시범 운영 3개월 <b>핵심&nbsp;수치</b></div><div class="rule"></div><div class="slead">핵심 숫자를 크게 보여 한 번에 읽힌다.</div></div>
+    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">22</span></div><div class="stitle">시범 운영 3개월 <b>핵심&nbsp;수치</b></div><div class="rule"></div><div class="slead">핵심 숫자를 크게 보여 한 번에 읽히게&nbsp;합니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="cap">상한&nbsp;반품</div><div class="bd"><div class="sv">1<small>건</small></div><div class="sn">이전 분기&nbsp;9건</div></div></div><div class="stat"><div class="cap">감지&nbsp;시간</div><div class="bd"><div class="sv">48<small>초</small></div><div class="sn">평균, 알림까지</div></div></div><div class="stat"><div class="cap">관제&nbsp;인원</div><div class="bd"><div class="sv">2<small>명</small></div><div class="sn">4명에서 절반으로</div></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="4-2 고객이 말한 **가장 큰 변화**" id="s23" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">23</span></div><div class="stitle">고객이 말한 <b>가장 큰&nbsp;변화</b></div><div class="rule"></div><div class="slead">한 문장을 배너로 남긴다.</div></div>
+    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">23</span></div><div class="stitle">고객이 말한 <b>가장 큰&nbsp;변화</b></div><div class="rule"></div><div class="slead">한 문장을 배너로 남깁니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:0 0 auto"><div class="inner"><div class="banner"><div class="lead">고객 의견</div><div class="msg">아침마다 기록지를 넘기던 일이 없어졌고, 문제가 생기면 바로 압니다.</div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="4-3 현장 적용 **사례 네 곳**" id="s24" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">24</span></div><div class="stitle">현장 적용 <b>사례 네&nbsp;곳</b></div><div class="rule"></div><div class="slead">사례와 시연 장면을 여러 개 한&nbsp;장에.</div></div>
+    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">24</span></div><div class="stitle">현장 적용 <b>사례 네&nbsp;곳</b></div><div class="rule"></div><div class="slead">사례와 시연 장면을 여러 개 한 장에 담습니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:1fr 1fr">
       <div class="card "><div class="cap">수도권&nbsp;센터</div><div class="bd">
         <div class="fill">
@@ -475,7 +475,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     
   </section>
 <section class="slide" data-label="4-4 함께하는 **고객과 파트너**" id="s25" data-fit="1" style="--k: 1.3;" style="--k:1.3">
-    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">25</span></div><div class="stitle">함께하는 <b>고객과 파트너</b></div><div class="rule"></div><div class="slead">로고를 한 번에. 파일이 없으면 자리표시자.</div></div>
+    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">25</span></div><div class="stitle">함께하는 <b>고객과 파트너</b></div><div class="rule"></div><div class="slead">로고를 한 번에 보여 줍니다. 파일이 없으면 자리표시자가 들어갑니다.</div></div>
     <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="grid" style="grid-template-columns:1fr 1fr 1fr">
       <div class="card "><div class="cap">고객사</div><div class="bd">
         <div class="fill">

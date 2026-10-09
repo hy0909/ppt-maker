@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS,
+import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
@@ -112,9 +112,9 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
 .stat .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.5em;line-height:1.4;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
-/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 4px 회색(--border-strong) 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
+/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 4px 회색(--text-light) 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
    머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열은 글자색만 포인트 컬러 */
-table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:4px solid var(--border-strong);border-bottom:4px solid var(--border-strong);}
+table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:4px solid var(--text-light);border-bottom:4px solid var(--text-light);}
 .rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:calc(var(--fs-tableh) * var(--kt, 1));line-height:1.3;word-break:keep-all;overflow-wrap:anywhere;vertical-align:middle;}   /* 머리글도 칸이 좁으면 줄바꿈 */
 .rt thead th.em{color:var(--primary);}
 .rt tbody td{padding:.6em .8em;border:0;word-break:keep-all;overflow-wrap:anywhere;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
@@ -133,7 +133,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
 .badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
-.badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.prog{background:#FFF6E1;color:var(--warning);} .badge.n{background:var(--bg-soft);color:var(--text-mid);}
+.badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.wip{background:#FFF6E1;color:var(--warning);}   /* .prog 는 표지 진행 줄이 쓰는 이름이라 겹치지 않게 wip */ .badge.n{background:var(--bg-soft);color:var(--text-mid);}
 /* highlight box (used by kv/stat pairs) */
 .hbox{background:var(--primary-softer);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.8em 1em;text-align:center;}
 .hbox .hl{font-size:var(--fs-small);color:var(--text);} .hbox .hv{font-size:calc(var(--fs-stat) * .62);font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
@@ -372,19 +372,14 @@ function imgOrPh(src, alt, ratio) {
   return `<img src="${esc(src)}" alt="${esc(alt || '')}"${ra}>`;
 }
 /** 숫자 칸인가 — 숫자가 있고 글자는 단위 정도(4자 이하)만. "2억 7,500만 원", "18%", "1,540명" 은 숫자, "3개 기능 구성" 은 글 */
-export function isNumCell(c) {
-  const t = String(c ?? '').replace(/\*\*/g, '').trim();
-  if (!/\d/.test(t)) return false;
-  const letters = (t.match(/[가-힣a-zA-Z]/g) || []).length;
-  return letters <= 4 && !/\s[가-힣a-zA-Z]{3,}/.test(t);
-}
+export { isNumCell } from './lib/common.mjs';
 /** 합계·평균 같은 마무리 행인가 (첫 칸으로 판단) */
 export function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
 function badgeCell(txt) {
   const t = String(txt).replace(/\*\*/g, '');
   if (/^(달성|완료|충족)$/.test(t)) return `<span class="badge ok">${esc(t)}</span>`;
   if (/^(조기달성|초과달성|초과)$/.test(t)) return `<span class="badge up">${esc(t)}</span>`;
-  if (/^(진행중|진행 중|예정|계획)$/.test(t)) return `<span class="badge prog">${esc(t)}</span>`;
+  if (/^(진행중|진행 중|예정|계획)$/.test(t)) return `<span class="badge wip">${esc(t)}</span>`;
   if (/^(미달|보류|중단)$/.test(t)) return `<span class="badge n">${esc(t)}</span>`;
   return rich(txt);
 }
@@ -439,11 +434,11 @@ const BLOCKS = {
   table(b) {
     const em = b.emphasize; const rows = b.rows || [];
     const leftCols = new Set(b.leftAlign || [0]);
-    // 숫자 칸이 절반 넘는 열(첫 열 제외)은 오른쪽 정렬, 첫 칸이 합계·평균이면 footer 행
+    // 수치만 있는 열(첫 열 제외)은 오른쪽 정렬, 글이 섞인 열은 왼쪽. 첫 칸이 합계·평균이면 footer 행
     const ncol = (b.headers || []).length || (rows[0] || []).length;
     // 열 너비: widths 를 주지 않았으면 칸 글자 양에 맞춰 나눈다(PPTX 와 같은 값)
     const widths = (b.widths || []).length === ncol ? b.widths : tableColWidths(b.headers, rows).map(p => p + '%');
-    const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
+    const numCol = numColumns(b.headers, rows, leftCols);
     const cls = (i, extra = '') => [i === em ? 'em' : '', numCol[i] ? 'n' : '', extra].filter(Boolean).join(' ');
     return `<div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt${b.rowHeader ? ' rh' : ''}">
       ${widths.length ? `<colgroup>${widths.map(w => `<col style="width:${w}">`).join('')}</colgroup>` : ''}

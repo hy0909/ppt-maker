@@ -230,6 +230,24 @@ export function splitTableSlide(sl, density = 'dense') {
   }));
 }
 
+/** 표 칸이 "수치"인가 — 금액·비율·개수처럼 숫자가 주인 칸만. "1분 이내", "다음 날"처럼 글에 숫자가 섞인 칸은 아니다.
+ *  허용: 앞에 월/약/₩/$/−, 숫자 묶음(2억 7,500만), 뒤에 단위(%, 명, 건, ms, req/s, (90.61)) 다섯 글자 안. */
+export function isNumCell(c) {
+  const t = String(c ?? '').replace(/\*\*/g, '').trim();
+  return /^(?:[월약연주일]\s|[₩$€]|[-+±~≈])?(?:\d[\d,.]*\s?[%a-zA-Z가-힣/()]{0,5}\s?)+(?:원)?$/.test(t);
+}
+/** 빈 칸·대시는 정렬을 정할 때 세지 않는다. */
+export const isBlankCell = c => /^(?:|[-–—]|없음|해당 없음|N\/A)$/i.test(String(c ?? '').replace(/\*\*/g, '').trim());
+/** 열마다 오른쪽 정렬 여부 — 첫 열은 늘 왼쪽, 나머지는 빈 칸을 뺀 모든 칸이 수치일 때만 오른쪽. HTML·PPTX 가 같은 값을 쓴다. */
+export function numColumns(headers = [], rows = [], leftCols = new Set([0])) {
+  const n = Math.max(headers.length, ...rows.map(r => (r || []).length), 1);
+  return Array.from({ length: n }, (_, i) => {
+    if (leftCols.has(i)) return false;
+    const cells = rows.map(r => (r || [])[i]).filter(c => !isBlankCell(c));
+    return cells.length > 0 && cells.every(isNumCell);
+  });
+}
+
 /** 표 열 너비(%)를 칸 글자 양에 맞춰 나눈다 — `widths` 를 안 준 표에 쓴다. HTML·PPTX 가 같은 값을 쓴다.
  *  열마다 머리글·칸 중 가장 긴 글자 수(영문·숫자는 0.55자)를 재고, 28자에서 자른다(그 이상은 줄바꿈이 낫다).
  *  너무 좁은 열이 생기지 않게 최소 8%(열이 많으면 그보다 작게)를 둔다. */

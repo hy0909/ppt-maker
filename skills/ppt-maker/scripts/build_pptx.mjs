@@ -11,7 +11,7 @@ const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // �
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -446,13 +446,7 @@ function chartPanel(slide, c, x, y, w, h, k) {
   if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
   else slide.addChart(pres.charts.LINE, data, { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 6, lineDataSymbolLineSize: 1, dataLabelPosition: 't', lineSmooth: true });
 }
-/** 숫자 칸인가 / 합계 행인가 — build_html.mjs 와 같은 규칙 */
-function isNumCell(c) {
-  const t = String(c ?? '').replace(/\*\*/g, '').trim();
-  if (!/\d/.test(t)) return false;
-  const letters = (t.match(/[가-힣a-zA-Z]/g) || []).length;
-  return letters <= 4 && !/\s[가-힣a-zA-Z]{3,}/.test(t);
-}
+/** 합계 행인가 — build_html.mjs 와 같은 규칙. 수치 칸·정렬은 common.mjs 의 numColumns */
 function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
 /** 이미지 상자 비율. 기본 16:9. 'original' 이면 원본 비율 그대로(contain). HTML 의 IMAGE_RATIOS 와 같은 값. */
 const IMAGE_RATIOS = { '16:9': 16 / 9, '4:3': 4 / 3, '1:1': 1, '9:16': 9 / 16, '3:4': 3 / 4 };
@@ -593,8 +587,8 @@ const B = {
     const colW = pct.map(pc => box.w * pc / pctTot);
     const leftCols = new Set(b.leftAlign || [0]);
     const clean = c => String(c ?? '').replace(/\*\*/g, '');
-    // HTML 과 같은 규칙: 숫자 칸이 절반 넘는 열은 오른쪽 정렬, 첫 칸이 합계·평균이면 footer 행(연회색·굵게)
-    const numCol = Array.from({ length: ncol }, (_, i) => i > 0 && !leftCols.has(i) && rows.length && rows.filter(r => isNumCell(r[i])).length * 2 > rows.length);
+    // HTML 과 같은 규칙: 수치만 있는 열은 오른쪽 정렬, 글이 섞인 열은 왼쪽. 첫 칸이 합계·평균이면 footer 행(연회색·굵게)
+    const numCol = numColumns(headers, rows, leftCols);
     let kk = k, hdrH, rowHs;
     for (let tries = 0; tries < 14; tries++) {
       const fs = D.table * kk, fsh = D.tableH * kk, padY = fs * 0.6, padX = fs * 0.8;
@@ -642,9 +636,9 @@ const B = {
       y += h;
     });
     if (rh) rect(slide, box.x + colW[0] - 1, box.y, 1, tblH, { fill: P.border });
-    // 시작·끝 = 4px 회색 선(--border-strong)
-    rect(slide, box.x, box.y, box.w, 4, { fill: P.borderStrong });
-    rect(slide, box.x, box.y + tblH - 4, box.w, 4, { fill: P.borderStrong });
+    // 시작·끝 = 4px 회색 선(--text-light)
+    rect(slide, box.x, box.y, box.w, 4, { fill: P.textLight });
+    rect(slide, box.x, box.y + tblH - 4, box.w, 4, { fill: P.textLight });
   },
   compare(slide, b, box, k) {
     const em = D.body * k, mid = em * 3, w = (box.w - mid) / 2;
