@@ -335,8 +335,8 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 
 .sl-body{background:#E9ECF0}
 .sl-body .top{position:absolute;top:30px;left:var(--pad);right:var(--pad)}
-.sl-body .eyebrow{font-size:var(--eyebrow);color:#4A5568;font-weight:500;display:flex;justify-content:space-between;align-items:baseline}
-.sl-body .eyebrow .pg{font-size:var(--pgno);color:#8B95A7;font-variant-numeric:tabular-nums}
+.sl-body .eyebrow{font-size:var(--eyebrow);color:#515B75;font-weight:500;display:flex;justify-content:space-between;align-items:baseline}
+.sl-body .eyebrow .pg{position:absolute;top:-8px;right:0;font-size:var(--pgno);color:#8B95A7;font-variant-numeric:tabular-nums}
 .sl-body .stitle{font-family:var(--deck-semi);font-weight:400;font-size:var(--stitle);color:#10141C;
   line-height:1.2;margin-top:9px;max-width:1100px;word-break:keep-all}
 .sl-body .stitle b{font-family:var(--deck-xbold);font-weight:400}
@@ -569,7 +569,7 @@ var DEFAULTS={
   density:'dense', k:1,
   primary:'#2B0CDD', secondary:'#5D48FF',
   h0:48,h0l:58.6,h0s:-1, h1:40,h1l:48,h1s:-1, h2:22,h2l:31.8,h2s:-0.2, b2:18,b2l:26.6,b2s:-0.8,
-  eyebrow:15, stitle:46, lead:24, pgno:13,
+  eyebrow:17, stitle:46, lead:24, pgno:13,
   pad:40, safeBottom:44, bodyTop:220,
   rCard:19, rBanner:14, rLabel:8, rPill:999,
   shY:2, shBlur:12, shOp:7,
@@ -759,7 +759,7 @@ function buildSections(){
     {tok:'.eyebrow', name:'아이브로우', sub:'y30 · 섹션 이름 하나만',
       fields:[{key:'eyebrow',unit:'px',min:8,max:40}],
       preview:pvType('배경 및 문제점','--eyebrow','--deck-body',null,'#4A5568')},
-    {tok:'.eyebrow .pgno', name:'쪽 번호', sub:'y30 · 오른쪽 끝',
+    {tok:'.eyebrow .pgno', name:'장 번호', sub:'y22 · 오른쪽 위 모서리 · 몇 번째 장인지',
       preview:pvType('12','--pgno','--deck-body',null,'#8B95A7'),
       fields:[{key:'pgno',unit:'px',min:8,max:40}]},
     {tok:'.stitle', name:'헤드라인', sub:'y61 · Paperlogy 6 SemiBold · 한 줄 한글 34자',
@@ -862,7 +862,7 @@ var FIXED=[
   ['primary-800','#2815B0','진한 단계 · 간지 그라데이션 시작'],['primary-700','#2A14C8','중간 진한 단계'],
   ['primary-600','#2B0CDD','메인'],['primary-400','#5D48FF','보조'],['primary-300','#7B69FF','primary 300'],['primary-200','#9B8EFF','primary 200'],
   ['--page','#E9ECF0','장표 바탕'],['--text','#1A2438','본문 글자'],['--title','#10141C','헤드라인'],
-  ['--body','#515B75','카드 안 소제목'],['--text-mid','#4A5568','아이브로우 · 리드'],['--text-light','#8B95A7','쪽 번호 · 캡션'],
+  ['--body','#515B75','아이브로우 · 카드 안 소제목'],['--text-mid','#4A5568','리드'],['--text-light','#8B95A7','쪽 번호 · 캡션'],
   ['--bg-soft','#F5F7FA','표 헤더 · 그래프 패널'],['--border','#D9DEE6','테두리'],
   ['success','#138A4E','배지 달성'],['warning','#C97A1F','배지 진행중'],['danger','#C9302C','배지 미달']
 ];

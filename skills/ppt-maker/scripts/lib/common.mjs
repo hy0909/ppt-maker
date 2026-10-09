@@ -117,7 +117,7 @@ const DEFAULT_TOKENS = {
   color:   { primary: C_MAIN, secondary: C_SECOND },
   type:    { h0: { size: 48, line: 58.6, spc: -1 }, h1: { size: 40, line: 48, spc: -1 },
              h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
-  head:    { eyebrow: 15, pgno: 13, stitle: 46, lead: 24, ruleColor: '#CFD4DC' },
+  head:    { eyebrow: 17, pgno: 13, stitle: 46, lead: 24, ruleColor: '#CFD4DC' },
   frame:   { pad: 40, safeBottom: 44, bodyTop: 220 },
   shape:   { card: 19, banner: 14, label: 8, pill: 999, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
   density: { dense: { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, gap: 12 },

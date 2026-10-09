@@ -717,7 +717,7 @@ const RGBA = (c, a) => `rgba(${parseInt(c.slice(1, 3), 16)},${parseInt(c.slice(3
 function topSection(slide, eyebrowRuns, headline, lead, pageNo) {
   const W = SLIDE_W - PAD * 2;
   slide.addText(eyebrowRuns, { x: IN(PAD), y: IN(30), w: IN(W - 80), h: IN(22), align: 'left', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
-  if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 30, 80, 22, { size: HEAD.pgno, color: P.textLight, align: 'right', valign: 'middle' });
+  if (pageNo) text(slide, pageNo, SLIDE_W - PAD - 80, 22, 80, 18, { size: HEAD.pgno, color: P.textLight, align: 'right', valign: 'top' });   // 몇 번째 장인지 — 오른쪽 위 모서리
   let ruleY = 68, titleExtra = 0;
   if (headline) {
     // .stitle: HEAD.stitle px, **강조** 는 같은 색 굵게. 두 줄 이상이면 구분선·리드·본문을 그만큼 내린다
@@ -841,7 +841,7 @@ function content(sl) {
   const k = (FIT[sl.order] || 1) * K_DAMP;
   const slide = sl.slide;
   // 아이브로우 = 이 장표가 속한 목차(섹션) 이름 하나만
-  const base = { fontFace: FONT, fontSize: PT(15), color: colorToHex(P.textMid), bold: false, charSpacing: -0.8 };
+  const base = { fontFace: FONT, fontSize: PT(HEAD.eyebrow), color: colorToHex(P.body), bold: false, charSpacing: -0.8 };
   const parts = [{ text: sl.kind === 'appendix' ? 'APPENDIX' : sl.section.title, options: base }];
   const headline = slide.headline || slide.title || '';
   const bodyTop = topSection(s, parts, headline, slide.lead, meta.pageNumbers && sl.pageNo ? String(parseInt(sl.pageNo, 10)) : '');

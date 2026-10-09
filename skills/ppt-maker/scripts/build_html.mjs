@@ -63,9 +63,9 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .slide{width:1280px;height:720px;overflow:hidden;background:var(--page);position:relative;font-size:var(--fs-body);line-height:1.5;letter-spacing:-.8pt;word-break:keep-all;}
 /* top: eyebrow + page no · headline · rule · meta line (minimal, no header strip) */
 .top{position:absolute;top:30px;left:var(--pad);right:var(--pad);z-index:4;}
-.eyebrow{font-size:${HEAD.eyebrow}px;color:var(--text-mid);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
+.eyebrow{font-size:${HEAD.eyebrow}px;color:var(--body);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
 .eyebrow b{color:var(--primary);font-weight:700;}
-.eyebrow .pgno{font-size:${HEAD.pgno}px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}
+.eyebrow .pgno{position:absolute;top:-8px;right:0;font-size:${HEAD.pgno}px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}   /* 몇 번째 장인지 — 오른쪽 위 모서리에 따로 띄운다 */
 .stitle{font-family:var(--font-title);font-size:${HEAD.stitle}px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
 .stitle b{font-family:var(--font-title-b);font-weight:400;color:var(--title);}
 .rule{height:1px;background:${HEAD.ruleColor};margin-top:13px;}
