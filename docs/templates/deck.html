@@ -107,7 +107,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
 .badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
-.badge.ok{background:#E6F5EC;color:var(--success);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.wip{background:#FFF6E1;color:var(--warning);}   /* .prog 는 표지 진행 줄이 쓰는 이름이라 겹치지 않게 wip */ .badge.n{background:var(--bg-soft);color:var(--text-mid);}
+.badge.ok{background:var(--primary-softer);color:var(--primary);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.wip{background:#FFF6E1;color:var(--warning);}   /* .prog 는 표지 진행 줄이 쓰는 이름이라 겹치지 않게 wip */ .badge.n{background:var(--bg-soft);color:var(--text-mid);}
 /* highlight box (used by kv/stat pairs) */
 .hbox{background:var(--primary-softer);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.8em 1em;text-align:center;}
 .hbox .hl{font-size:var(--fs-small);color:var(--text);} .hbox .hv{font-size:calc(var(--fs-stat) * .62);font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
@@ -173,17 +173,17 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
    막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
 .gantt .gh,.gantt .gr{display:grid;grid-template-columns:var(--gl) 1fr;min-height:0;}
-.gantt .gh{flex:0 0 auto;background:var(--primary-deep);color:#fff;border-radius:6px;overflow:hidden;} .gantt .gr{flex:1;}
-.gantt .gh .gnh{display:flex;align-items:center;padding:.45em .8em;font-weight:700;font-size:.9em;}
+.gantt .gh{flex:0 0 auto;background:var(--primary-deep);color:#fff;border-radius:6px;overflow:hidden;margin:0 -8px 8px;padding:0 8px;}   /* 띠는 내용보다 좌우 8px 넓게, 글자는 내용 끝선에 맞춤, 아래 행과 8px */ .gantt .gr{flex:1;}
+.gantt .gh .gnh{display:flex;align-items:center;padding:.45em .8em .45em 0;font-weight:700;font-size:.9em;}
 .gantt .gcols{display:grid;grid-template-columns:repeat(var(--n),1fr);text-align:left;color:#fff;font-weight:600;font-size:.9em;margin-right:var(--gto,3.4em);}
 .gantt .gcols span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.45em .5em;border-left:1px solid rgba(255,255,255,.22);}
 .gantt .gname{display:flex;align-items:center;padding-right:.8em;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .gantt .gtrack{position:relative;min-height:1.9em;margin-right:var(--gto,3.4em);}   /* 오른쪽은 to 라벨 자리 */
 .gantt .glead{position:absolute;left:0;top:50%;height:1px;background:var(--border-strong);}   /* 이름 끝 → 막대 시작 안내선 */
-.gantt .gbar{position:absolute;top:50%;height:1.45em;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.85em;white-space:nowrap;overflow:hidden;padding:0 .4em;}
+.gantt .gbar{position:absolute;top:50%;height:1.45em;font-style:normal;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.85em;white-space:nowrap;overflow:hidden;padding:0 .4em;}
 .gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--pill-glow);} .gantt .gbar.muted{background:var(--text-mid);}
 .gantt .gfrom,.gantt .gto{position:absolute;top:50%;transform:translateY(-50%);font-size:.85em;color:var(--text-mid);white-space:nowrap;}
-.gantt .gfrom{transform:translate(-100%,-50%);padding-right:.5em;} .gantt .gto{padding-left:.5em;}
+.gantt .gfrom{transform:translate(-100%,-50%);padding-right:.5em;} .gantt .gto{padding-left:.5em;} .gantt .gto.end{left:auto!important;right:calc(-1 * var(--gto,3.4em));text-align:right;padding-left:0;}
 /* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}

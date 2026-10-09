@@ -560,13 +560,13 @@ const B = {
     // 레퍼런스 "시간표" 모양: 진한 머리띠(흰 열 라벨) · 이름 끝 → 막대 안내선 · 두꺼운 막대에 흰 라벨 · 막대 앞뒤 from·to
     const toW = tasks.some(t => t.to) ? fs * 3.4 : 0;   // 오른쪽 끝 to 라벨 자리
     const nameW = inner.w * 0.24, gx = inner.x + nameW, gw = inner.w - nameW - toW, hdrH = fs * 2.1;
-    rect(slide, inner.x, inner.y, inner.w - toW, hdrH, { fill: P.primaryDeep, radius: 6 });
-    if (b.nameHeader) text(slide, String(b.nameHeader), inner.x + em * 0.8, inner.y, nameW - em, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
+    rect(slide, inner.x - 8, inner.y, inner.w + 16, hdrH, { fill: P.primaryDeep, radius: 6 });   // 띠는 내용보다 좌우 8px 넓게
+    if (b.nameHeader) text(slide, String(b.nameHeader), inner.x, inner.y, nameW - em, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
     cols.forEach((c, i) => {
       if (i) rect(slide, gx + gw * i / n, inner.y + hdrH * 0.2, 1, hdrH * 0.6, { fill: mix(P.white, P.primaryDeep, 0.78) });
       text(slide, String(c), gx + gw * i / n + em * 0.5, inner.y, gw / n - em * 0.5, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
     });
-    const rowsY = inner.y + hdrH, rowsH = Math.max(1, inner.h - hdrH), rowH = rowsH / Math.max(1, tasks.length);
+    const rowsY = inner.y + hdrH + 8, rowsH = Math.max(1, inner.h - hdrH - 8), rowH = rowsH / Math.max(1, tasks.length);   // 띠 아래 8px
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
     const tone = t => t.tone === 'muted' ? P.textMid : t.tone === 'accent' ? P.pillGlow : t.tone === 'second' ? P.primary2 : P.primary;
     tasks.forEach((t, i) => {
@@ -579,7 +579,7 @@ const B = {
       if (t.from) text(slide, String(t.from), bx - fromW, y, fromW - em * 0.25, rowH, { size: D.small * 0.85, k, color: P.textMid, align: 'right', valign: 'middle' });
       rect(slide, bx, cy - bh / 2, bw, bh, { fill: tone(t), radius: 3 });
       if (t.label) text(slide, String(t.label), bx, cy - bh / 2, bw, bh, { size: D.small * 0.85, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
-      if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.small * 0.85, k, color: P.textMid, valign: 'middle' });
+      if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.small * 0.85, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
     });
   },
   timeline(slide, b, box, k) {
@@ -631,7 +631,7 @@ const B = {
         const t = clean(c).trim();
         const badge = /^(달성|완료|충족|조기달성|초과달성|초과|진행중|진행 중|예정|계획|미달|보류|중단)$/.test(t);
         if (badge && !isEm) {
-          const [bg, fg] = /^(달성|완료|충족)$/.test(t) ? ['#E6F5EC', P.success] : /^(조기달성|초과달성|초과)$/.test(t) ? ['#DDEEFF', P.primary2] : /^(진행중|진행 중|예정|계획)$/.test(t) ? ['#FFF6E1', P.warning] : [P.bgSoft, P.textMid];
+          const [bg, fg] = /^(달성|완료|충족)$/.test(t) ? [P.softerBlue, P.primary] : /^(조기달성|초과달성|초과)$/.test(t) ? ['#DDEEFF', P.primary2] : /^(진행중|진행 중|예정|계획)$/.test(t) ? ['#FFF6E1', P.warning] : [P.bgSoft, P.textMid];
           const bw = estW(t, fs * 0.8) + fs * 2.2, bh = fs * 1.6;
           rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
           text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
