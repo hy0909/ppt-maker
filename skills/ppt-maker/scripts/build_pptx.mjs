@@ -642,9 +642,9 @@ const B = {
       y += h;
     });
     if (rh) rect(slide, box.x + colW[0] - 1, box.y, 1, tblH, { fill: P.border });
-    // 시작·끝 = 2px 검정 선
-    rect(slide, box.x, box.y, box.w, 2, { fill: P.title });
-    rect(slide, box.x, box.y + tblH - 2, box.w, 2, { fill: P.title });
+    // 시작·끝 = 4px 회색 선(--text-mid)
+    rect(slide, box.x, box.y, box.w, 4, { fill: P.textMid });
+    rect(slide, box.x, box.y + tblH - 4, box.w, 4, { fill: P.textMid });
   },
   compare(slide, b, box, k) {
     const em = D.body * k, mid = em * 3, w = (box.w - mid) / 2;
