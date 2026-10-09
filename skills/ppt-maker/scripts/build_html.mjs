@@ -63,7 +63,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .slide{width:1280px;height:720px;overflow:hidden;background:var(--page);position:relative;font-size:var(--fs-body);line-height:1.5;letter-spacing:-.8pt;word-break:keep-all;font-family:var(--font);color:var(--text);}   /* deck-stage 가 슬롯에 흰 글자·시스템 글꼴을 깔아서, 색·글꼴을 명시하지 않은 글자가 사라지지 않게 */
 /* top: eyebrow + page no · headline · rule · meta line (minimal, no header strip) */
 .top{position:absolute;top:30px;left:var(--pad);right:var(--pad);z-index:4;}
-.eyebrow{font-size:${HEAD.eyebrow}px;color:var(--body);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
+.eyebrow{font-size:${HEAD.eyebrow}px;color:var(--primary-deep);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
 .eyebrow b{color:var(--primary);font-weight:700;}
 .eyebrow .pgno{position:absolute;top:-8px;right:0;font-size:${HEAD.pgno}px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}   /* 몇 번째 장인지 — 오른쪽 위 모서리에 따로 띄운다 */
 .stitle{font-family:var(--font-title);font-size:${HEAD.stitle}px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
@@ -231,7 +231,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .hist.list .hg{display:grid;grid-template-columns:7.5em 1fr;column-gap:1.4em;}
 .hist.list .hp{font-weight:700;color:var(--primary);line-height:1.55;}
 .hist.list .hrow{display:grid;grid-template-columns:3.2em 3em 1fr;column-gap:.6em;line-height:1.55;}
-.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;}
+.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;margin-left:-4px;}   /* 월과 내용 사이 4px 좁게 */
 /* gantt(2026-10-09, 레퍼런스 "시간표" 모양) — 위에 진한 머리띠(열 라벨 흰 글자) · 왼쪽 항목 이름 · 이름 끝에서 막대까지 가는 안내선 ·
    막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
@@ -321,9 +321,11 @@ function chartSvg(b) {
   const labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = SERIES_COLORS();
   const all = series.flatMap(sr => sr.values || []).filter(v => typeof v === 'number');
   const max = Math.max(1, ...all) * 1.25, min = Math.min(0, ...all);
-  const W = 340, H = 118, padL = 16, padR = 16, padT = 20, padB = 24;
+  // 좌표계 = 장표 본문 너비(1200). 좌우 여백 20px(2026-10-10), 위는 값 라벨 자리, 아래는 축 라벨 자리
+  const W = 1200, H = 416, padL = 20, padR = 20, padT = 70, padB = 84;
   const n = Math.max(labels.length, ...series.map(sr => (sr.values || []).length));
-  const x = i => padL + (n <= 1 ? (W - padL - padR) / 2 : (W - padL - padR) * i / (n - 1));
+  const inset = b.kind === 'bar' ? 0 : 12;   // 선 그래프는 끝 점이 잘리지 않게 점 반지름만큼 안쪽
+  const x = i => padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1));
   const y = v => padT + (H - padT - padB) * (1 - (v - min) / (max - min));
   const num = v => esc(String(v));
   let out = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">`;
@@ -331,22 +333,22 @@ function chartSvg(b) {
     const gy = (padT + (H - padT - padB) * g / 4).toFixed(1);
     out += `<line x1="${padL}" y1="${gy}" x2="${W - padR}" y2="${gy}" stroke="${P.border}" stroke-opacity=".6" stroke-width="1"/>`;
   }
-  labels.forEach((l, i) => { out += `<text x="${x(i)}" y="${H - padB + 16}" text-anchor="middle" font-size="10" fill="${P.textMid}">${esc(l)}</text>`; });
+  labels.forEach((l, i) => { out += `<text x="${x(i)}" y="${H - padB + 56}" text-anchor="middle" font-size="34" fill="${P.textMid}">${esc(l)}</text>`; });
   if (b.kind === 'bar') {
-    const gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(28, gw * 0.6 / series.length), r = series.length > 1 ? 3 : 5;
+    const gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(110, gw * 0.72 / series.length), r = series.length > 1 ? 10 : 16;   // 막대는 묶음 너비의 72%
     series.forEach((sr, si) => (sr.values || []).forEach((v, i) => {
-      const bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 1, w = bw - 2;
+      const bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
       const top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
       out += `<path d="M${bx},${bot} V${top + rr} Q${bx},${top} ${bx + rr},${top} H${bx + w - rr} Q${bx + w},${top} ${bx + w},${top + rr} V${bot} Z" fill="${cols[si]}"/>`;
-      out += `<text x="${bx + w / 2}" y="${top - 6}" text-anchor="middle" font-size="10" font-weight="600" fill="${P.text}">${num(v)}</text>`;
+      out += `<text x="${bx + w / 2}" y="${top - 20}" text-anchor="middle" font-size="34" font-weight="600" fill="${P.text}">${num(v)}</text>`;
     }));
   } else {
     series.forEach((sr, si) => {
       const pts = (sr.values || []).map((v, i) => [x(i), y(v)]);
-      out += `<path d="${smoothPath(pts)}" fill="none" stroke="${cols[si]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      out += `<path d="${smoothPath(pts)}" fill="none" stroke="${cols[si]}" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>`;
       pts.forEach(([px, py], i) => {
-        out += `<circle cx="${px}" cy="${py}" r="3.2" fill="${cols[si]}"/>`;
-        out += `<text x="${px}" y="${py - 9}" text-anchor="middle" font-size="11" font-weight="600" fill="${P.text}">${num((sr.values || [])[i])}</text>`;
+        out += `<circle cx="${px}" cy="${py}" r="11" fill="${cols[si]}"/>`;
+        out += `<text x="${px}" y="${py - 30}" text-anchor="middle" font-size="38" font-weight="600" fill="${P.text}">${num((sr.values || [])[i])}</text>`;
       });
     });
   }

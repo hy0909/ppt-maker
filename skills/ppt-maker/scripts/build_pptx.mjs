@@ -642,7 +642,7 @@ const B = {
           const tw2 = Math.max(1, inner.x + inner.w - (x + yw + mw + g2 * 2)), th2 = lines(it.text || '', fs, tw2) * lh;
           text(slide, it.year || '', x, yy, yw, lh, { size: D.small, k, bold: true, valign: 'middle' });
           text(slide, it.month || '', x + yw + g2, yy, mw, lh, { size: D.small, k, color: P.textMid, valign: 'middle' });
-          text(slide, it.text || '', x + yw + mw + g2 * 2, yy, tw2, th2, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });
+          text(slide, it.text || '', x + yw + mw + g2 * 2 - 4, yy, tw2 + 4, th2, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });   // 월과 내용 사이 4px 좁게
           yy += th2;
         });
         y = Math.max(yy, y + lh) + 14;
@@ -945,7 +945,7 @@ function content(sl) {
   const k = (FIT[sl.order] || 1) * K_DAMP;
   const slide = sl.slide;
   // 아이브로우 = 이 장표가 속한 목차(섹션) 이름 하나만
-  const base = { fontFace: FONT, fontSize: PT(HEAD.eyebrow), color: colorToHex(P.body), bold: false, charSpacing: -0.8 };
+  const base = { fontFace: FONT, fontSize: PT(HEAD.eyebrow), color: colorToHex(P.primaryDeep), bold: false, charSpacing: -0.8 };
   const parts = [{ text: sl.kind === 'appendix' ? 'APPENDIX' : sl.section.title, options: base }];
   const headline = slide.headline || slide.title || '';
   const bodyTop = topSection(s, parts, headline, slide.lead, meta.pageNumbers && sl.pageNo ? String(parseInt(sl.pageNo, 10)) : '');

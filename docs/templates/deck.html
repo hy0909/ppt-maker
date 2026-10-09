@@ -37,7 +37,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .slide{width:1280px;height:720px;overflow:hidden;background:var(--page);position:relative;font-size:var(--fs-body);line-height:1.5;letter-spacing:-.8pt;word-break:keep-all;font-family:var(--font);color:var(--text);}   /* deck-stage 가 슬롯에 흰 글자·시스템 글꼴을 깔아서, 색·글꼴을 명시하지 않은 글자가 사라지지 않게 */
 /* top: eyebrow + page no · headline · rule · meta line (minimal, no header strip) */
 .top{position:absolute;top:30px;left:var(--pad);right:var(--pad);z-index:4;}
-.eyebrow{font-size:17px;color:var(--body);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
+.eyebrow{font-size:17px;color:var(--primary-deep);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
 .eyebrow b{color:var(--primary);font-weight:700;}
 .eyebrow .pgno{position:absolute;top:-8px;right:0;font-size:13px;color:var(--text-light);font-weight:500;font-variant-numeric:tabular-nums;}   /* 몇 번째 장인지 — 오른쪽 위 모서리에 따로 띄운다 */
 .stitle{font-family:var(--font-title);font-size:46px;font-weight:400;color:var(--title);line-height:1.2;margin-top:9px;word-break:keep-all;overflow-wrap:break-word;max-width:1100px;}
@@ -205,7 +205,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .hist.list .hg{display:grid;grid-template-columns:7.5em 1fr;column-gap:1.4em;}
 .hist.list .hp{font-weight:700;color:var(--primary);line-height:1.55;}
 .hist.list .hrow{display:grid;grid-template-columns:3.2em 3em 1fr;column-gap:.6em;line-height:1.55;}
-.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;}
+.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;margin-left:-4px;}   /* 월과 내용 사이 4px 좁게 */
 /* gantt(2026-10-09, 레퍼런스 "시간표" 모양) — 위에 진한 머리띠(열 라벨 흰 글자) · 왼쪽 항목 이름 · 이름 끝에서 막대까지 가는 안내선 ·
    막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
