@@ -45,7 +45,7 @@
 | body2 | Pretendard Light | 18pt | 고정 26.6pt | −0.8pt | 표지 설명줄 |
 
 본문 안쪽 글자는 읽는 방식(dense·airy)에 상관없이 같은 값을 쓴다.
-본문 18px, 작은 글 16px, 카드 제목 26px, 큰 수치 34px, 표 24px, 칸 사이 12px 이다.
+본문 18px, 작은 글 16px, 카드 제목 24px, 큰 수치 34px, 표 24px, 칸 사이 12px 이다.
 장표마다 넘치지 않게 `fit_slides` 가 배율을 따로 매기므로, 두 방식의 차이는 배율 상한에만 남는다.
 
 Paperlogy·Pretendard 는 굵기마다 패밀리 이름이 따로 있다(`Paperlogy 7 Bold`, `Pretendard Light`).

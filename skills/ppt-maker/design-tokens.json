@@ -7,6 +7,6 @@
   "frame":   { "pad":40, "safeBottom":44, "bodyTop":220 },
   "shape":   { "card":19, "banner":14, "label":8, "pill":999,
                "shadowY":2, "shadowBlur":12, "shadowOpacity":7 },
-  "density": { "dense":{"body":18,"small":16,"cardTitle":26,"stat":34,"table":24,"tableH":24,"gap":12},
-               "airy": {"body":18,"small":16,"cardTitle":26,"stat":34,"table":24,"tableH":24,"gap":12} }
+  "density": { "dense":{"body":18,"small":16,"cardTitle":24,"stat":34,"table":24,"tableH":24,"gap":12},
+               "airy": {"body":18,"small":16,"cardTitle":24,"stat":34,"table":24,"tableH":24,"gap":12} }
 }
