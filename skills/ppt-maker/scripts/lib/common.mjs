@@ -69,9 +69,12 @@ export function derivePalette(brand = {}) {
     border: G.border, borderStrong: G.borderStrong, text: G.text, textMid: G.textMid, textLight: G.textLight, bgSoft: G.bgSoft,
     body: G.body,                                      // 카드 안 본문 글자(제목보다 연하게)
     banner: mix(primary, '#FFFFFF', 0.88),             // 참고·특이사항 배너 바탕(메인 컬러를 아주 연하게, 보라면 연보라) — 2026-10-08 밝게 반전
-    bannerBorder: mix(primary, '#FFFFFF', 0.6),        // 그 배너의 테두리(메인 컬러 연하게) — 연회색 장표 바탕과 구분
+    bannerBorder: mix(primary, '#FFFFFF', 0.76),       // 그 배너의 테두리(메인 컬러 연하게, 바탕보다 두 단계만 진하게) — 연회색 장표 바탕과 구분
     bannerLabel: primary,                              // 배너 라벨 글자(포인트 컬러, 굵게)
     bannerText: G.body,                                // 배너 본문 글자(카드 본문과 같은 회색)
+    // 배너 위계 — 주의(warn): 빨간 바탕·흰 글자 / 강조(strong): 검정 바탕·흰 라벨·연회색 본문
+    bannerWarn: ST.danger, bannerWarnText: mix('#FFFFFF', ST.danger, 0.12),
+    bannerStrong: G.title, bannerStrongText: G.border,
     coverBadge: mix(mix(primary, '#000000', 0.28), '#FFFFFF', 0.17),  // 표지 오른쪽 아래 상자(원본 #3C34A1)
     primaryDark: scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.22),
     primaryMid: scale ? scale[COLORS.role.mid] : mix(primary, '#000000', 0.10),

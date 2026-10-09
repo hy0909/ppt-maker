@@ -41,7 +41,7 @@ deck-stage:not(:defined){visibility:hidden;}
   --accent:${P.teal};--gold:${P.gold};--gold-light:${P.goldLight};
   --success:${P.success};--warning:${P.warning};--danger:${P.danger};
   --bg-soft:${P.bgSoft};--border:${P.border};--border-strong:${P.borderStrong};
-  --text:${P.text};--title:${COLORS.gray.title};--body:${P.body};--banner:${P.banner};--banner-border:${P.bannerBorder};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
+  --text:${P.text};--title:${COLORS.gray.title};--body:${P.body};--banner:${P.banner};--banner-border:${P.bannerBorder};--banner-warn:${P.bannerWarn};--banner-warn-text:${P.bannerWarnText};--banner-strong:${P.bannerStrong};--banner-strong-text:${P.bannerStrongText};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
   --pad:${FRAME.pad}px;--hdr:0px;--foot:0px;--safe-bottom:${FRAME.safeBottom}px;--page:${COLORS.gray.page};--card-shadow:${SHAPE.shadowCss};
   --font:'${meta.font}','Pretendard','Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
   --font-title:'${FONTS.face.headline}',${FALLBACK_FACES};
@@ -142,11 +142,14 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .foot{position:absolute;left:var(--pad);right:var(--pad);bottom:${SLIDE_FOOT.bottom}px;z-index:3;
   font-size:${px(SLIDE_FOOT.size)}px;line-height:${px(SLIDE_FOOT.line)}px;letter-spacing:${SLIDE_FOOT.spc}pt;color:var(--text-light);}
 .foot>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.banner{background:var(--banner);border:1.5px solid var(--banner-border);color:var(--text);padding:.75em 1.6em;border-radius:${SHAPE.banner}px;display:flex;align-items:center;gap:1.6em;flex-shrink:0;font-size:var(--fs-small);}
+.banner{background:var(--banner);border:1.5px solid var(--banner-border);color:var(--text);padding:.75em 1.6em;border-radius:${SHAPE.banner}px;display:flex;align-items:baseline;gap:1.6em;flex-shrink:0;font-size:var(--fs-small);}
 .banner .lead{color:var(--banner-label);font-size:calc(var(--fs-small) * 1.05);font-weight:700;white-space:nowrap;line-height:1.3;flex:0 0 auto;text-align:center;}
 .banner .msg{font-size:var(--fs-small);font-weight:500;line-height:1.3;flex:1;min-width:0;}
 .banner .msg ul.rl li{color:var(--banner-text);font-size:var(--fs-small);} .banner .msg ul.rl li::before{color:var(--banner-text);} .banner .msg b{color:var(--primary);font-weight:800;} .banner .msg ul.rl li .v{color:var(--text-mid);}
 .banner.light{background:#fff;border-color:transparent;color:var(--text);box-shadow:var(--card-shadow);} .banner.light .lead{color:var(--primary);} .banner.light .msg ul.rl li{color:var(--body);} .banner.light .msg ul.rl li::before{color:var(--body);} .banner.light .msg b{color:var(--primary);}
+/* 배너 위계: 기본(연한 메인 컬러) · 주의(warn, 빨강) · 강조(strong, 검정). 글자색은 바탕과 대비가 나게 */
+.banner.warn{background:var(--banner-warn);border-color:var(--banner-warn);color:#fff;} .banner.warn .lead{color:#fff;} .banner.warn .msg,.banner.warn .msg ul.rl li{color:var(--banner-warn-text);} .banner.warn .msg ul.rl li::before{color:var(--banner-warn-text);} .banner.warn .msg b{color:#fff;} .banner.warn .msg ul.rl li .v{color:var(--banner-warn-text);}
+.banner.strong{background:var(--banner-strong);border-color:var(--banner-strong);color:#fff;} .banner.strong .lead{color:#fff;} .banner.strong .msg,.banner.strong .msg ul.rl li{color:var(--banner-strong-text);} .banner.strong .msg ul.rl li::before{color:var(--banner-strong-text);} .banner.strong .msg b{color:#fff;} .banner.strong .msg ul.rl li .v{color:var(--banner-strong-text);}
 /* compare: two labeled cards */
 .cmp{display:grid;grid-template-columns:1fr 3em 1fr;align-items:stretch;flex:1;min-height:0;font-size:var(--fs-body);}
 .side{position:relative;background:transparent;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;}
@@ -465,7 +468,8 @@ const BLOCKS = {
   callout(b) {
     const body = b.items && b.items.length ? listItems(b.items) : rich(b.text || '');
     const label = b.label || '핵심 요약';
-    return `<div class="banner${b.tone === 'light' ? ' light' : ''}"><div class="lead">${esc(label)}</div><div class="msg">${body}</div></div>`;
+    const tone = ['light', 'warn', 'strong'].includes(b.tone) ? ' ' + b.tone : '';
+    return `<div class="banner${tone}"><div class="lead">${esc(label)}</div><div class="msg">${body}</div></div>`;
   },
 };
 

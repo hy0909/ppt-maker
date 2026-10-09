@@ -73,7 +73,7 @@
 | `compare` | `left:{tag?, heading, items}, right:{tag?, heading, items}` | AS-IS→TO-BE, 난제→해법. `tag` 기본 AS-IS/TO-BE, 오른쪽이 연파랑 강조 | 항목 3~4 |
 | `image` | `src, alt?, caption?, heading?, side:"left"\|"right"\|"full", ratio?:"16:9"\|"4:3"\|"1:1"\|"9:16"\|"3:4"\|"original", text?:{heading, items}, flex?` | 구성도·화면·사진. `src`가 비어 있으면 `[ alt ]` 점선 자리표시자. **`ratio` 기본 16:9** — 원본이 다르면 사용자에게 묻고, 고른 비율 상자에 맞춰 가장자리를 잘라 채운다(`original` 만 안 자름) | 1 |
 | `bullets` | `heading?, items` | 최후의 수단. 항목이 4개 넘으면 columns/cards 로 | 3~5 |
-| `callout` | `items?:[…] 또는 text, label?("핵심 요약"·"특이사항"), tone?:"light"` | 장표 맨 아래 어두운 둥근 배너, 왼쪽에 흰 라벨 칩. **불릿 2~3개(`items`) 권장** | 1 |
+| `callout` | `items?:[…] 또는 text, label?("핵심 요약"·"특이사항"), tone?:"warn"\|"strong"\|"light"` | 장표 맨 아래 둥근 배너. **위계 셋** — 기본(연한 메인 컬러, tone 없음) · `warn` 주의(빨간 바탕: 위험·미달·주의사항) · `strong` 강조(검정 바탕: 결론 한 줄). 왼쪽 라벨은 본문 첫 줄과 같은 높이. **불릿 2~3개(`items`) 권장** | 1 |
 
 ## 자동으로 처리되는 것
 

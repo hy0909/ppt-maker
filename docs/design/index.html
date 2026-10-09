@@ -249,13 +249,15 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .rl li .v{display:block;color:#4A5568;font-size:calc(var(--fs-small)*var(--k));margin-top:.1em}
 .d-card.dark .rl li,.d-card.dark .rl li .v{color:#fff}
 .d-banner{background:var(--p-banner);border:1.5px solid var(--p-bborder);color:#1A2438;padding:.75em 1.6em;border-radius:var(--r-banner);
-  display:flex;align-items:center;gap:1.6em;font-size:calc(var(--fs-small)*var(--k))}
+  display:flex;align-items:baseline;gap:1.6em;font-size:calc(var(--fs-small)*var(--k))}
 .d-banner .lb{color:var(--p-blabel);font-size:calc(var(--fs-small)*var(--k)*1.05);font-weight:700;
   white-space:nowrap;line-height:1.3;text-align:center}
 .d-banner .msg{flex:1;min-width:0}
 .d-banner .msg .rl li{color:var(--p-btext);font-size:calc(var(--fs-small)*var(--k));gap:.35em}
 .d-banner .msg .rl li::before{color:var(--p-btext)}
 .d-banner .msg .rl{gap:.35em}
+.d-banner.warn{background:#C9302C;border-color:#C9302C;color:#fff}.d-banner.warn .lb{color:#fff}.d-banner.warn .msg .rl li,.d-banner.warn .msg .rl li::before,.d-banner.warn .msg{color:#F8E1E0}
+.d-banner.strong{background:#10141C;border-color:#10141C;color:#fff}.d-banner.strong .lb{color:#fff}.d-banner.strong .msg .rl li,.d-banner.strong .msg .rl li::before,.d-banner.strong .msg{color:#D9DEE6}
 /* 표 — SAFE AI Data Table: 위·아래 4px 연회색 선, 안쪽 1px 연회색 선, 타이틀 영역 연회색 바탕·회색 글자 */
 .d-tbl{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table)*var(--k));background:#fff;table-layout:fixed;text-align:left;
   border-top:4px solid #8B95A7;border-bottom:4px solid #8B95A7}
@@ -553,7 +555,7 @@ function derive(primary,secondary){
   var banner=mix(primary,'#FFFFFF',0.88), bannerLabel=primary;   // 배너는 메인 컬러를 연하게 깐 바탕 + 테두리(장표와 같은 값)
   return {primary:primary,primary2:primary2,primaryDeep:mix(primary,'#000000',0.28),
     softBlue:mix(primary2,'#FFFFFF',0.86),softerBlue:mix(primary2,'#FFFFFF',0.94),
-    banner:banner,bannerBorder:mix(primary,'#FFFFFF',0.6),bannerLabel:bannerLabel,bannerText:'#515B75',
+    banner:banner,bannerBorder:mix(primary,'#FFFFFF',0.76),bannerLabel:bannerLabel,bannerText:'#515B75',
     coverBadge:mix(mix(primary,'#000000',0.28),'#FFFFFF',0.17),dark:dark,
     usedSecondary:!!(sec&&luminance(sec)>luminance(primary))};
 }
@@ -899,9 +901,14 @@ var DEMOS=[
    '<li>사람 눈대중에 기댄다</li><li><b>여름</b> 반품률이 오른다</li></ul></div></div>'+
    '<div class="d-card tint"><div class="cap">제안 체계</div><div class="bd"><ul class="rl">'+
    '<li>온도 기록을 함께 본다</li><li>판단 근거가 남는다</li></ul></div></div></div>'],
-  ['배너','맨 아래 한 줄 요약. 내용 높이만 차지하니 고정 높이로 그리면 안 된다.',
+  ['배너','맨 아래 한 줄 요약. 내용 높이만 차지하니 고정 높이로 그리면 안 된다. 위계 셋 — 기본(연한 메인 컬러) · 주의(warn, 빨강) · 강조(strong, 검정). 라벨은 본문 첫 줄과 같은 높이에서 시작한다.',
+   '<div style="display:flex;flex-direction:column;gap:calc(var(--gap)*var(--k))">'+
    '<div class="d-banner"><div class="lb">핵심 요약</div><div class="msg"><ul class="rl">'+
-   '<li>세 기능을 한 화면에서 묶는다</li><li>배송 인원을 늘리지 않는다</li></ul></div></div>'],
+   '<li>세 기능을 한 화면에서 묶습니다</li><li>배송 인원을 늘리지 않습니다</li></ul></div></div>'+
+   '<div class="d-banner warn"><div class="lb">주의</div><div class="msg"><ul class="rl">'+
+   '<li>여름철 상한 반품은 아직 기준치를 넘습니다</li><li>7월 센서 교체 전 데이터는 비교에서 뺐습니다</li></ul></div></div>'+
+   '<div class="d-banner strong"><div class="lb">결론</div><div class="msg"><ul class="rl">'+
+   '<li>온도 기록을 판단에 넣으면 상한 반품이 9건에서 1건으로 줄어듭니다</li></ul></div></div></div>'],
   ['표','헤더 행과 첫 열은 연회색, 강조 열만 메인 컬러. 마지막 행은 굵게.',
    '<table class="d-tbl"><thead><tr><th>지표</th><th>목표</th><th class="em">결과</th></tr></thead>'+
    '<tbody><tr><td>정온 유지율</td><td>90%</td><td class="em">97.6%</td></tr>'+

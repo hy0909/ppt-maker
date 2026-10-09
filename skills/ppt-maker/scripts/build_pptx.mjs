@@ -682,19 +682,25 @@ const B = {
     chartPanel(slide, b, inner.x, inner.y, inner.w, inner.h, k);
   },
   callout(slide, b, box, k) {
-    // 연하늘 바탕 + 연하늘 테두리 둥근 박스 하나. 왼쪽에 라벨(포인트 컬러), 오른쪽에 본문 — 모두 박스 안에 들어간다.
-    // 글자는 카드보다 한 단계 작게(원본: 라벨 15pt · 본문 14pt), 본문색은 라벨보다 죽인 톤.
-    const light = b.tone === 'light', em = D.small * k, fs = D.small * 1.05 * k;
+    // 둥근 박스 하나. 왼쪽에 라벨, 오른쪽에 본문 — 라벨은 본문 첫 줄과 같은 높이에서 시작한다(가운데 정렬 아님).
+    // 위계: 기본(연한 메인 컬러 바탕 + 테두리) · light(흰 카드) · warn(빨강 바탕·흰 글자) · strong(검정 바탕·흰 라벨·연회색 본문)
+    const tone = b.tone, em = D.small * k, fs = D.small * 1.05 * k;
     const label = b.label || '핵심 요약';
     const h = box.h;
-    if (light) card(slide, box.x, box.y, box.w, h, P.white, 14);
-    else rect(slide, box.x, box.y, box.w, h, { fill: P.banner, line: { color: P.bannerBorder, width: 1.1 }, radius: 14 });
+    const tones = {
+      light:  { bg: P.white,        line: null,           label: P.primary,     text: P.text },
+      warn:   { bg: P.bannerWarn,   line: P.bannerWarn,   label: P.white,       text: P.bannerWarnText },
+      strong: { bg: P.bannerStrong, line: P.bannerStrong, label: P.white,       text: P.bannerStrongText },
+    };
+    const T = tones[tone] || { bg: P.banner, line: P.bannerBorder, label: P.bannerLabel, text: P.bannerText };
+    if (tone === 'light') card(slide, box.x, box.y, box.w, h, P.white, 14);
+    else rect(slide, box.x, box.y, box.w, h, { fill: T.bg, line: { color: T.line, width: 1.1 }, radius: 14 });
     const padX = em * 1.6, padY = em * 0.75, gap = em * 1.6;
     const lw = Math.max(estW(label, fs), fs * 3.2);
-    text(slide, label, box.x + padX, box.y + padY, lw, h - padY * 2, { size: D.small * 1.05, k, color: light ? P.primary : P.bannerLabel, bold: true, align: 'center', valign: 'middle', lineSpacing: 1.3 });
+    text(slide, label, box.x + padX, box.y + padY, lw, h - padY * 2, { size: D.small * 1.05, k, color: T.label, bold: true, align: 'left', valign: 'top', lineSpacing: 1.3 });
     const tx = box.x + padX + lw + gap, tw = Math.max(1, box.x + box.w - padX - tx);
-    if (b.items && b.items.length) listBox(slide, b.items, tx, box.y + padY, tw, h - padY * 2, k, { dark: false, valign: 'middle', availH: h - padY * 2, tight: true, size: D.small, plainColor: light ? P.text : P.bannerText });
-    else if (b.text) text(slide, b.text, tx, box.y + padY, tw, h - padY * 2, { size: D.small, k, color: light ? P.text : P.bannerText, valign: 'middle', lineSpacing: 1.3 });
+    if (b.items && b.items.length) listBox(slide, b.items, tx, box.y + padY, tw, h - padY * 2, k, { dark: false, valign: 'top', availH: h - padY * 2, tight: true, size: D.small, plainColor: T.text });
+    else if (b.text) text(slide, b.text, tx, box.y + padY, tw, h - padY * 2, { size: D.small, k, color: T.text, valign: 'top', lineSpacing: 1.3 });
   },
 };
 /** 배너 높이(레이아웃 단계용). callout() 과 같은 여백·글자 크기로 계산한다. */
