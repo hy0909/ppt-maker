@@ -133,7 +133,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .side.to>.bd{background:var(--primary-softer);}
 .side .sh{font-size:var(--fs-card);font-weight:700;margin:.1em 0 .6em;color:var(--text);}
 .side .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;}
-.cmp .arr{display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:2.2em;font-weight:800;}
+.cmp .arr{display:flex;align-items:center;justify-content:center;} .cmp .arr i{width:1.9em;height:1.9em;border-radius:50%;background:var(--title);color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:1em;padding-left:.15em;}   /* 전/후 화살표 = 검정 원 안 흰 삼각형 */
 /* roadmap (process / timeline) */
 .rm{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-body);}
 .rm .line{position:absolute;left:4%;right:4%;top:calc(1.3em - 1px);height:2px;background:var(--primary);opacity:.55;}
@@ -169,6 +169,24 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .card .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.45em;line-height:1.4;margin-bottom:.9em;}
 .sec2+.sec2{margin-top:1em;padding-top:1em;border-top:1px solid #E6E9EE;}
 /* chart */
+/* history(연혁, 2026-10-09) — layout columns(기본): 간트와 같은 진한 머리띠(기간 + 흰 원), 열마다 세로 점선 + 점 + 연도·내용
+   layout list: 왼쪽 기간(포인트 컬러), 오른쪽 연·월·내용 줄. 글이 많은 제출용 */
+.hist{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);}
+.hist .hh{display:grid;grid-template-columns:repeat(var(--n),1fr);background:var(--primary-deep);color:#fff;border-radius:6px;margin:0 -8px 12px;padding:0 8px;flex:0 0 auto;}
+.hist .hh span{display:flex;align-items:center;gap:.6em;padding:.5em .6em .5em 0;font-weight:700;font-size:.95em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist .hh span::before{content:'';width:.7em;height:.7em;border-radius:50%;background:#fff;flex:0 0 auto;box-shadow:0 0 0 .22em var(--primary-deep),0 0 0 .32em rgba(255,255,255,.55);margin-left:.32em;}
+.hist .hcols{display:grid;grid-template-columns:repeat(var(--n),1fr);column-gap:1.2em;flex:1;min-height:0;}
+.hist .hcol{position:relative;padding-left:1.3em;}
+.hist .hcol::before{content:'';position:absolute;left:.3em;top:.6em;bottom:.6em;border-left:1px dashed var(--border-strong);}
+.hist .hi{position:relative;margin-bottom:12px;}
+.hist .hi::before{content:'';position:absolute;left:-1.3em;top:.4em;width:.65em;height:.65em;border-radius:50%;background:var(--primary);}
+.hist .hy{font-weight:700;color:var(--text);line-height:1.3;} .hist .hy small{font-weight:500;color:var(--text-mid);font-size:.9em;margin-left:.3em;}
+.hist .ht{color:var(--text-mid);line-height:1.35;font-size:.95em;}
+.hist.list{gap:14px;}
+.hist.list .hg{display:grid;grid-template-columns:7.5em 1fr;column-gap:1.4em;}
+.hist.list .hp{font-weight:700;color:var(--primary);line-height:1.55;}
+.hist.list .hrow{display:grid;grid-template-columns:3.2em 3em 1fr;column-gap:.6em;line-height:1.55;}
+.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;}
 /* gantt(2026-10-09, 레퍼런스 "시간표" 모양) — 위에 진한 머리띠(열 라벨 흰 글자) · 왼쪽 항목 이름 · 이름 끝에서 막대까지 가는 안내선 ·
    막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
@@ -260,7 +278,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
         <div class="eb">CHAPTER 01</div>
         <h1>사업 개요</h1>
         <div class="s">회사와 과제를 소개하는 장표</div>
-        <div class="ft"><span>장표 템플릿 24종 견본</span><span>3/26p</span></div>
+        <div class="ft"><span>장표 템플릿 24종 견본</span><span>3/28p</span></div>
       </div>
     </div>
   </section>
@@ -320,7 +338,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
         <div class="eb">CHAPTER 02</div>
         <h1>해결 방안</h1>
         <div class="s">무엇을 어떻게 바꾸는지</div>
-        <div class="ft"><span>장표 템플릿 24종 견본</span><span>8/26p</span></div>
+        <div class="ft"><span>장표 템플릿 24종 견본</span><span>8/28p</span></div>
       </div>
     </div>
   </section>
@@ -331,7 +349,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   </section>
 <section class="slide" data-label="2-2 수기 점검에서 **자동 판정**으로" id="s10" data-fit="1" style="--k: 1.3;" style="--k:1.3">
     <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">10</span></div><div class="stitle">수기 점검에서 <b>자동 판정</b>으로</div><div class="rule"></div><div class="slead">같은 기준으로 두 상태를 맞댑니다.</div></div>
-    <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="cmp"><div class="side from"><div class="cap">AS-IS</div><div class="bd"><div class="sh">수기&nbsp;점검</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g12"><li>하루 두 번 기록지&nbsp;확인</li><li>이상은 다음 날&nbsp;발견</li><li>판단 근거가 남지&nbsp;않음</li></ul></div></div></div><div class="arr">›</div><div class="side to"><div class="cap">TO-BE</div><div class="bd"><div class="sh">자동&nbsp;판정</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g13"><li>1분 간격 자동&nbsp;수집</li><li>이상 즉시&nbsp;알림</li><li>판정 근거 자동&nbsp;기록</li></ul></div></div></div></div></div></div></div>
+    <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="cmp"><div class="side from"><div class="cap">AS-IS</div><div class="bd"><div class="sh">수기&nbsp;점검</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g12"><li>하루 두 번 기록지&nbsp;확인</li><li>이상은 다음 날&nbsp;발견</li><li>판단 근거가 남지&nbsp;않음</li></ul></div></div></div><div class="arr"><i>▶</i></div><div class="side to"><div class="cap">TO-BE</div><div class="bd"><div class="sh">자동&nbsp;판정</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g13"><li>1분 간격 자동&nbsp;수집</li><li>이상 즉시&nbsp;알림</li><li>판정 근거 자동&nbsp;기록</li></ul></div></div></div></div></div></div></div>
     
   </section>
 <section class="slide" data-label="2-3 수집부터 판정까지의 **시스템 구성**" id="s11" data-fit="1" style="--k: 1.3;" style="--k:1.3">
@@ -346,7 +364,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   </section>
 <section class="slide" data-label="2-5 기술 난제와 **대응 방안**" id="s13" data-fit="1" style="--k: 1.1044921875;" style="--k:1.1">
     <div class="top"><div class="eyebrow"><span>해결 방안</span><span class="pgno">13</span></div><div class="stitle">기술 난제와 <b>대응&nbsp;방안</b></div><div class="rule"></div><div class="slead">난제와 해법을 맞대고 근거를 표로 받칩니다.</div></div>
-    <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="cmp"><div class="side from"><div class="cap">난제</div><div class="bd"><div class="sh">짧은 이상&nbsp;구간</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g16"><li>문 열림 1~2분</li><li>평균값에&nbsp;묻힘</li></ul></div></div></div><div class="arr">›</div><div class="side to"><div class="cap">해법</div><div class="bd"><div class="sh">구간 단위&nbsp;판정</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g17"><li>1분 단위 구간&nbsp;분리</li><li>구간별 누적&nbsp;점수</li></ul></div></div></div></div></div></div><div class="blk" style="flex:1 1 0"><div class="inner"><div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt">
+    <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="cmp"><div class="side from"><div class="cap">난제</div><div class="bd"><div class="sh">짧은 이상&nbsp;구간</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g16"><li>문 열림 1~2분</li><li>평균값에&nbsp;묻힘</li></ul></div></div></div><div class="arr"><i>▶</i></div><div class="side to"><div class="cap">해법</div><div class="bd"><div class="sh">구간 단위&nbsp;판정</div><div class="fill"><ul class="rl" style="--rl-gap: 0.40em;" data-gap-id="g17"><li>1분 단위 구간&nbsp;분리</li><li>구간별 누적&nbsp;점수</li></ul></div></div></div></div></div></div><div class="blk" style="flex:1 1 0"><div class="inner"><div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt">
       <colgroup><col style="width:33.3%"><col style="width:33.3%"><col style="width:33.3%"></colgroup>
       <thead><tr><th class="">지표</th><th class="n">기존</th><th class="em n">제안</th></tr></thead>
       <tbody><tr><td class="">감지율</td><td class="n">62%</td><td class="em n">94%</td></tr><tr><td class="">오탐률</td><td class="n">18%</td><td class="em n">5%</td></tr></tbody>
@@ -393,7 +411,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
         <div class="eb">CHAPTER 03</div>
         <h1>추진 계획</h1>
         <div class="s">언제, 누가, 얼마나</div>
-        <div class="ft"><span>장표 템플릿 24종 견본</span><span>17/26p</span></div>
+        <div class="ft"><span>장표 템플릿 24종 견본</span><span>17/28p</span></div>
       </div>
     </div>
   </section>
@@ -445,7 +463,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
         <div class="eb">CHAPTER 04</div>
         <h1>성과</h1>
         <div class="s">무엇이 달라졌는지</div>
-        <div class="ft"><span>장표 템플릿 24종 견본</span><span>21/26p</span></div>
+        <div class="ft"><span>장표 템플릿 24종 견본</span><span>21/28p</span></div>
       </div>
     </div>
   </section>
@@ -507,6 +525,16 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
         <div class="fill">
         <div class="imgblk" style="flex:1"><div class="pic" style="border:0;padding:0;box-shadow:none"><div class="fr"><div class="ph ib" style="--arw:16;--arh:9">[ 로고 ]</div></div></div></div></div>
       </div></div></div></div></div></div>
+    
+  </section>
+<section class="slide" data-label="4-5 2019년 창업 뒤 **해마다 거점을 넓혀 온** 연혁" id="s26" data-fit="1" style="--k: 1.3;" style="--k:1.3">
+    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">26</span></div><div class="stitle">2019년 창업 뒤 <b>해마다 거점을 넓혀 온</b>&nbsp;연혁</div><div class="rule"></div><div class="slead">기간별로 묶은 연혁입니다. 발표용 가로형입니다.</div></div>
+    <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="card grow"><div class="bd"><div class="hist" style="--n:3"><div class="hh"><span>2019 – 2020</span><span>2021 – 2022</span><span>2023 – 2024</span></div><div class="hcols"><div class="hcol"><div class="hi"><div class="hy">2019<small>3월</small></div><div class="ht">냉장 물류 관제 서비스&nbsp;출시</div></div><div class="hi"><div class="hy">2019<small>9월</small></div><div class="ht">서울 본사&nbsp;설립</div></div><div class="hi"><div class="hy">2020<small>5월</small></div><div class="ht">식품 유통사 3곳&nbsp;계약</div></div><div class="hi"><div class="hy">2020<small>11월</small></div><div class="ht">시드 투자&nbsp;유치</div></div></div><div class="hcol"><div class="hi"><div class="hy">2021<small>2월</small></div><div class="ht">GS 인증 1등급</div></div><div class="hi"><div class="hy">2021<small>8월</small></div><div class="ht">특허 2건&nbsp;등록</div></div><div class="hi"><div class="hy">2022<small>4월</small></div><div class="ht">부산 연구소&nbsp;개소</div></div><div class="hi"><div class="hy">2022<small>12월</small></div><div class="ht">차량 500대&nbsp;돌파</div></div></div><div class="hcol"><div class="hi"><div class="hy">2023<small>3월</small></div><div class="ht">중기부 기술개발 과제&nbsp;선정</div></div><div class="hi"><div class="hy">2023<small>10월</small></div><div class="ht">시리즈 A&nbsp;투자</div></div><div class="hi"><div class="hy">2024<small>6월</small></div><div class="ht">콜드체인 물류사&nbsp;계약</div></div><div class="hi"><div class="hy">2024<small>12월</small></div><div class="ht">차량 1,000대&nbsp;돌파</div></div></div></div></div></div></div></div></div></div>
+    
+  </section>
+<section class="slide" data-label="4-6 연도별 **계약·선정·투자** 실적" id="s27" data-fit="1" style="--k: 1.3;" style="--k:1.3">
+    <div class="top"><div class="eyebrow"><span>성과</span><span class="pgno">27</span></div><div class="stitle">연도별 <b>계약·선정·투자</b>&nbsp;실적</div><div class="rule"></div><div class="slead">글로 읽는 제출용 세로형입니다.</div></div>
+    <div class="body" style="--body-top:220px;--safe-bottom:44px"><div class="blk" style="flex:1 1 0"><div class="inner"><div class="card grow"><div class="bd"><div class="hist list"><div class="hg"><div class="hp">2019 – 2020</div><div><div class="hrow"><span class="hy">2019</span><span class="hm">3월</span><span class="ht">냉장 물류 관제 서비스&nbsp;출시</span></div><div class="hrow"><span class="hy">2019</span><span class="hm">9월</span><span class="ht">서울 본사&nbsp;설립</span></div><div class="hrow"><span class="hy">2020</span><span class="hm">5월</span><span class="ht">식품 유통사 3곳&nbsp;계약</span></div><div class="hrow"><span class="hy">2020</span><span class="hm">11월</span><span class="ht">시드 투자&nbsp;유치</span></div></div></div><div class="hg"><div class="hp">2021 – 2022</div><div><div class="hrow"><span class="hy">2021</span><span class="hm">2월</span><span class="ht">GS 인증 1등급</span></div><div class="hrow"><span class="hy">2021</span><span class="hm">8월</span><span class="ht">특허 2건&nbsp;등록</span></div><div class="hrow"><span class="hy">2022</span><span class="hm">4월</span><span class="ht">부산 연구소&nbsp;개소</span></div><div class="hrow"><span class="hy">2022</span><span class="hm">12월</span><span class="ht">차량 500대&nbsp;돌파</span></div></div></div><div class="hg"><div class="hp">2023 – 2024</div><div><div class="hrow"><span class="hy">2023</span><span class="hm">3월</span><span class="ht">중기부 기술개발 과제&nbsp;선정</span></div><div class="hrow"><span class="hy">2023</span><span class="hm">10월</span><span class="ht">시리즈 A&nbsp;투자</span></div><div class="hrow"><span class="hy">2024</span><span class="hm">6월</span><span class="ht">콜드체인 물류사&nbsp;계약</span></div><div class="hrow"><span class="hy">2024</span><span class="hm">12월</span><span class="ht">차량 1,000대&nbsp;돌파</span></div></div></div></div></div></div></div></div></div>
     
   </section>
 <section class="slide closing" data-label="마무리">

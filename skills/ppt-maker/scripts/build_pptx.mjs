@@ -582,6 +582,53 @@ const B = {
       if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.small * 0.85, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
     });
   },
+  history(slide, b, box, k) {
+    const inner = labeledCard(slide, box, k, b.heading);
+    const groups = b.groups || [], n = Math.max(1, groups.length);
+    const fs = D.small * k, em = D.body * k;
+    if (b.layout === 'list') {
+      // 왼쪽 기간(포인트 컬러) · 오른쪽 연·월·내용 줄. 묶음 사이 14px
+      const pw = fs * 7.5, gapc = em * 1.4, lh = fs * 1.55, yw = fs * 3.2, mw = fs * 3, g2 = fs * 0.6;
+      let y = inner.y;
+      groups.forEach(g => {
+        text(slide, g.period || '', inner.x, y, pw, lh, { size: D.small, k, bold: true, color: P.primary, valign: 'middle' });
+        let yy = y; const x = inner.x + pw + gapc;
+        (g.items || []).forEach(it => {
+          text(slide, it.year || '', x, yy, yw, lh, { size: D.small, k, bold: true, valign: 'middle' });
+          text(slide, it.month || '', x + yw + g2, yy, mw, lh, { size: D.small, k, color: P.textMid, valign: 'middle' });
+          text(slide, it.text || '', x + yw + mw + g2 * 2, yy, Math.max(1, inner.x + inner.w - (x + yw + mw + g2 * 2)), lh, { size: D.small, k, valign: 'middle' });
+          yy += lh;
+        });
+        y = Math.max(yy, y + lh) + 14;
+      });
+      return;
+    }
+    // columns: 간트와 같은 진한 머리띠(내용보다 좌우 8px 넓게) + 기간마다 흰 원, 열마다 세로선 + 점 + 연도·내용
+    const hdrH = fs * 2.2;
+    rect(slide, inner.x - 8, inner.y, inner.w + 16, hdrH, { fill: P.primaryDeep, radius: 6 });
+    const colGap = em * 1.2, cw = (inner.w - colGap * (n - 1)) / n, d0 = fs * 0.7;
+    groups.forEach((g, i) => {
+      const x = inner.x + i * (cw + colGap);
+      slide_dot(slide, x + fs * 0.3, inner.y + hdrH / 2 - d0 / 2, d0, P.white);
+      text(slide, g.period || '', x + fs * 0.3 + d0 + fs * 0.6, inner.y, cw - d0 - fs, hdrH, { size: D.small * 0.95, k, bold: true, color: P.white, valign: 'middle' });
+    });
+    const top = inner.y + hdrH + 12, yH = fs * 1.3, d = fs * 0.65;
+    groups.forEach((g, i) => {
+      const x = inner.x + i * (cw + colGap), lineX = x + fs * 0.3, tx = x + fs * 1.3, tw = cw - fs * 1.3;
+      const items = g.items || [];
+      const tH = t => lines(t, fs * 0.95, tw) * fs * 0.95 * 1.35;
+      const totalH = items.reduce((a, it) => a + yH + tH(it.text || '') + 12, 0) - 12;
+      if (items.length > 1) rect(slide, lineX, top + fs * 0.6, 1, Math.max(1, Math.min(totalH, inner.y + inner.h - top) - fs * 1.2), { fill: P.borderStrong });
+      let y = top;
+      items.forEach(it => {
+        slide_dot(slide, lineX - d / 2 + 0.5, y + yH / 2 - d / 2, d, P.primary);
+        text(slide, (it.year || '') + (it.month ? '  ' + it.month : ''), tx, y, tw, yH, { size: D.small, k, bold: true, valign: 'middle' });
+        const th = tH(it.text || '');
+        text(slide, it.text || '', tx, y + yH, tw, th, { size: D.small * 0.95, k, color: P.textMid, lineSpacing: 1.35 });
+        y += yH + th + 12;
+      });
+    });
+  },
   timeline(slide, b, box, k) {
     return B.process(slide, { steps: (b.phases || []).map(p => ({ period: p.period, title: p.title, items: p.items, desc: p.desc, highlight: p.highlight, dark: p.dark })), darkLast: b.darkLast }, box, k);
   },
@@ -662,7 +709,10 @@ const B = {
       stack(slide, rest, k, [s.sections ? fragSections(s.sections, k, inner.w) : null, s.items ? fragList(s.items, k, inner.w) : null]);
     };
     side(b.left || {}, box.x, false);
-    text(slide, '›', box.x + w, box.y, mid, box.h, { size: D.body * 2.2, k, color: P.primary, bold: true, align: 'center', valign: 'middle' });
+    // 전/후 화살표 = 검정 원 안 흰 삼각형
+    const cd = em * 1.9, cx = box.x + w + mid / 2 - cd / 2, cy = box.y + box.h / 2 - cd / 2;
+    slide_dot(slide, cx, cy, cd, P.title);
+    text(slide, '▶', cx + cd * 0.06, cy, cd, cd, { size: D.body * 0.8, k, color: P.white, align: 'center', valign: 'middle' });
     side(b.right || {}, box.x + w + mid, true);
   },
   image(slide, b, box, k) {

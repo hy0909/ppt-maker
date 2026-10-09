@@ -159,7 +159,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .side.to>.bd{background:var(--primary-softer);}
 .side .sh{font-size:var(--fs-card);font-weight:700;margin:.1em 0 .6em;color:var(--text);}
 .side .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;}
-.cmp .arr{display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:2.2em;font-weight:800;}
+.cmp .arr{display:flex;align-items:center;justify-content:center;} .cmp .arr i{width:1.9em;height:1.9em;border-radius:50%;background:var(--title);color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:1em;padding-left:.15em;}   /* 전/후 화살표 = 검정 원 안 흰 삼각형 */
 /* roadmap (process / timeline) */
 .rm{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-body);}
 .rm .line{position:absolute;left:4%;right:4%;top:calc(1.3em - 1px);height:2px;background:var(--primary);opacity:.55;}
@@ -195,6 +195,24 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .card .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.45em;line-height:1.4;margin-bottom:.9em;}
 .sec2+.sec2{margin-top:1em;padding-top:1em;border-top:1px solid #E6E9EE;}
 /* chart */
+/* history(연혁, 2026-10-09) — layout columns(기본): 간트와 같은 진한 머리띠(기간 + 흰 원), 열마다 세로 점선 + 점 + 연도·내용
+   layout list: 왼쪽 기간(포인트 컬러), 오른쪽 연·월·내용 줄. 글이 많은 제출용 */
+.hist{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);}
+.hist .hh{display:grid;grid-template-columns:repeat(var(--n),1fr);background:var(--primary-deep);color:#fff;border-radius:6px;margin:0 -8px 12px;padding:0 8px;flex:0 0 auto;}
+.hist .hh span{display:flex;align-items:center;gap:.6em;padding:.5em .6em .5em 0;font-weight:700;font-size:.95em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist .hh span::before{content:'';width:.7em;height:.7em;border-radius:50%;background:#fff;flex:0 0 auto;box-shadow:0 0 0 .22em var(--primary-deep),0 0 0 .32em rgba(255,255,255,.55);margin-left:.32em;}
+.hist .hcols{display:grid;grid-template-columns:repeat(var(--n),1fr);column-gap:1.2em;flex:1;min-height:0;}
+.hist .hcol{position:relative;padding-left:1.3em;}
+.hist .hcol::before{content:'';position:absolute;left:.3em;top:.6em;bottom:.6em;border-left:1px dashed var(--border-strong);}
+.hist .hi{position:relative;margin-bottom:12px;}
+.hist .hi::before{content:'';position:absolute;left:-1.3em;top:.4em;width:.65em;height:.65em;border-radius:50%;background:var(--primary);}
+.hist .hy{font-weight:700;color:var(--text);line-height:1.3;} .hist .hy small{font-weight:500;color:var(--text-mid);font-size:.9em;margin-left:.3em;}
+.hist .ht{color:var(--text-mid);line-height:1.35;font-size:.95em;}
+.hist.list{gap:14px;}
+.hist.list .hg{display:grid;grid-template-columns:7.5em 1fr;column-gap:1.4em;}
+.hist.list .hp{font-weight:700;color:var(--primary);line-height:1.55;}
+.hist.list .hrow{display:grid;grid-template-columns:3.2em 3em 1fr;column-gap:.6em;line-height:1.55;}
+.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;}
 /* gantt(2026-10-09, 레퍼런스 "시간표" 모양) — 위에 진한 머리띠(열 라벨 흰 글자) · 왼쪽 항목 이름 · 이름 끝에서 막대까지 가는 안내선 ·
    막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
@@ -436,6 +454,17 @@ const BLOCKS = {
     }).join('');
     return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div class="gnh">${esc(b.nameHeader || '')}</div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
   },
+  /** 연혁: groups[{period, items[{year, month?, text}]}]. layout "columns"(기본) | "list" */
+  history(b) {
+    const groups = b.groups || [], n = Math.max(1, groups.length);
+    if (b.layout === 'list') {
+      const gs = groups.map(g => `<div class="hg"><div class="hp">${rich(g.period || '')}</div><div>${(g.items || []).map(it => `<div class="hrow"><span class="hy">${esc(it.year || '')}</span><span class="hm">${esc(it.month || '')}</span><span class="ht">${rich(it.text || '')}</span></div>`).join('')}</div></div>`).join('');
+      return `${cardOpen('grow', b.heading)}<div class="hist list">${gs}</div>${CARD_CLOSE}`;
+    }
+    const head = `<div class="hh">${groups.map(g => `<span>${esc(g.period || '')}</span>`).join('')}</div>`;
+    const cols = `<div class="hcols">${groups.map(g => `<div class="hcol">${(g.items || []).map(it => `<div class="hi"><div class="hy">${esc(it.year || '')}${it.month ? `<small>${esc(it.month)}</small>` : ''}</div><div class="ht">${rich(it.text || '')}</div></div>`).join('')}</div>`).join('')}</div>`;
+    return `${cardOpen('grow', b.heading)}<div class="hist" style="--n:${n}">${head}${cols}</div>${CARD_CLOSE}`;
+  },
   timeline(b) {
     return BLOCKS.process({ steps: (b.phases || []).map(p => ({ period: p.period, title: p.title, items: p.items, desc: p.desc, highlight: p.highlight, dark: p.dark })), darkLast: b.darkLast });
   },
@@ -456,7 +485,7 @@ const BLOCKS = {
   },
   compare(b) {
     const side = (s, cls, tag) => `<div class="side ${cls}"><div class="cap">${esc(s.tag || tag)}</div><div class="bd">${s.heading ? `<div class="sh">${rich(s.heading)}</div>` : ''}<div class="fill">${s.sections ? subSections(s.sections) : ''}${listItems(s.items)}</div></div></div>`;
-    return `<div class="cmp">${side(b.left || {}, 'from', 'AS-IS')}<div class="arr">›</div>${side(b.right || {}, 'to', 'TO-BE')}</div>`;
+    return `<div class="cmp">${side(b.left || {}, 'from', 'AS-IS')}<div class="arr"><i>▶</i></div>${side(b.right || {}, 'to', 'TO-BE')}</div>`;
   },
   image(b) {
     const pic = `<div class="pic">${b.heading ? `<div class="sh2">${rich(b.heading)}</div>` : ''}<div class="fr">${imgOrPh(b.src, b.caption || b.alt, b.ratio)}</div>${b.caption && b.src ? `<div class="cp">${esc(b.caption)}</div>` : ''}</div>`;
