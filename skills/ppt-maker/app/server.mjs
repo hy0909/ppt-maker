@@ -85,6 +85,7 @@ function run(cmd, args, cwd) {
 function systemPrompt() {
   const schema = fs.readFileSync(path.join(REFS, 'outline-schema.md'), 'utf8');
   const templates = fs.readFileSync(path.join(REFS, 'outline-templates.md'), 'utf8');
+  const writing = fs.readFileSync(path.join(REFS, 'writing.md'), 'utf8');
   return `당신은 발표자료 기획자다. 사용자가 준 원문과 설정으로 outline.json 을 작성한다.
 
 # 출력
@@ -96,7 +97,7 @@ function systemPrompt() {
 - lead 는 한 줄 보조 정보(집계 기간, 전제, 근거)로 짧게. 쓸 내용이 없으면 넣지 않는다.
 - 장표 위쪽 작은 글씨에는 그 장표가 속한 목차(섹션) 이름이 자동으로 들어간다. **header·subtitle 필드는 쓰지 않는다.**
 - meta.numbering 은 넣지 않는다(목차·간지 번호는 1·2·3 숫자로 표기된다).
-- **사람이 직접 쓴 보고서처럼 쓴다.** 담백하고 구체적으로. 다음은 쓰지 않는다: "본 자료는 / 본 문서에서는", "~를 통해 ~할 수 있습니다", "효율적으로·효과적으로·체계적으로·극대화" 같은 빈 수식어, 같은 뜻 반복, 번역투("~에 대한 ~의 수행"), 모든 항목을 같은 길이와 같은 어미로 맞춘 기계적인 나열, 원문에 없는 일반론.
+- **글은 아래 "장표 글 규칙"을 따른다.** 제목·카드 제목·표 칸·라벨은 명사형 종결이 최우선이고, 리드·항목·배너 글은 쉬운 말로 결론부터 쓴다. 번역투·빈 수식어·상투구는 금지.
 - 카드·컬럼의 소제목(heading·tag·sections.heading)은 내용을 가리키는 이름으로 쓴다. "화면", "내용", "항목", "개요"처럼 껍데기뿐인 소제목은 넣지 말고 생략한다. 카드 제목과 같은 말을 소제목으로 반복하지 않는다.
 - 원문에 없는 수치·시장규모·고객명·성과는 만들지 않는다. 필요한 자리는 "[입력 필요: …]" 텍스트로 남긴다. **이미지 경로(src·image)는 지어내지 말고 빈 문자열로 두고** alt/caption 에 무엇이 들어갈 자리인지 적는다(자리표시자가 그려진다).
 - image 블록의 ratio 는 사용자가 정하지 않았으면 넣지 않는다(기본 16:9). 이미지 원본 비율이 다르면 사용자에게 정사각형(1:1)/가로형 1(16:9)/가로형 2(4:3)/세로형 1(9:16)/세로형 2(3:4)/원본 중 고르게 하고 그 값을 ratio 에 적는다.
@@ -114,7 +115,10 @@ function systemPrompt() {
 ${schema}
 
 # 문서 유형별 목차 템플릿
-${templates}`;
+${templates}
+
+# 장표 글 규칙
+${writing}`;
 }
 
 
