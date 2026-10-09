@@ -41,7 +41,7 @@ deck-stage:not(:defined){visibility:hidden;}
   --accent:${P.teal};--gold:${P.gold};--gold-light:${P.goldLight};
   --success:${P.success};--warning:${P.warning};--danger:${P.danger};
   --bg-soft:${P.bgSoft};--border:${P.border};--border-strong:${P.borderStrong};
-  --text:${P.text};--title:${COLORS.gray.title};--body:${P.body};--banner:${P.banner};--banner-border:${P.bannerBorder};--banner-warn:${P.bannerWarn};--banner-warn-text:${P.bannerWarnText};--banner-strong:${P.bannerStrong};--banner-strong-text:${P.bannerStrongText};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
+  --text:${P.text};--title:${COLORS.gray.title};--body:${P.body};--banner:${P.banner};--banner-border:${P.bannerBorder};--banner-warn:${P.bannerWarn};--banner-warn-label:${P.bannerWarnLabel};--banner-warn-text:${P.bannerWarnText};--banner-strong:${P.bannerStrong};--banner-strong-text:${P.bannerStrongText};--banner-label:${P.bannerLabel};--banner-text:${P.bannerText};--text-mid:${P.textMid};--text-light:${P.textLight};
   --pad:${FRAME.pad}px;--hdr:0px;--foot:0px;--safe-bottom:${FRAME.safeBottom}px;--page:${COLORS.gray.page};--card-shadow:${SHAPE.shadowCss};
   --font:'${meta.font}','Pretendard','Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Noto Sans KR',sans-serif;
   --font-title:'${FONTS.face.headline}',${FALLBACK_FACES};
@@ -112,9 +112,9 @@ ul.rl.row li .v{display:inline;margin-left:.5em;}
 .stat .sv small{font-size:.5em;color:var(--text);margin-left:.05em;font-weight:700;}
 .stat .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.5em;line-height:1.4;}
 /* kv table (minimal): label column grey, values, bold last row; emphasize col tinted */
-/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 4px 회색(--text-light) 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
+/* 표 — SAFE AI 디자인 시스템 Data Table: 위·아래 3px 회색(--text-mid) 선으로 시작·끝, 안쪽은 1px 연회색 선(세로선 없음).
    머리글(타이틀 영역)은 연회색 바탕·회색 글자. rowHeader 면 첫 열도 타이틀 영역(연회색 바탕·회색 글자 + 오른쪽 1px 선). 강조 열은 글자색만 포인트 컬러 */
-table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:4px solid var(--text-light);border-bottom:4px solid var(--text-light);}
+table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * var(--kt, 1));background:#fff;table-layout:fixed;text-align:left;border-top:3px solid var(--text-mid);border-bottom:3px solid var(--text-mid);}
 .rt thead th{background:var(--bg-soft);color:var(--text-mid);font-weight:700;text-align:left;padding:.55em .8em;border:0;border-bottom:1px solid var(--border);font-size:calc(var(--fs-tableh) * var(--kt, 1));line-height:1.3;word-break:keep-all;overflow-wrap:anywhere;vertical-align:middle;}   /* 머리글도 칸이 좁으면 줄바꿈 */
 .rt thead th.em{color:var(--primary);}
 .rt tbody td{padding:.6em .8em;border:0;word-break:keep-all;overflow-wrap:anywhere;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);background:transparent;text-align:left;line-height:1.45;}
@@ -148,7 +148,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .banner .msg ul.rl li{color:var(--banner-text);font-size:var(--fs-small);} .banner .msg ul.rl li::before{color:var(--banner-text);} .banner .msg b{color:var(--primary);font-weight:800;} .banner .msg ul.rl li .v{color:var(--text-mid);}
 .banner.light{background:#fff;border-color:transparent;color:var(--text);box-shadow:var(--card-shadow);} .banner.light .lead{color:var(--primary);} .banner.light .msg ul.rl li{color:var(--body);} .banner.light .msg ul.rl li::before{color:var(--body);} .banner.light .msg b{color:var(--primary);}
 /* 배너 위계: 기본(연한 메인 컬러) · 주의(warn, 빨강) · 강조(strong, 검정). 글자색은 바탕과 대비가 나게 */
-.banner.warn{background:var(--banner-warn);border-color:var(--banner-warn);color:#fff;} .banner.warn .lead{color:#fff;} .banner.warn .msg,.banner.warn .msg ul.rl li{color:var(--banner-warn-text);} .banner.warn .msg ul.rl li::before{color:var(--banner-warn-text);} .banner.warn .msg b{color:#fff;} .banner.warn .msg ul.rl li .v{color:var(--banner-warn-text);}
+.banner.warn{background:var(--banner-warn);border-color:var(--banner-warn);color:var(--banner-warn-text);} .banner.warn .lead{color:var(--banner-warn-label);} .banner.warn .msg,.banner.warn .msg ul.rl li{color:var(--banner-warn-text);} .banner.warn .msg ul.rl li::before{color:var(--banner-warn-text);} .banner.warn .msg b{color:var(--banner-warn-label);} .banner.warn .msg ul.rl li .v{color:var(--banner-warn-text);}
 .banner.strong{background:var(--banner-strong);border-color:var(--banner-strong);color:#fff;} .banner.strong .lead{color:#fff;} .banner.strong .msg,.banner.strong .msg ul.rl li{color:var(--banner-strong-text);} .banner.strong .msg ul.rl li::before{color:var(--banner-strong-text);} .banner.strong .msg b{color:#fff;} .banner.strong .msg ul.rl li .v{color:var(--banner-strong-text);}
 /* compare: two labeled cards */
 .cmp{display:grid;grid-template-columns:1fr 3em 1fr;align-items:stretch;flex:1;min-height:0;font-size:var(--fs-body);}

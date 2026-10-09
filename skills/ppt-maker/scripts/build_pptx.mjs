@@ -636,9 +636,9 @@ const B = {
       y += h;
     });
     if (rh) rect(slide, box.x + colW[0] - 1, box.y, 1, tblH, { fill: P.border });
-    // 시작·끝 = 4px 회색 선(--text-light)
-    rect(slide, box.x, box.y, box.w, 4, { fill: P.textLight });
-    rect(slide, box.x, box.y + tblH - 4, box.w, 4, { fill: P.textLight });
+    // 시작·끝 = 3px 회색 선(--text-mid)
+    rect(slide, box.x, box.y, box.w, 3, { fill: P.textMid });
+    rect(slide, box.x, box.y + tblH - 3, box.w, 3, { fill: P.textMid });
   },
   compare(slide, b, box, k) {
     const em = D.body * k, mid = em * 3, w = (box.w - mid) / 2;
@@ -689,7 +689,7 @@ const B = {
     const h = box.h;
     const tones = {
       light:  { bg: P.white,        line: null,           label: P.primary,     text: P.text },
-      warn:   { bg: P.bannerWarn,   line: P.bannerWarn,   label: P.white,       text: P.bannerWarnText },
+      warn:   { bg: P.bannerWarn,   line: P.bannerWarn,   label: P.bannerWarnLabel, text: P.bannerWarnText },
       strong: { bg: P.bannerStrong, line: P.bannerStrong, label: P.white,       text: P.bannerStrongText },
     };
     const T = tones[tone] || { bg: P.banner, line: P.bannerBorder, label: P.bannerLabel, text: P.bannerText };

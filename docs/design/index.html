@@ -256,11 +256,11 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .d-banner .msg .rl li{color:var(--p-btext);font-size:calc(var(--fs-small)*var(--k));gap:.35em}
 .d-banner .msg .rl li::before{color:var(--p-btext)}
 .d-banner .msg .rl{gap:.35em}
-.d-banner.warn{background:#C9302C;border-color:#C9302C;color:#fff}.d-banner.warn .lb{color:#fff}.d-banner.warn .msg .rl li,.d-banner.warn .msg .rl li::before,.d-banner.warn .msg{color:#F8E1E0}
+.d-banner.warn{background:#FF5F5B;border-color:#FF5F5B;color:#1A2438}.d-banner.warn .lb{color:#10141C}.d-banner.warn .msg .rl li,.d-banner.warn .msg .rl li::before,.d-banner.warn .msg{color:#1A2438}
 .d-banner.strong{background:#10141C;border-color:#10141C;color:#fff}.d-banner.strong .lb{color:#fff}.d-banner.strong .msg .rl li,.d-banner.strong .msg .rl li::before,.d-banner.strong .msg{color:#D9DEE6}
 /* 표 — SAFE AI Data Table: 위·아래 4px 연회색 선, 안쪽 1px 연회색 선, 타이틀 영역 연회색 바탕·회색 글자 */
 .d-tbl{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table)*var(--k));background:#fff;table-layout:fixed;text-align:left;
-  border-top:4px solid #8B95A7;border-bottom:4px solid #8B95A7}
+  border-top:3px solid #4A5568;border-bottom:3px solid #4A5568}
 .d-tbl th{background:#F5F7FA;color:#4A5568;font-weight:700;text-align:left;padding:.55em .8em;
   border:0;border-bottom:1px solid #D9DEE6;font-size:calc(var(--fs-tableh)*var(--k));line-height:1.3;white-space:nowrap}
 .d-tbl th.em{color:var(--p)}
@@ -555,7 +555,7 @@ function derive(primary,secondary){
   var banner=mix(primary,'#FFFFFF',0.88), bannerLabel=primary;   // 배너는 메인 컬러를 연하게 깐 바탕 + 테두리(장표와 같은 값)
   return {primary:primary,primary2:primary2,primaryDeep:mix(primary,'#000000',0.28),
     softBlue:mix(primary2,'#FFFFFF',0.86),softerBlue:mix(primary2,'#FFFFFF',0.94),
-    banner:banner,bannerBorder:mix(primary,'#FFFFFF',0.76),bannerLabel:bannerLabel,bannerText:'#515B75',
+    banner:banner,bannerBorder:mix(primary,'#FFFFFF',0.68),bannerLabel:bannerLabel,bannerText:'#515B75',
     coverBadge:mix(mix(primary,'#000000',0.28),'#FFFFFF',0.17),dark:dark,
     usedSecondary:!!(sec&&luminance(sec)>luminance(primary))};
 }
