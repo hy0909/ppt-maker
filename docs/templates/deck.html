@@ -550,14 +550,15 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 <script>
 /* 그래프를 그래프 칸의 실제 가로세로 비율로 다시 그린다 — 가로를 꽉 채우기 위해. fit_slides 는 배율을 정한 뒤 window.__drawCharts() 를 부른다 */
 (function () {
-  var draw = function(b, W, H, C) {
+  var draw = function(b, W, H, C, fs) {
+  fs = fs || 21;   // 글자 기준 크기(px) = 장표의 작은 글(--fs-small × 배율). 그림 좌표 1 = 화면 1px
   var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
   var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = C.series;
   var all = [].concat.apply([], series.map(function(sr) { return sr.values || []; })).filter(function(v) { return typeof v === 'number'; });
   var max = Math.max.apply(null, [1].concat(all)) * 1.25, min = Math.min.apply(null, [0].concat(all));
-  var padL = 20, padR = 20, padT = 70, padB = 84;   // 좌우 여백 20px(장표 기준), 위는 값 라벨, 아래는 축 라벨 자리
+  var padL = 20, padR = 20, padT = fs * 2.2, padB = fs * 2.6;   // 좌우 여백 20px, 위는 값 라벨, 아래는 축 라벨 자리
   var n = Math.max.apply(null, [labels.length].concat(series.map(function(sr) { return (sr.values || []).length; })));
-  var inset = b.kind === 'bar' ? 0 : 12;
+  var dot = fs * 0.3, inset = b.kind === 'bar' ? 0 : dot;
   var x = function(i) { return padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1)); };
   var y = function(v) { return padT + (H - padT - padB) * (1 - (v - min) / (max - min)); };
   var smooth = function(pts) {
@@ -573,20 +574,20 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   };
   var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
   for (var g = 0; g <= 4; g++) { var gy = (padT + (H - padT - padB) * g / 4).toFixed(1); out += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="' + C.border + '" stroke-opacity=".6" stroke-width="1"/>'; }
-  labels.forEach(function(l, i) { out += '<text x="' + x(i) + '" y="' + (H - padB + 56) + '" text-anchor="middle" font-size="34" fill="' + C.textMid + '">' + esc(l) + '</text>'; });
+  labels.forEach(function(l, i) { out += '<text x="' + x(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + (fs * 0.9) + '" fill="' + C.textMid + '">' + esc(l) + '</text>'; });
   if (b.kind === 'bar') {
-    var gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(110, gw * 0.72 / series.length), r = series.length > 1 ? 10 : 16;
+    var gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5;
     series.forEach(function(sr, si) { (sr.values || []).forEach(function(v, i) {
       var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
       var top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
       out += '<path d="M' + bx + ',' + bot + ' V' + (top + rr) + ' Q' + bx + ',' + top + ' ' + (bx + rr) + ',' + top + ' H' + (bx + w - rr) + ' Q' + (bx + w) + ',' + top + ' ' + (bx + w) + ',' + (top + rr) + ' V' + bot + ' Z" fill="' + cols[si] + '"/>';
-      out += '<text x="' + (bx + w / 2) + '" y="' + (top - 20) + '" text-anchor="middle" font-size="34" font-weight="600" fill="' + C.text + '">' + esc(v) + '</text>';
+      out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '">' + esc(v) + '</text>';
     }); });
   } else {
     series.forEach(function(sr, si) {
       var pts = (sr.values || []).map(function(v, i) { return [x(i), y(v)]; });
-      out += '<path d="' + smooth(pts) + '" fill="none" stroke="' + cols[si] + '" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>';
-      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="11" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - 30) + '" text-anchor="middle" font-size="38" font-weight="600" fill="' + C.text + '">' + esc((sr.values || [])[i]) + '</text>'; });
+      out += '<path d="' + smooth(pts) + '" fill="none" stroke="' + cols[si] + '" stroke-width="' + (fs * 0.18) + '" stroke-linejoin="round" stroke-linecap="round"/>';
+      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - fs * 0.85) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '">' + esc((sr.values || [])[i]) + '</text>'; });
     });
   }
   return out + '</svg>';
@@ -596,9 +597,9 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
     document.querySelectorAll('.chart[data-chart]').forEach(function (el) {
       var plot = el.querySelector('.cplot'); if (!plot) return;
       var w = plot.clientWidth, h = plot.clientHeight; if (w < 20 || h < 20) return;
-      var H = Math.max(220, Math.min(900, Math.round(1200 * h / w)));
+      var hh = el.querySelector('.chh'), fs = hh ? parseFloat(getComputedStyle(hh).fontSize) : 16;   // 작은 글 크기(배율 포함)
       var b = JSON.parse(el.getAttribute('data-chart'));
-      plot.innerHTML = draw(b, 1200, H, C);
+      plot.innerHTML = draw(b, Math.round(w), Math.round(h), C, fs);
     });
   }
   window.__drawCharts = redraw;
