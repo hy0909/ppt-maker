@@ -582,6 +582,51 @@ const B = {
       if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.small * 0.85, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
     });
   },
+  org(slide, b, box, k) {
+    // 조직도: 장표 바탕 위에 바로. 대표 카드(진한 머리띠·이름 줄·사진 빈 칸·이력 두 열) → 연결선 → 팀 카드
+    const hd = b.head || {}, teams = b.teams || [], n = Math.max(1, teams.length);
+    const fs = D.small * k, em = D.body * k;
+    const hw = box.w * 0.46, hx = box.x + (box.w - hw) / 2;
+    const roleH = fs * 1.95, nameH = fs * 1.8;
+    const items = hd.items || [], rows = Math.ceil(items.length / 2);
+    const bodyH = Math.max(fs * 5.2 * 4 / 3 + fs * 1.5, (hd.title ? fs * 1.6 : 0) + rows * fs * 1.3 + fs * 1.5);
+    const hh = roleH + nameH + bodyH;
+    rect(slide, hx, box.y, hw, hh, { fill: P.bgSoft, line: { color: P.primaryDeep, width: 1.1 }, radius: 10 });
+    rect(slide, hx, box.y, hw, roleH, { fill: P.primaryDeep, radius: 10 }); rect(slide, hx, box.y + roleH / 2, hw, roleH / 2, { fill: P.primaryDeep });
+    text(slide, hd.role || 'CEO', hx, box.y, hw, roleH, { size: D.small * 1.15, k, bold: true, color: P.white, align: 'center', valign: 'middle' });
+    rect(slide, hx + 1, box.y + roleH, hw - 2, nameH, { fill: P.white });
+    text(slide, hd.name || '', hx, box.y + roleH, hw, nameH, { size: D.small * 1.1, k, bold: true, align: 'center', valign: 'middle', letterSpacing: 3 });
+    rect(slide, hx, box.y + roleH + nameH, hw, 1, { fill: P.border });
+    const by = box.y + roleH + nameH, pw = fs * 5.2, ph = pw * 4 / 3, padX = fs * 0.9;
+    rect(slide, hx + padX, by + fs * 0.7, pw, ph, { fill: P.border, radius: 4 });   // 사진 빈 칸
+    const tx = hx + padX + pw + em, tw = hw - padX - pw - em - fs;
+    let ty = by + fs * 0.8;
+    if (hd.title) { text(slide, hd.title, tx, ty, tw, fs * 1.6, { size: D.small, k, bold: true, color: P.primary, valign: 'middle' }); ty += fs * 1.6; }
+    items.forEach((t, i) => text(slide, '• ' + t, tx + (i % 2) * (tw / 2 + fs * 0.5), ty + Math.floor(i / 2) * fs * 1.3, tw / 2 - fs * 0.5, fs * 1.3, { size: D.small * 0.92, k, color: P.textMid, valign: 'middle' }));
+    // 연결선
+    const ly = box.y + hh, lh = 28;
+    rect(slide, box.x + box.w / 2, ly, 1, lh / 2, { fill: P.borderStrong });
+    const gap = em * 1.2, cw = (box.w - gap * (n - 1)) / n;
+    rect(slide, box.x + cw / 2, ly + lh / 2, box.w - cw, 1, { fill: P.borderStrong });
+    // 팀 카드
+    const ty0 = ly + lh, tnH = fs * 2.1;
+    const descH = t => t.desc ? lines(t.desc, fs * 0.88, cw - fs * 1.6) * fs * 0.88 * 1.35 : 0;
+    const th = Math.min(box.y + box.h - ty0, tnH + fs * 0.9 + fs * 1.6 + fs * 0.5 + Math.max(...teams.map(descH), 0) + fs * 0.9);   // 내용 높이만큼
+    teams.forEach((t, i) => {
+      const x = box.x + i * (cw + gap);
+      rect(slide, x + cw / 2, ly + lh / 2, 1, lh / 2, { fill: P.borderStrong });
+      rect(slide, x, ty0, cw, th, { fill: P.white, line: { color: P.softerBlue, width: 1 }, radius: 10 });
+      rect(slide, x, ty0, cw, tnH, { fill: P.softerBlue, radius: 10 }); rect(slide, x, ty0 + tnH / 2, cw, tnH / 2, { fill: P.softerBlue });
+      rect(slide, x, ty0 + tnH - 1, cw, 1, { fill: P.border });
+      text(slide, `${t.name || ''}${t.count ? ` (${t.count})` : ''}`, x, ty0, cw, tnH, { size: D.small * 1.05, k, bold: true, color: P.primary, align: 'center', valign: 'middle' });
+      const leader = t.leader || '', badge = t.leaderRole || '';
+      const lw = estW(leader, fs * 1.1) + fs * 1.1 * 0.15 * Math.max(0, leader.length - 1), bw = badge ? estW(badge, fs * 0.72) + fs * 1.4 : 0, tot = lw + (badge ? fs * 0.5 + bw : 0);
+      const lx = x + (cw - tot) / 2, lyy = ty0 + tnH + fs * 0.9, lH = fs * 1.6;
+      text(slide, leader, lx, lyy, lw, lH, { size: D.small * 1.1, k, bold: true, valign: 'middle', letterSpacing: 2 });
+      if (badge) { rect(slide, lx + lw + fs * 0.5, lyy + lH / 2 - fs * 0.55, bw, fs * 1.1, { fill: P.bgSoft, radius: fs * 0.55 }); text(slide, badge, lx + lw + fs * 0.5, lyy + lH / 2 - fs * 0.55, bw, fs * 1.1, { size: D.small * 0.72, k, color: P.textMid, align: 'center', valign: 'middle' }); }
+      if (t.desc) text(slide, t.desc, x + fs * 0.8, lyy + lH + fs * 0.5, cw - fs * 1.6, Math.max(fs * 1.2, descH(t)), { size: D.small * 0.88, k, color: P.textMid, align: 'center', lineSpacing: 1.35 });
+    });
+  },
   history(slide, b, box, k) {
     const inner = labeledCard(slide, box, k, b.heading);
     const groups = b.groups || [], n = Math.max(1, groups.length);
@@ -594,10 +639,11 @@ const B = {
         text(slide, g.period || '', inner.x, y, pw, lh, { size: D.small, k, bold: true, color: P.primary, valign: 'middle' });
         let yy = y; const x = inner.x + pw + gapc;
         (g.items || []).forEach(it => {
+          const tw2 = Math.max(1, inner.x + inner.w - (x + yw + mw + g2 * 2)), th2 = lines(it.text || '', fs, tw2) * lh;
           text(slide, it.year || '', x, yy, yw, lh, { size: D.small, k, bold: true, valign: 'middle' });
           text(slide, it.month || '', x + yw + g2, yy, mw, lh, { size: D.small, k, color: P.textMid, valign: 'middle' });
-          text(slide, it.text || '', x + yw + mw + g2 * 2, yy, Math.max(1, inner.x + inner.w - (x + yw + mw + g2 * 2)), lh, { size: D.small, k, valign: 'middle' });
-          yy += lh;
+          text(slide, it.text || '', x + yw + mw + g2 * 2, yy, tw2, th2, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });
+          yy += th2;
         });
         y = Math.max(yy, y + lh) + 14;
       });
@@ -647,7 +693,7 @@ const B = {
     let kk = k, hdrH, rowHs;
     for (let tries = 0; tries < 14; tries++) {
       const fs = D.table * kk, fsh = D.tableH * kk, padY = fs * 0.6, padX = fs * 0.8;
-      hdrH = Math.max(1, ...headers.map((h, i) => lines(clean(h), fsh, colW[i] - padX * 2))) * fsh * 1.3 + padY * 2;
+      hdrH = headers.length ? Math.max(1, ...headers.map((h, i) => lines(clean(h), fsh, colW[i] - padX * 2))) * fsh * 1.3 + padY * 2 : 0;
       rowHs = rows.map(r => Math.max(1, ...r.map((c, i) => lines(clean(c), fs, colW[i] - padX * 2))) * fs * 1.45 + padY * 2);
       const total = hdrH + rowHs.reduce((a, c) => a + c, 0);
       if (total <= box.h || kk <= 0.56) {   // HTML 과 같은 바닥: 본문 0.75 × 표 0.75 ≈ 10pt
@@ -936,38 +982,34 @@ function content(sl) {
 }
 
 function closing() {
+  // 2026-10-09 레이아웃: 진한 메인 단색 바탕 · 왼쪽 위 메시지 · 왼쪽 아래 로고 + Web/E-mail · 오른쪽 그림(closing.image)
   const s = pres.addSlide();
-  closingBg(s);
-  logo(s, true);
+  s.background = { color: colorToHex(P.primaryDeep) };
   const c = outline.closing, ct = meta.contact || {};
-  const cols = (meta.orgs && meta.orgs.length ? meta.orgs : [meta.company && { role: '작성', name: meta.company }].filter(Boolean)).map(o => ({ r: o.role || '', v: o.name || '' }));
-  if (ct.email) cols.push({ r: 'CONTACT', v: ct.email + (ct.phone ? ` · ${ct.phone}` : '') });
-  if (ct.web) cols.push({ r: 'WEB', v: ct.web });
-  const bigH = 96, tyH = 30, progH = meta.event ? 25 + 26 : 0, csH = cols.length ? 22 + 20 + 40 : 0;
-  const total = progH + bigH + 16 + tyH + csH;
-  let y = (SLIDE_H - total) / 2;
-  if (meta.event) {
-    const pw = meta.pill ? Math.round(estW(meta.pill, 12) + 24) : 0, ew = estW(meta.event, 17);
-    let px = (SLIDE_W - (pw + (pw ? 10 : 0) + ew)) / 2;
-    if (meta.pill) { rect(s, px, y, pw, 25, { fill: P.gold, radius: 3 }); text(s, meta.pill, px, y, pw, 25, { size: 12, color: P.primary, bold: true, align: 'center', valign: 'middle' }); px += pw + 10; }
-    text(s, meta.event, px, y, ew + 20, 25, { size: 17, color: 'rgba(255,255,255,.82)', valign: 'middle' });
-    y += progH;
+  const L = 66;
+  const msgLines = Math.max(1, lines(String(c.message || ''), 40, 760));
+  s.addText(richRuns(c.message, { fontFace: FONT_TITLE_B, fontSize: PT(40), color: colorToHex(P.white), charSpacing: -0.8 }), { x: IN(L), y: IN(70), w: IN(760), h: IN(msgLines * 54), align: 'left', valign: 'top', margin: 0, lineSpacingMultiple: 1.35, fit: 'none', autoFit: false });
+  if (c.sub) text(s, c.sub, L, 300, 600, 60, { size: 18, color: 'rgba(255,255,255,.8)', lineSpacing: 1.5 });
+  const lp = asset(meta.logo.dark);
+  if (meta.logo.dark && fs.existsSync(lp)) {
+    const dim = imgDims(lp), lh = 44, lw = dim ? lh * dim.w / dim.h : 160;
+    s.addImage({ path: lp, altText: '로고', x: IN(L), y: IN(SLIDE_H - 168 - lh), w: IN(lw), h: IN(lh) });
   }
-  s.addText(richRuns(c.message, { fontFace: FONT_TITLE_B, fontSize: PT(88), color: colorToHex(P.white), charSpacing: -3 }), { x: IN(PAD), y: IN(y), w: IN(SLIDE_W - PAD * 2), h: IN(bigH), align: 'center', valign: 'middle', margin: 0, fit: 'none', autoFit: false });
-  y += bigH + 16;
-  text(s, c.sub || 'Thank You', PAD, y, SLIDE_W - PAD * 2, tyH, { size: 20, color: 'rgba(255,255,255,.85)', align: 'center', valign: 'middle' });
-  y += tyH;
-  if (cols.length) {
-    y += 22;
-    const lw = Math.min(SLIDE_W - PAD * 2, cols.length * 260);
-    rect(s, (SLIDE_W - lw) / 2, y, lw, 1, { fill: RGBA('#FFFFFF', 0.2) });
-    y += 20;
-    const colW = lw / cols.length;
-    cols.forEach((col, i) => {
-      const cx = (SLIDE_W - lw) / 2 + i * colW;
-      text(s, col.r, cx, y, colW, 14, { size: 9, color: 'rgba(255,255,255,.6)', bold: true, align: 'center', letterSpacing: 1.2, valign: 'middle' });
-      text(s, col.v, cx, y + 17, colW, 24, { size: 15, color: P.white, bold: true, align: 'center', valign: 'middle' });
-    });
+  const rows = [];
+  if (ct.web) rows.push(['Web', ct.web, true]);
+  if (ct.email) rows.push(['E-mail', ct.email, false]);
+  if (ct.phone) rows.push(['Tel', ct.phone, false]);
+  const rowH = 30, gapY = 14, startY = SLIDE_H - 52 - rows.length * rowH - (rows.length - 1) * gapY;
+  rows.forEach(([r, v, u], i) => {
+    const y = startY + i * (rowH + gapY);
+    text(s, r, L, y, 110, rowH, { size: 20 * 0.75, color: 'rgba(255,255,255,.9)', valign: 'middle', letterSpacing: 0 });
+    s.addText(v, { x: IN(L + 110 + 28), y: IN(y), w: IN(500), h: IN(rowH), fontFace: FONT, fontSize: 20 * 0.75, color: colorToHex(P.white), underline: u ? { style: 'sng' } : undefined, valign: 'middle', margin: 0, fit: 'none', autoFit: false });
+  });
+  const ip = c.image ? asset(c.image) : '';
+  if (ip && fs.existsSync(ip)) {
+    const dim = imgDims(ip), bw = SLIDE_W - 680 - 40, bh = SLIDE_H - 70 - 40;
+    let w = bw, h = bh; if (dim) { const r = Math.min(bw / dim.w, bh / dim.h); w = dim.w * r; h = dim.h * r; }
+    s.addImage({ path: ip, x: IN(680 + (bw - w) / 2), y: IN(70 + (bh - h) / 2), w: IN(w), h: IN(h) });
   }
 }
 

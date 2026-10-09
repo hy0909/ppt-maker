@@ -60,7 +60,7 @@ deck-stage:not(:defined){visibility:hidden;}
 img{display:block;max-width:100%;}
 html,body{margin:0;padding:0;background:#2a3142;}
 body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text);letter-spacing:-.8pt;}
-.slide{width:1280px;height:720px;overflow:hidden;background:var(--page);position:relative;font-size:var(--fs-body);line-height:1.5;letter-spacing:-.8pt;word-break:keep-all;}
+.slide{width:1280px;height:720px;overflow:hidden;background:var(--page);position:relative;font-size:var(--fs-body);line-height:1.5;letter-spacing:-.8pt;word-break:keep-all;font-family:var(--font);color:var(--text);}   /* deck-stage 가 슬롯에 흰 글자·시스템 글꼴을 깔아서, 색·글꼴을 명시하지 않은 글자가 사라지지 않게 */
 /* top: eyebrow + page no · headline · rule · meta line (minimal, no header strip) */
 .top{position:absolute;top:30px;left:var(--pad);right:var(--pad);z-index:4;}
 .eyebrow{font-size:${HEAD.eyebrow}px;color:var(--body);font-weight:500;display:flex;justify-content:space-between;align-items:baseline;}
@@ -80,7 +80,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 /* card: 제목 피약 + 흰 본문 — 투명 래퍼 + 독립 피약 + 독립 흰 박스 */
 .card{position:relative;background:transparent;border:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;min-height:0;overflow:visible;gap:.3em;font-size:var(--fs-body);}
 .card>.cap{background:linear-gradient(225deg,var(--pill-glow) 0%,var(--primary) 70%);color:#fff;font-size:var(--fs-card);font-weight:700;line-height:1.3;text-align:center;padding:.325em 1em;letter-spacing:-.01em;border-radius:${SHAPE.pill}px;flex:0 0 auto;white-space:nowrap;}
-.card>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.card.plain>.bd{background:transparent;box-shadow:none;padding:0;} .card>.bd{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);padding:.95em 1.4em 1em;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
 /* 강조 카드도 본문 박스는 흰색이다. 한 장표 안에서 카드 바탕이 서로 달라 보이면
    어느 쪽이 중요한지가 아니라 "왜 색이 다르지" 로 읽힌다. 강조는 알약 제목으로만 한다. */
 .card.tint>.bd{background:#fff;}
@@ -195,6 +195,25 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .card .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.45em;line-height:1.4;margin-bottom:.9em;}
 .sec2+.sec2{margin-top:1em;padding-top:1em;border-top:1px solid #E6E9EE;}
 /* chart */
+/* org(조직도·인력 배치, 2026-10-09) — 위 대표 카드(진한 머리띠 "CEO" · 이름 줄 · 사진 빈 칸 + 이력 두 열) → 연결선 → 팀 카드 2~5개(연한 머리띠 "팀 (인원)" · 팀장 이름 + 역할 배지 · 이력 한 줄) */
+.org{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);align-items:center;}
+.org .ohead{width:46%;background:#fff;border:1.5px solid var(--primary-deep);border-radius:10px;overflow:hidden;box-shadow:var(--card-shadow);flex:0 0 auto;}
+.org .ohead .orole{background:var(--primary-deep);color:#fff;text-align:center;font-weight:700;font-size:1.15em;padding:.4em;}
+.org .ohead .oname{text-align:center;font-weight:600;font-size:1.1em;padding:.35em;border-bottom:1px solid var(--border);letter-spacing:.2em;}
+.org .ohead .obody{display:grid;grid-template-columns:5.2em 1fr;gap:1em;padding:.7em 1em .8em .9em;background:var(--bg-soft);}
+.org .ohead .ophoto{aspect-ratio:3/4;background:var(--border);border-radius:4px;}
+.org .ohead .otitle{color:var(--primary);font-weight:600;margin-bottom:.3em;}
+.org .ohead .oitems{display:grid;grid-template-columns:1fr 1fr;column-gap:1em;row-gap:.15em;color:var(--text-mid);font-size:.92em;line-height:1.4;}
+.org .ohead .oitems div::before{content:'• ';}
+.org .olines{position:relative;width:100%;height:28px;flex:0 0 auto;}
+.org .olines i{position:absolute;background:var(--border-strong);}
+.org .oteams{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:1.2em;width:100%;flex:0 0 auto;align-items:start;}   /* 팀 카드는 내용 높이만큼 */
+.org .oteam{background:#fff;border:1px solid var(--pill-glow-border,var(--primary-softer));border-radius:10px;overflow:hidden;box-shadow:var(--card-shadow);display:flex;flex-direction:column;}
+.org .oteam .tname{background:var(--primary-softer);color:var(--primary);text-align:center;font-weight:600;font-size:1.05em;padding:.5em .6em;border-bottom:1px solid var(--border);}
+.org .oteam .tbody{padding:.9em .8em;text-align:center;}
+.org .oteam .tlead{font-weight:600;font-size:1.1em;letter-spacing:.15em;}
+.org .oteam .tbadge{display:inline-block;margin-left:.5em;background:var(--bg-soft);color:var(--text-mid);border-radius:1em;padding:.1em .7em;font-size:.72em;font-weight:500;letter-spacing:0;vertical-align:middle;}
+.org .oteam .tdesc{color:var(--text-mid);font-size:.88em;margin-top:.5em;line-height:1.35;}
 /* history(연혁, 2026-10-09) — layout columns(기본): 간트와 같은 진한 머리띠(기간 + 흰 원), 열마다 세로 점선 + 점 + 연도·내용
    layout list: 왼쪽 기간(포인트 컬러), 오른쪽 연·월·내용 줄. 글이 많은 제출용 */
 .hist{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);}
@@ -241,42 +260,15 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .cv .cbg{background-image:url('${coverBgFile(meta.coverBg)}');}
 /* 제목이 놓이는 왼쪽을 살짝 눌러 글씨가 밝은 부분에 걸쳐도 읽히게 한다 */
 .cv .scrim{position:absolute;inset:0;z-index:1;background:${coverScrim(meta.coverBg)};}
-.closing .cbg{background:${closingBgCss(P)};}
-/* 표지 본문 — 원본 PPTX 좌표·여백 그대로 */
-.cover .clead{position:absolute;left:${C.lead.x}px;top:${C.lead.y}px;width:${C.lead.w}px;height:${C.lead.h}px;${typeCss(TYPE.body2)}color:#E7E6E6;z-index:2;word-break:keep-all;}
-.cover .ctitle{position:absolute;left:${C.title.x}px;top:${C.title.y}px;width:${C.title.w}px;height:${C.title.h}px;${typeCss(TYPE.h0)}color:#fff;z-index:2;word-break:keep-all;}
-.cover .clogo{position:absolute;left:${C.logo.x}px;top:${C.logo.y}px;width:${C.logo.w}px;height:${C.logo.h}px;object-fit:contain;object-position:left center;z-index:2;}
-.cover .cbadge{position:absolute;right:${1280 - C.badge.x - C.badge.w}px;bottom:${720 - C.badge.y - C.badge.h}px;height:${C.badge.h}px;min-width:${C.badge.w}px;display:flex;align-items:center;justify-content:flex-end;padding:0 ${+(C.badge.x + C.badge.w - C.badgeText.x - C.badgeText.w).toFixed(1)}px;background:var(--cover-badge);font-size:${px(C.badgeText.size)}px;font-weight:700;letter-spacing:${C.badgeText.spc}pt;color:#fff;white-space:nowrap;z-index:2;}
-.cover .logo{position:absolute;top:30px;right:53px;height:22px;z-index:3;}   /* 마무리 장표의 오른쪽 위 로고 */
-.cin{position:relative;z-index:2;padding:66px 66px 56px;height:100%;display:flex;flex-direction:column;justify-content:space-between;}
-.prog{font-size:17px;font-weight:500;letter-spacing:.02em;color:rgba(255,255,255,.82);display:flex;align-items:center;gap:10px;}
-.pill{display:inline-block;padding:4px 11px;background:var(--gold);color:var(--primary);border-radius:3px;font-size:12px;font-weight:700;white-space:nowrap;}
-/* 목차 — 원본 PPTX 좌표·여백 그대로. 왼쪽 위 '목차', 오른쪽에 번호 + 섹션명 2열 */
-.tocp{position:absolute;inset:0;background:var(--page);}
-.tocp .lb{position:absolute;left:${A.title.x}px;top:${A.title.y}px;width:${A.title.w}px;height:${A.title.h}px;${typeCss(TYPE.h1)}color:var(--title);}
-.tocp .items{position:absolute;left:${A.cols[0].n}px;top:${A.rowTop}px;width:${A.cols[1].t + A.itemW - A.cols[0].n}px;display:grid;grid-auto-flow:column;grid-template-columns:${A.cols[0].t - A.cols[0].n + A.itemW}px ${A.cols[1].t - A.cols[1].n + A.itemW}px;column-gap:${+(A.cols[1].n - A.cols[0].t - A.itemW).toFixed(1)}px;row-gap:${+(A.rowPitch - A.itemH).toFixed(1)}px;align-content:start;}
-.tocp .it{display:grid;grid-template-columns:${A.itemH - 10}px 1fr;column-gap:${+(A.cols[0].t - A.cols[0].n - A.itemH + 10).toFixed(1)}px;min-height:${A.itemH}px;}
-.tocp .it .n{text-align:center;align-self:start;font-family:'${TYPE.h0.face}',${FALLBACK_FACES};font-weight:400;font-size:${px(A.numSize)}px;line-height:${A.itemH}px;letter-spacing:${A.numSpc}pt;color:var(--primary);}
-.tocp .it .t{${typeCss(TYPE.h2)}color:var(--title);word-break:keep-all;margin:${+((A.itemH - px(TYPE.h2.line)) / 2).toFixed(2)}px 0;}
-.tocp .it.apx .n{font-family:'${FONTS.face.regular}',${FALLBACK_FACES};font-size:${px(20)}px;}
-.tocp .it.apx .t{font-family:'${FONTS.face.regular}',${FALLBACK_FACES};}
-.tocp .ft{position:absolute;left:${A.foot.x}px;top:${A.foot.y}px;width:${A.foot.w}px;height:${A.foot.h}px;font-size:${px(A.foot.size)}px;line-height:${A.foot.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
-.tocp .pn{position:absolute;left:${A.pageNo.x}px;top:${A.pageNo.y}px;width:${A.pageNo.w}px;height:${A.pageNo.h}px;text-align:right;font-size:${px(A.foot.size)}px;line-height:${A.pageNo.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
-/* 간지: 포인트 컬러 한 면 + 좌상단 라벨·큰 제목 + 우하단 로고 워터마크 + 하단 정보줄 */
-.dv{position:absolute;inset:0;overflow:hidden;background:linear-gradient(118deg,var(--primary-deep) 0%,var(--primary) 54%,var(--primary-2) 100%);color:#fff;}
-.dv .wm{position:absolute;right:var(--pad);bottom:86px;width:620px;opacity:.12;pointer-events:none;}
-${DIVIDER_BG ? `.dv .dbg{position:absolute;inset:0;background:#000 url('${DIVIDER_BG}') center center / cover no-repeat;}
-.dv .dsc{position:absolute;inset:0;background:${DIVIDER_SCRIM};}` : ''}
-.dv .in{position:absolute;inset:0;padding:56px var(--pad) 42px;display:flex;flex-direction:column;z-index:2;}
-.dv .eb{font-size:15px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.62);text-transform:uppercase;}
-.dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:26px;max-width:1000px;word-break:keep-all;}
-.dv .s{font-size:18px;color:rgba(255,255,255,.72);margin-top:18px;max-width:820px;line-height:1.55;}
-.dv .ft{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
-.closing .cin{justify-content:center;align-items:center;text-align:center;}
-.closing .big{font-family:var(--font-title-b);font-size:88px;font-weight:400;color:#fff;letter-spacing:-.04em;line-height:1;margin-bottom:16px;}
-.closing .ty{font-size:20px;color:rgba(255,255,255,.85);margin-bottom:24px;}
-.closing .cs{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.2);display:flex;justify-content:center;gap:32px;}
-.closing .ci .r{font-size:9px;color:rgba(255,255,255,.6);letter-spacing:.15em;font-weight:700;} .closing .ci .v{font-size:15px;font-weight:700;color:#fff;margin-top:5px;}
+.closing .cbg{background:${P.primaryDeep};}   /* 2026-10-09 마무리: 진한 메인 단색, 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
+.closing .cin{display:block;padding:0;}
+.closing .big{position:absolute;left:66px;top:70px;width:760px;font-family:var(--font-title-b);font-size:40px;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.35;}
+.closing .ty{position:absolute;left:66px;top:300px;width:600px;font-size:18px;color:rgba(255,255,255,.8);line-height:1.5;}
+.closing .clogo2{position:absolute;left:66px;bottom:168px;height:44px;}
+.closing .cs{position:absolute;left:66px;bottom:52px;display:grid;grid-template-columns:5.5em 1fr;row-gap:14px;column-gap:1.4em;font-size:20px;color:#fff;}
+.closing .cs .r{color:rgba(255,255,255,.9);} .closing .cs .v{color:#fff;} .closing .cs .v.u{text-decoration:underline;text-underline-offset:4px;}
+.closing .cimg{position:absolute;left:680px;top:70px;right:40px;bottom:40px;display:flex;align-items:center;justify-content:center;}
+.closing .cimg img{max-width:100%;max-height:100%;object-fit:contain;}
 @media print{.no-print{display:none!important;}}
 `;
 }
@@ -454,6 +446,19 @@ const BLOCKS = {
     }).join('');
     return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div class="gnh">${esc(b.nameHeader || '')}</div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
   },
+  /** 조직도·인력 배치: head{role,name,title,items[]} + teams[{name,count,leader,leaderRole,desc}]. 사진은 넣지 않고 빈 칸 */
+  org(b) {
+    const hd = b.head || {}, teams = b.teams || [], n = Math.max(1, teams.length);
+    // 연결선: 대표 카드 아래 중앙에서 내려와 가로선, 팀마다 아래로
+    const lines = [`<i style="left:50%;top:0;width:1px;height:50%"></i>`, `<i style="left:calc(50% / ${n});right:calc(50% / ${n});top:50%;height:1px"></i>`]
+      .concat(teams.map((_, i) => `<i style="left:calc(${(i + 0.5) / n * 100}%);top:50%;width:1px;height:50%"></i>`)).join('');
+    return `${cardOpen('grow plain', b.heading)}<div class="org" style="--n:${n}">
+      <div class="ohead"><div class="orole">${esc(hd.role || 'CEO')}</div><div class="oname">${esc(hd.name || '')}</div>
+        <div class="obody"><div class="ophoto"></div><div>${hd.title ? `<div class="otitle">${esc(hd.title)}</div>` : ''}<div class="oitems">${(hd.items || []).map(t => `<div>${esc(t)}</div>`).join('')}</div></div></div></div>
+      <div class="olines">${lines}</div>
+      <div class="oteams">${teams.map(t => `<div class="oteam"><div class="tname">${esc(t.name || '')}${t.count ? ` (${esc(t.count)})` : ''}</div><div class="tbody"><div class="tlead">${esc(t.leader || '')}${t.leaderRole ? `<span class="tbadge">${esc(t.leaderRole)}</span>` : ''}</div>${t.desc ? `<div class="tdesc">${esc(t.desc)}</div>` : ''}</div></div>`).join('')}</div>
+    </div>${CARD_CLOSE}`;
+  },
   /** 연혁: groups[{period, items[{year, month?, text}]}]. layout "columns"(기본) | "list" */
   history(b) {
     const groups = b.groups || [], n = Math.max(1, groups.length);
@@ -479,7 +484,7 @@ const BLOCKS = {
     const cls = (i, extra = '') => [i === em ? 'em' : '', numCol[i] ? 'n' : '', extra].filter(Boolean).join(' ');
     return `<div class="tbl" style="flex:1;min-height:0;overflow:hidden"><table class="rt${b.rowHeader ? ' rh' : ''}">
       ${widths.length ? `<colgroup>${widths.map(w => `<col style="width:${w}">`).join('')}</colgroup>` : ''}
-      <thead><tr>${(b.headers || []).map((h, i) => `<th class="${cls(i)}">${rich(h)}</th>`).join('')}</tr></thead>
+      ${(b.headers || []).length ? `<thead><tr>${b.headers.map((h, i) => `<th class="${cls(i)}">${rich(h)}</th>`).join('')}</tr></thead>` : ''}
       <tbody>${rows.map(r => `<tr${isTotalRow(r) ? ' class="tot"' : ''}>${r.map((c, i) => `<td class="${cls(i, leftCols.has(i) && i > 0 ? 'l' : '')}">${i === em ? rich(c) : badgeCell(c)}</td>`).join('')}</tr>`).join('')}</tbody>
     </table></div>`;
   },
@@ -598,14 +603,20 @@ function renderClosing() {
   const cols = (meta.orgs && meta.orgs.length ? meta.orgs : [meta.company && { role: '작성', name: meta.company }].filter(Boolean)).map(o => `<div class="ci"><div class="r">${esc(o.role || '')}</div><div class="v">${esc(o.name || '')}</div></div>`);
   if (ct.email) cols.push(`<div class="ci"><div class="r">CONTACT</div><div class="v">${esc(ct.email)}${ct.phone ? ` · ${esc(ct.phone)}` : ''}</div></div>`);
   if (ct.web) cols.push(`<div class="ci"><div class="r">WEB</div><div class="v">${esc(ct.web)}</div></div>`);
+  // 2026-10-09 레이아웃: 왼쪽 위 메시지(두세 줄) · 왼쪽 아래 로고 + Web/E-mail · 오른쪽 그림(closing.image, 없으면 비움)
+  const rows = [];
+  if (ct.web) rows.push(['Web', `<span class="v u">${esc(ct.web)}</span>`]);
+  if (ct.email) rows.push(['E-mail', `<span class="v">${esc(ct.email)}</span>`]);
+  if (ct.phone) rows.push(['Tel', `<span class="v">${esc(ct.phone)}</span>`]);
   return `<section class="slide closing" data-label="마무리">
-    <div class="cover"><div class="cbg" data-deco></div>${logoDark()}
-      <div class="cin"><div>
-        ${meta.event ? `<div class="prog" style="justify-content:center;margin-bottom:26px">${meta.pill ? `<span class="pill">${esc(meta.pill)}</span>` : ''}${esc(meta.event)}</div>` : ''}
+    <div class="cover"><div class="cbg" data-deco></div>
+      <div class="cin">
         <div class="big">${rich(c.message)}</div>
-        <div class="ty">${rich(c.sub || 'Thank You')}</div>
-        ${cols.length ? `<div class="cs">${cols.join('')}</div>` : ''}
-      </div></div></div>
+        ${c.sub ? `<div class="ty">${rich(c.sub)}</div>` : ''}
+        ${meta.logo.dark ? `<img class="clogo2" src="${esc(meta.logo.dark)}" alt="">` : ''}
+        ${rows.length ? `<div class="cs">${rows.map(([r, v]) => `<span class="r">${r}</span>${v}`).join('')}</div>` : ''}
+        ${c.image ? `<div class="cimg"><img src="${esc(c.image)}" alt=""></div>` : ''}
+      </div></div>
   </section>`;
 }
 

@@ -1,0 +1,15 @@
+{
+  "_": "인력 배치(조직도) 기본값. 원문에 조직 정보가 없을 때 org 블록에 이 내용을 그대로 넣는다. 사진은 넣지 않고 빈 칸으로 둔다.",
+  "head": {
+    "role": "CEO",
+    "name": "이원섭",
+    "title": "SafeAI CEO",
+    "items": ["CNAI CEO (M&A EXIT)", "Samsung Electronics SW Engineer", "Seoul National Univ. AICEO", "KAIST Management of Tech MS.", "Indiana Univ Bloomington. Econ BS"]
+  },
+  "teams": [
+    { "name": "Management Support", "count": 2, "leader": "진아정", "leaderRole": "Team Leader", "desc": "CNAI, LI&FUNG Financial Accounting" },
+    { "name": "Strategic Planning", "count": 2, "leader": "김진호", "leaderRole": "Team Leader", "desc": "LH Research Institute and Onpoom Inc PM" },
+    { "name": "AI Research", "count": 4, "leader": "손준원", "leaderRole": "Team Leader", "desc": "Seoul Nat'l Univ. Dept. of Computer Eng. M.S" },
+    { "name": "Software Development", "count": 7, "leader": "양경모", "leaderRole": "Team Leader", "desc": "Focus AI VMS Team Lead" }
+  ]
+}

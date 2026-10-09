@@ -25,8 +25,8 @@
    "secondary": "#5D48FF"
   },
   "contact": {
-   "email": "hello@example.com",
-   "web": "example.com"
+   "email": "contact@safeai.kr",
+   "web": "http://www.safeai.kr"
   },
   "agenda": true,
   "dividers": true,
@@ -40,37 +40,45 @@
    "slides": [
     {
      "notes": "TPL 20",
-     "title": "냉장 물류 관제 **한 가지에 집중**하는 회사",
-     "lead": "회사 소개서의 첫 본문입니다. 왼쪽은 소개, 오른쪽은 규모를 보여 주는 수치입니다.",
+     "title": "We develop AI for Safety",
+     "lead": "Enhancing Security with Next-Gen Solutions",
      "blocks": [
       {
-       "type": "columns",
-       "columns": [
-        {
-         "heading": "회사 소개",
-         "items": [
-          {
-           "k": "설립",
-           "v": "2019년, 냉장 물류 관제 전문"
-          },
-          {
-           "k": "거점",
-           "v": "서울 본사 · 부산 연구소"
-          },
-          {
-           "k": "한 줄 소개",
-           "v": "온도 기록을 판단으로 바꾸는 관제 서비스"
-          }
-         ]
-        },
-        {
-         "heading": "주요 지표",
-         "stat": {
-          "sub": "함께하는 고객사",
-          "value": "120곳",
-          "desc": "전년 대비 30곳 늘어남"
-         }
-        }
+       "type": "table",
+       "rowHeader": true,
+       "widths": [
+        "30%",
+        "70%"
+       ],
+       "rows": [
+        [
+         "기업명",
+         "SafeAI"
+        ],
+        [
+         "직원 수",
+         "[입력 필요: 직원 수 — 예: 16 명 (SW 개발팀 : 11, 지원 인력 : 5)]"
+        ],
+        [
+         "서울(기업부설연구소)",
+         "서울시 서초구 태봉로 114, 3층"
+        ],
+        [
+         "대전(본사)",
+         "대전시 유성구 테크노 4로 17, A동 418호"
+        ],
+        [
+         "룩셈부르크 사무소",
+         "LCI, 9 Rue du Laboratoire, 1911 Gare Luxembourg"
+        ],
+        [
+         "이메일",
+         "contact@safeai.kr"
+        ],
+        [
+         "홈페이지",
+         "www.safeai.kr"
+        ]
        ]
       }
      ]
@@ -625,84 +633,89 @@
     },
     {
      "notes": "TPL 25",
-     "title": "2019년 창업 뒤 **해마다 거점을 넓혀 온** 연혁",
+     "title": "SafeAI **연혁** (2025 – 2026)",
      "lead": "기간별로 묶은 연혁입니다. 발표용 가로형입니다.",
      "blocks": [
       {
        "type": "history",
        "groups": [
         {
-         "period": "2019 – 2020",
+         "period": "2025.01",
          "items": [
           {
-           "year": "2019",
-           "month": "3월",
-           "text": "냉장 물류 관제 서비스 출시"
+           "year": "2025",
+           "month": "1월",
+           "text": "**룩셈부르크 법인 투자유치(규모 : 50,000 €)**"
           },
           {
-           "year": "2019",
-           "month": "9월",
-           "text": "서울 본사 설립"
-          },
-          {
-           "year": "2020",
-           "month": "5월",
-           "text": "식품 유통사 3곳 계약"
-          },
-          {
-           "year": "2020",
-           "month": "11월",
-           "text": "시드 투자 유치"
-          }
-         ]
-        },
-        {
-         "period": "2021 – 2022",
-         "items": [
-          {
-           "year": "2021",
-           "month": "2월",
-           "text": "GS 인증 1등급"
-          },
-          {
-           "year": "2021",
-           "month": "8월",
-           "text": "특허 2건 등록"
-          },
-          {
-           "year": "2022",
+           "year": "2025",
            "month": "4월",
-           "text": "부산 연구소 개소"
+           "text": "KISA 2025년 AI 보안 유망기업 육성 지원사업 선정"
           },
           {
-           "year": "2022",
+           "year": "2025",
+           "month": "6월",
+           "text": "조달청 공공혁신수요 기반 혁신제품 기술개발 R&D 선정"
+          },
+          {
+           "year": "2025",
+           "month": "6월",
+           "text": "KIPOT 능동형 안전서비스 제공을 위한 이동형 플랫폼 기반 솔루션 개발 R&D 선정"
+          },
+          {
+           "year": "2025",
+           "month": "7월",
+           "text": "**㈜ 롯데쇼핑 롯데마트 결품탐지 솔루션 공급계약 체결**"
+          },
+          {
+           "year": "2025",
+           "month": "8월",
+           "text": "중기부 2025년 초격차 스타트업 1000+ Micro DIPS AX 선정"
+          },
+          {
+           "year": "2025",
+           "month": "9월",
+           "text": "중기부 2025년 디지털기반 중소제조 산재예방 기술개발사업 선정"
+          },
+          {
+           "year": "2025",
            "month": "12월",
-           "text": "차량 500대 돌파"
+           "text": "한국 S사 영상압축 SW라이센스 공급 계약 체결"
           }
          ]
         },
         {
-         "period": "2023 – 2024",
+         "period": "2026.01",
          "items": [
           {
-           "year": "2023",
-           "month": "3월",
-           "text": "중기부 기술개발 과제 선정"
+           "year": "2026",
+           "month": "1월",
+           "text": "**글로벌 톱티어 AI 학회 WACV 2026 '열화상 객체 탐지' 글로벌 챌린지 1위**"
           },
           {
-           "year": "2023",
-           "month": "10월",
-           "text": "시리즈 A 투자"
+           "year": "2026",
+           "month": "1월",
+           "text": "**글로벌 톱티어 AI 학회 WACV 2026 'RetailAction 탐지' 글로벌 챌린지 1위**"
           },
           {
-           "year": "2024",
-           "month": "6월",
-           "text": "콜드체인 물류사 계약"
+           "year": "2026",
+           "month": "2월",
+           "text": "포커스에이아이 물리보안 AI 기술협력 MOU 체결"
           },
           {
-           "year": "2024",
-           "month": "12월",
-           "text": "차량 1,000대 돌파"
+           "year": "2026",
+           "month": "4월",
+           "text": "과기부 IITP-디지털 딥페이크 범죄대응핵심기술개발 R&D 선정"
+          },
+          {
+           "year": "2026",
+           "month": "4월",
+           "text": "중기부 2026년 글로벌 엑셀러레이팅(GMEP) 지원사업 선정"
+          },
+          {
+           "year": "2026",
+           "month": "4월",
+           "text": "과기부 연구개발특구-전략기술 연구성과 사업화(일반형) 선정"
           }
          ]
         }
@@ -712,87 +725,149 @@
     },
     {
      "notes": "TPL 26",
-     "title": "연도별 **계약·선정·투자** 실적",
-     "lead": "글로 읽는 제출용 세로형입니다.",
+     "title": "SafeAI **연혁** (2023 – 2024)",
+     "lead": "글로 읽는 제출용 세로형입니다. 항목이 많은 해는 이 모양이 맞습니다.",
      "blocks": [
       {
        "type": "history",
        "layout": "list",
        "groups": [
         {
-         "period": "2019 – 2020",
-         "items": [
-          {
-           "year": "2019",
-           "month": "3월",
-           "text": "냉장 물류 관제 서비스 출시"
-          },
-          {
-           "year": "2019",
-           "month": "9월",
-           "text": "서울 본사 설립"
-          },
-          {
-           "year": "2020",
-           "month": "5월",
-           "text": "식품 유통사 3곳 계약"
-          },
-          {
-           "year": "2020",
-           "month": "11월",
-           "text": "시드 투자 유치"
-          }
-         ]
-        },
-        {
-         "period": "2021 – 2022",
-         "items": [
-          {
-           "year": "2021",
-           "month": "2월",
-           "text": "GS 인증 1등급"
-          },
-          {
-           "year": "2021",
-           "month": "8월",
-           "text": "특허 2건 등록"
-          },
-          {
-           "year": "2022",
-           "month": "4월",
-           "text": "부산 연구소 개소"
-          },
-          {
-           "year": "2022",
-           "month": "12월",
-           "text": "차량 500대 돌파"
-          }
-         ]
-        },
-        {
-         "period": "2023 – 2024",
+         "period": "2023.08",
          "items": [
           {
            "year": "2023",
-           "month": "3월",
-           "text": "중기부 기술개발 과제 선정"
+           "month": "8월",
+           "text": "**법인설립**"
           },
           {
            "year": "2023",
            "month": "10월",
-           "text": "시리즈 A 투자"
+           "text": "**룩셈부르크 FIT4스타트업 14th 선정**"
           },
           {
-           "year": "2024",
-           "month": "6월",
-           "text": "콜드체인 물류사 계약"
-          },
-          {
-           "year": "2024",
-           "month": "12월",
-           "text": "차량 1,000대 돌파"
+           "year": "2023",
+           "month": "11월",
+           "text": "KIPoT 과학치안진흥센터 미래치안도전기술개발 과제 선정(딥페이크,딥보이스,가짜뉴스)"
           }
          ]
+        },
+        {
+         "period": "2024.01",
+         "items": [
+          {
+           "year": "2024",
+           "month": "1월",
+           "text": "한국N사 AICCTV 솔루션 계약체결"
+          },
+          {
+           "year": "2024",
+           "month": "2월",
+           "text": "**SEED투자 유치 넥스트웨이브벤처파트너스 (30억기업가치 2억투자유치)**"
+          },
+          {
+           "year": "2024",
+           "month": "3월",
+           "text": "룩셈부르크 경찰청 NDA 체결 및 POC"
+          },
+          {
+           "year": "2024",
+           "month": "3월",
+           "text": "아이슬란드 Videntifier NDA 체결 및 POC"
+          },
+          {
+           "year": "2024",
+           "month": "4월",
+           "text": "**글로벌 칩페이크 탐지 챌린지 (ACM ICMR 2024) 1위**"
+          },
+          {
+           "year": "2024",
+           "month": "4월",
+           "text": "IITP ETRI주관 송파구 마약던지기 행동 감지 R&D선정"
+          },
+          {
+           "year": "2024",
+           "month": "5월",
+           "text": "한국 D사 wifi, Bluetooth 신호활용 군중밀집 관리 기술 계약 체결"
+          },
+          {
+           "year": "2024",
+           "month": "10월",
+           "text": "**룩셈부르크 법인설립**"
+          },
+          {
+           "year": "2024",
+           "month": "11월",
+           "text": "2024 Smart City Expo World Congress Barcelona 부스 운영"
+          },
+          {
+           "year": "2024",
+           "month": "11월",
+           "text": "**(주)롯데쇼핑 롯데마트 이상탐지 솔루션 공급 계약 체결**"
+          },
+          {
+           "year": "2024",
+           "month": "11월",
+           "text": "한국 A사 이상징후 판독 S/W 플랫폼 개발 계약 체결"
+          },
+          {
+           "year": "2024",
+           "month": "11월",
+           "text": "한국 A사 AI 합성데이터 공급 계약 체결"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "notes": "TPL 27",
+     "title": "영상 AI 분야 **전문 인력 배치**",
+     "lead": "대표와 팀장 중심의 조직 구성입니다.",
+     "blocks": [
+      {
+       "type": "org",
+       "head": {
+        "role": "CEO",
+        "name": "이원섭",
+        "title": "SafeAI CEO",
+        "items": [
+         "CNAI CEO (M&A EXIT)",
+         "Samsung Electronics SW Engineer",
+         "Seoul National Univ. AICEO",
+         "KAIST Management of Tech MS.",
+         "Indiana Univ Bloomington. Econ BS"
+        ]
+       },
+       "teams": [
+        {
+         "name": "Management Support",
+         "count": 2,
+         "leader": "진아정",
+         "leaderRole": "Team Leader",
+         "desc": "CNAI, LI&FUNG Financial Accounting"
+        },
+        {
+         "name": "Strategic Planning",
+         "count": 2,
+         "leader": "김진호",
+         "leaderRole": "Team Leader",
+         "desc": "LH Research Institute and Onpoom Inc PM"
+        },
+        {
+         "name": "AI Research",
+         "count": 4,
+         "leader": "손준원",
+         "leaderRole": "Team Leader",
+         "desc": "Seoul Nat'l Univ. Dept. of Computer Eng. M.S"
+        },
+        {
+         "name": "Software Development",
+         "count": 7,
+         "leader": "양경모",
+         "leaderRole": "Team Leader",
+         "desc": "Focus AI VMS Team Lead"
         }
        ]
       }
@@ -802,7 +877,7 @@
   }
  ],
  "closing": {
-  "message": "감사합니다",
-  "sub": "템플릿 견본 덱"
+  "message": "We are defining the future of AI,<br>where safety and<br>privacy are guaranteed.",
+  "sub": ""
  }
 }

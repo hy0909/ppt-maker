@@ -1,0 +1,45 @@
+{
+  "_": "회사 소개(20 Company Overview) 기본값. 원문에 회사 정보가 없을 때 이 장표를 쓴다. 직원 수는 비워 두고 만드는 사람에게 묻는다(intake-questions.md).",
+  "title": "We develop AI for Safety",
+  "lead": "Enhancing Security with Next-Gen Solutions",
+  "blocks": [
+    {
+      "type": "table",
+      "rowHeader": true,
+      "widths": [
+        "30%",
+        "70%"
+      ],
+      "rows": [
+        [
+          "기업명",
+          "SafeAI"
+        ],
+        [
+          "직원 수",
+          "[입력 필요: 직원 수 — 예: 16 명 (SW 개발팀 : 11, 지원 인력 : 5)]"
+        ],
+        [
+          "서울(기업부설연구소)",
+          "서울시 서초구 태봉로 114, 3층"
+        ],
+        [
+          "대전(본사)",
+          "대전시 유성구 테크노 4로 17, A동 418호"
+        ],
+        [
+          "룩셈부르크 사무소",
+          "LCI, 9 Rue du Laboratoire, 1911 Gare Luxembourg"
+        ],
+        [
+          "이메일",
+          "contact@safeai.kr"
+        ],
+        [
+          "홈페이지",
+          "www.safeai.kr"
+        ]
+      ]
+    }
+  ]
+}

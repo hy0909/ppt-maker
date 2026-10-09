@@ -86,11 +86,14 @@ function systemPrompt() {
   const schema = fs.readFileSync(path.join(REFS, 'outline-schema.md'), 'utf8');
   const templates = fs.readFileSync(path.join(REFS, 'outline-templates.md'), 'utf8');
   const writing = fs.readFileSync(path.join(REFS, 'writing.md'), 'utf8');
+  const TPL = path.join(REFS, '..', 'templates');
+  const readTpl = f => { try { return fs.readFileSync(path.join(TPL, f), 'utf8'); } catch { return ''; } };
+  const defaults = ['company-default.json', 'history-default.json', 'org-default.json'].map(f => `## ${f}\n${readTpl(f)}`).join('\n\n');
   return `당신은 발표자료 기획자다. 사용자가 준 원문과 설정으로 outline.json 을 작성한다.
 
 # 출력
 - **JSON 객체 하나만** 출력한다. 코드펜스, 설명, 주석 없이.
-- 아래 스키마를 정확히 따른다. 블록 타입은 스키마의 12종만 사용한다. 연혁(연도별 계약·선정·투자)은 history(columns 기본, 글이 많으면 list) 로 그린다 — timeline 이 아니다. 여러 일이 겹치는 일정은 gantt(cols + tasks[start,end]) 로 그린다.
+- 아래 스키마를 정확히 따른다. 블록 타입은 스키마의 13종만 사용한다. 연혁(연도별 계약·선정·투자)은 history(columns 기본, 글이 많으면 list) 로, 인력 배치·조직도는 org 로 그린다 — timeline·cards 가 아니다. 여러 일이 겹치는 일정은 gantt(cols + tasks[start,end]) 로 그린다.
 
 # 콘텐츠 규칙
 - 장표 1개 = 메시지 1개. **title 은 결론을 담되 문장이 아니라 명사형으로 끝낸다**: "제품 목록·품질 통계·프린터 설정 **세 기능으로 구성**", "네 항목 모두 **8월 목표치 초과 달성**", "요구사항 정리부터 시범 운영까지 **24주 일정**". "~한다 / ~합니다 / ~이다 / ~했다 / ~된다" 같은 서술형 종결은 쓰지 않는다. 핵심 구절 1~2곳만 **…** 로 감싼다(굵게만 표시되고 색은 본문과 같다).
@@ -118,7 +121,14 @@ ${schema}
 ${templates}
 
 # 장표 글 규칙
-${writing}`;
+${writing}
+
+# 사내(SafeAI) 기본값 — 원문에 해당 정보가 없을 때 그대로 넣는다
+- 회사 소개(20): company-default.json 의 title·lead·blocks 를 그대로. **직원 수는 비워 두고** "[입력 필요: 직원 수]" 로 남긴다(만드는 사람에게 묻는다).
+- 연혁(25·26): history-default.json 의 groups 를 그대로(**굵게** 표시 포함). 항목이 많으면 layout "list" 로 두 장에 나눈다.
+- 인력 배치·조직도(27): org-default.json 의 head·teams 를 그대로. 사진은 넣지 않는다(빈 칸).
+- 다른 회사 문서(고객사·타사 소개)에는 이 기본값을 쓰지 않는다.
+${defaults}`;
 }
 
 
