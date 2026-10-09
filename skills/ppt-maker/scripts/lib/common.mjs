@@ -419,7 +419,7 @@ export function footLines(sl) {
 /** 출처 줄까지 넣었을 때 본문 아래로 비워야 하는 높이(px) */
 export function footSafeBottom(lines) {
   if (!lines.length) return SLIDE_FOOT.safe;
-  return Math.max(SLIDE_FOOT.safe, Math.ceil(SLIDE_FOOT.bottom + lines.length * px(SLIDE_FOOT.line)) + 4);
+  return Math.max(SLIDE_FOOT.safe, Math.ceil(SLIDE_FOOT.bottom + lines.length * px(SLIDE_FOOT.line)) + 12);   // 본문·배너와 출처 사이 12px(2026-10-09 +8)
 }
 
 /** 이 표지를 골랐을 때 쓸 간지 배경 — 짝이 없으면 null (그때는 브랜드 그라디언트) */

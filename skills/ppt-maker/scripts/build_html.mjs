@@ -195,18 +195,21 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .card .sn{font-size:var(--fs-small);color:var(--primary-2);font-weight:700;margin-top:.45em;line-height:1.4;margin-bottom:.9em;}
 .sec2+.sec2{margin-top:1em;padding-top:1em;border-top:1px solid #E6E9EE;}
 /* chart */
-/* gantt — 왼쪽 항목 이름 · 위 기간 라벨 · 세로 격자선(연한 테두리색) · 가로 막대(포인트 컬러, muted 회색). 가로 구분선 없음 */
-.card.grow{flex:1 1 0%;}   /* 간트처럼 남은 높이를 다 쓰는 블록의 카드 */
+/* gantt(2026-10-09, 레퍼런스 "시간표" 모양) — 위에 진한 머리띠(열 라벨 흰 글자) · 왼쪽 항목 이름 · 이름 끝에서 막대까지 가는 안내선 ·
+   막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
 .gantt .gh,.gantt .gr{display:grid;grid-template-columns:var(--gl) 1fr;min-height:0;}
-.gantt .gh{flex:0 0 auto;} .gantt .gr{flex:1;}
-.gantt .gcols{display:grid;grid-template-columns:repeat(var(--n),1fr);text-align:center;color:var(--text-mid);padding-bottom:.4em;border-bottom:1px solid var(--border);}
-.gantt .gcols span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 .2em;}
-.gantt .gname{display:flex;align-items:center;padding-right:.8em;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.gantt .gtrack{position:relative;min-height:1.7em;background-image:linear-gradient(to right,var(--border) 1px,transparent 1px);background-size:calc(100% / var(--n)) 100%;border-right:1px solid var(--border);}
-.gantt .gbar{position:absolute;top:50%;height:.85em;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;}   /* 두께는 글자 기준 고정 — 행이 커져도 막대는 가늘게 */
-.gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--accent);} .gantt .gbar.muted{background:var(--border-strong);}
-.gantt .gbar span{position:absolute;left:100%;top:50%;transform:translateY(-50%);margin-left:.5em;white-space:nowrap;font-size:.9em;color:var(--text-mid);}
+.gantt .gh{flex:0 0 auto;background:var(--primary-deep);color:#fff;border-radius:6px;overflow:hidden;} .gantt .gr{flex:1;}
+.gantt .gh .gnh{display:flex;align-items:center;padding:.45em .8em;font-weight:700;font-size:.9em;}
+.gantt .gcols{display:grid;grid-template-columns:repeat(var(--n),1fr);text-align:left;color:#fff;font-weight:600;font-size:.9em;margin-right:var(--gto,3.4em);}
+.gantt .gcols span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.45em .5em;border-left:1px solid rgba(255,255,255,.22);}
+.gantt .gname{display:flex;align-items:center;padding-right:.8em;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.gantt .gtrack{position:relative;min-height:1.9em;margin-right:var(--gto,3.4em);}   /* 오른쪽은 to 라벨 자리 */
+.gantt .glead{position:absolute;left:0;top:50%;height:1px;background:var(--border-strong);}   /* 이름 끝 → 막대 시작 안내선 */
+.gantt .gbar{position:absolute;top:50%;height:1.45em;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.85em;white-space:nowrap;overflow:hidden;padding:0 .4em;}
+.gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--pill-glow);} .gantt .gbar.muted{background:var(--text-mid);}
+.gantt .gfrom,.gantt .gto{position:absolute;top:50%;transform:translateY(-50%);font-size:.85em;color:var(--text-mid);white-space:nowrap;}
+.gantt .gfrom{transform:translate(-100%,-50%);padding-right:.5em;} .gantt .gto{padding-left:.5em;}
 /* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
@@ -427,9 +430,11 @@ const BLOCKS = {
     const rows = tasks.map(t => {
       const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
       const left = ((s - 1) / n * 100).toFixed(2), width = ((e - s + 1) / n * 100).toFixed(2);
-      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}" style="left:${left}%;width:${width}%">${t.label ? `<span>${esc(t.label)}</span>` : ''}</i></div></div>`;
+      // 안내선은 이름 끝에서 막대(또는 from 글자) 앞까지. from·to 는 막대 앞뒤 작은 글자, label 은 막대 안
+      const fromW = t.from ? `calc(${left}% - ${String(t.from).length * 0.55 + 1}em)` : `${left}%`;
+      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="glead" style="width:${fromW}"></i>${t.from ? `<span class="gfrom" style="left:${left}%">${esc(t.from)}</span>` : ''}<i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}" style="left:${left}%;width:${width}%">${t.label ? esc(t.label) : ''}</i>${t.to ? `<span class="gto" style="left:${(+left + +width).toFixed(2)}%">${esc(t.to)}</span>` : ''}</div></div>`;
     }).join('');
-    return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div></div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
+    return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div class="gnh">${esc(b.nameHeader || '')}</div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
   },
   timeline(b) {
     return BLOCKS.process({ steps: (b.phases || []).map(p => ({ period: p.period, title: p.title, items: p.items, desc: p.desc, highlight: p.highlight, dark: p.dark })), darkLast: b.darkLast });

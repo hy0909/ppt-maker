@@ -557,20 +557,29 @@ const B = {
     const inner = labeledCard(slide, box, k, b.heading);
     const cols = b.cols || [], n = Math.max(1, cols.length), tasks = b.tasks || [];
     const fs = D.small * k, em = D.body * k;
-    const nameW = inner.w * 0.24, gx = inner.x + nameW, gw = inner.w - nameW, hdrH = fs * 2;
-    cols.forEach((c, i) => text(slide, String(c), gx + gw * i / n, inner.y, gw / n, hdrH, { size: D.small, k, color: P.textMid, align: 'center', valign: 'middle' }));
-    rect(slide, gx, inner.y + hdrH - 1, gw, 1, { fill: P.border });
+    // 레퍼런스 "시간표" 모양: 진한 머리띠(흰 열 라벨) · 이름 끝 → 막대 안내선 · 두꺼운 막대에 흰 라벨 · 막대 앞뒤 from·to
+    const toW = tasks.some(t => t.to) ? fs * 3.4 : 0;   // 오른쪽 끝 to 라벨 자리
+    const nameW = inner.w * 0.24, gx = inner.x + nameW, gw = inner.w - nameW - toW, hdrH = fs * 2.1;
+    rect(slide, inner.x, inner.y, inner.w - toW, hdrH, { fill: P.primaryDeep, radius: 6 });
+    if (b.nameHeader) text(slide, String(b.nameHeader), inner.x + em * 0.8, inner.y, nameW - em, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
+    cols.forEach((c, i) => {
+      if (i) rect(slide, gx + gw * i / n, inner.y + hdrH * 0.2, 1, hdrH * 0.6, { fill: mix(P.white, P.primaryDeep, 0.78) });
+      text(slide, String(c), gx + gw * i / n + em * 0.5, inner.y, gw / n - em * 0.5, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
+    });
     const rowsY = inner.y + hdrH, rowsH = Math.max(1, inner.h - hdrH), rowH = rowsH / Math.max(1, tasks.length);
-    for (let i = 0; i <= n; i++) rect(slide, gx + gw * i / n - (i === n ? 1 : 0), rowsY, 1, rowsH, { fill: P.border });
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
-    const tone = t => t.tone === 'muted' ? P.borderStrong : t.tone === 'accent' ? P.teal : t.tone === 'second' ? P.primary2 : P.primary;
+    const tone = t => t.tone === 'muted' ? P.textMid : t.tone === 'accent' ? P.pillGlow : t.tone === 'second' ? P.primary2 : P.primary;
     tasks.forEach((t, i) => {
-      const y = rowsY + rowH * i;
-      text(slide, String(t.name || '').replace(/\*\*/g, ''), inner.x, y, nameW - em * 0.5, rowH, { size: D.small, k, color: P.text, valign: 'middle' });
+      const y = rowsY + rowH * i, cy = y + rowH / 2;
+      text(slide, String(t.name || '').replace(/\*\*/g, ''), inner.x, y, nameW - em * 0.5, rowH, { size: D.small, k, color: P.text, bold: true, valign: 'middle' });
       const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
-      const bx = gx + gw * (s - 1) / n, bw = Math.max(3, gw * (e - s + 1) / n), bh = Math.min(rowH * 0.4, fs * 1.1);   // 두께는 글자 기준 상한
-      rect(slide, bx, y + (rowH - bh) / 2, bw, bh, { fill: tone(t), radius: 3 });
-      if (t.label) text(slide, String(t.label), bx + bw + em * 0.4, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.4), rowH, { size: D.small * 0.9, k, color: P.textMid, valign: 'middle' });
+      const bx = gx + gw * (s - 1) / n, bw = Math.max(3, gw * (e - s + 1) / n), bh = Math.min(rowH * 0.55, fs * 1.45);
+      const fromW = t.from ? estW(String(t.from), fs * 0.85) + em * 0.5 : 0;
+      if (bx - fromW - gx > 2) rect(slide, gx, cy, bx - fromW - gx, 1, { fill: P.borderStrong });   // 안내선
+      if (t.from) text(slide, String(t.from), bx - fromW, y, fromW - em * 0.25, rowH, { size: D.small * 0.85, k, color: P.textMid, align: 'right', valign: 'middle' });
+      rect(slide, bx, cy - bh / 2, bw, bh, { fill: tone(t), radius: 3 });
+      if (t.label) text(slide, String(t.label), bx, cy - bh / 2, bw, bh, { size: D.small * 0.85, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
+      if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.small * 0.85, k, color: P.textMid, valign: 'middle' });
     });
   },
   timeline(slide, b, box, k) {
