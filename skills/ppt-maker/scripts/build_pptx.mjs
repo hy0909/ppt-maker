@@ -428,7 +428,7 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const em = D.body * k, padX = em * 1.2, padY = em * 0.6;
   const hh = em * 1.5;
   text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.body * 0.94, k, bold: true, color: P.body, valign: 'middle' });   // 그래프 제목 = 카드 안 소제목
-  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small - 4, k, color: P.textLight, align: 'right', valign: 'middle' });   // 단위 = 캡션 톤, 4px 작게
+  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small - 4, k, color: P.textLight, align: 'right', valign: 'middle' });   // 단위 = 캡션 글자(작은 글 −4px, --text-light)
   const series = (c.series || []).slice(0, 4), labels = c.labels || [];
   const ch = h - padY - hh - em * 0.6;
   if (!series.length || ch < 30) return;
@@ -462,7 +462,7 @@ function fragImage(src, caption, k, w, ratio) {
       rect(slide, bx, by, bw, bh, { fill: P.bgSoft, line: { color: '#C3CAD5', width: 1.5 }, radius: 8, dash: 'dash' });
       const lab = String(caption || '이미지 자리').trim();
       text(slide, /^\[.*\]$/.test(lab) ? lab : `[ ${lab} ]`, bx, by, bw, bh, { size: D.small, k, color: '#6F7C92', align: 'center', valign: 'middle' });
-    } else if (capH) text(slide, caption, x, y + h - capH, w, capH, { size: D.small, k, color: P.textLight, align: 'center', valign: 'middle' });
+    } else if (capH) text(slide, caption, x, y + h - capH, w, capH, { size: D.small - 4, k, color: P.textLight, align: 'center', valign: 'middle' });   // 캡션 글자
   } };
 }
 /** stack fragments inside a box: fixed ones keep their height, flex ones share the remaining space; leftover is distributed evenly (space-evenly). */
@@ -633,7 +633,8 @@ const B = {
     const fs = D.small * k, em = D.body * k;
     if (b.layout === 'list') {
       // 왼쪽 기간(포인트 컬러) · 오른쪽 연·월·내용 줄. 묶음 사이 14px
-      const pw = fs * 7.5, gapc = em * 1.4, lh = fs * 1.55, yw = fs * 3.2, mw = fs * 3, g2 = fs * 0.6;
+      const pw = fs * 7.5, gapc = em * 1.4, lh = fs * 1.55, yw = fs * 3.2, g2 = fs * 0.6;
+      const mw = Math.max(1, ...groups.flatMap(g => (g.items || []).map(it => estW(String(it.month || ''), fs))));   // 월 칸은 가장 긴 월 글자 너비
       let y = inner.y;
       groups.forEach(g => {
         text(slide, g.period || '', inner.x, y, pw, lh, { size: D.small, k, bold: true, color: P.primary, valign: 'middle' });
@@ -642,7 +643,7 @@ const B = {
           const tw2 = Math.max(1, inner.x + inner.w - (x + yw + mw + g2 * 2)), th2 = lines(it.text || '', fs, tw2) * lh;
           text(slide, it.year || '', x, yy, yw, lh, { size: D.small, k, bold: true, valign: 'middle' });
           text(slide, it.month || '', x + yw + g2, yy, mw, lh, { size: D.small, k, color: P.textMid, valign: 'middle' });
-          text(slide, it.text || '', x + yw + mw + g2 * 2 - 8, yy, tw2 + 8, th2, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });   // 월과 내용 사이 8px 좁게
+          text(slide, it.text || '', x + yw + mw + g2 * 2 - 4, yy, tw2 + 4, th2, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });   // 월과 내용 사이: 칸 간격에서 4px 뺌
           yy += th2;
         });
         y = Math.max(yy, y + lh) + 14;
