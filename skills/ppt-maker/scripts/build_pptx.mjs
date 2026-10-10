@@ -428,7 +428,7 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const em = D.body * k, padX = em * 1.2, padY = em * 0.6;
   const hh = em * 1.5;
   text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.body, k, bold: true, color: P.text, valign: 'middle' });
-  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small, k, color: P.textMid, align: 'right', valign: 'middle' });
+  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small - 2, k, color: P.textLight, align: 'right', valign: 'middle' });   // 2px 작게, 두 단계 연하게
   const series = (c.series || []).slice(0, 4), labels = c.labels || [];
   const ch = h - padY - hh - em * 0.6;
   if (!series.length || ch < 30) return;

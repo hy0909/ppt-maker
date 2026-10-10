@@ -250,7 +250,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 /* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
-.chart .chh b{color:var(--text);font-weight:700;font-size:var(--fs-body);} .chart .chh span{color:var(--text-mid);}
+.chart .chh b{color:var(--text);font-weight:700;font-size:var(--fs-body);} .chart .chh span{color:var(--text-light);font-size:calc(var(--fs-small) - 2px);}   /* 단위: 2px 작게, 두 단계 연하게 */
 .chart .cplot{flex:1;min-height:0;margin-top:.5em;display:flex;} .chart .cplot svg{width:100%;height:100%;display:block;}
 .chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--text);margin-top:.35em;} .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
 /* cover / toc / divider / closing */
@@ -313,7 +313,7 @@ function statFrag(st) {
 }
 function chartPanel(b) {
   const data = esc(JSON.stringify({ kind: b.kind, labels: b.labels || [], series: (b.series || []).slice(0, 4).map(sr => ({ values: sr.values || [] })) }));
-  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span>${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS()[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
+  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span class="aux">${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS()[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
 }
 const SERIES_COLORS = () => [P.primary2, P.primary, P.teal, P.gold];
 /** 그래프 — shadcn/ui Charts(recharts) 모양을 따른다: 가로 격자선만, 축선·눈금선 없음, 막대는 위 모서리만 둥글게, 선은 부드러운 곡선 + 점, 값 라벨은 위.

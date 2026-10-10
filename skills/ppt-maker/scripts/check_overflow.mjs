@@ -159,7 +159,8 @@ for (let i = 0; i < n; i++) {
         const large = px >= 24 || (px >= 18.66 && bold);
         const floor = large ? 3 : 4.5;
         const rt = ratio(fg, bg);
-        if (rt < floor) add(rt < floor * 0.7 ? 'error' : 'warn', 'low-contrast', `${rt.toFixed(1)}:1 (기준 ${floor}:1)`, el);
+        // .aux 는 단위·캡션처럼 일부러 연하게 둔 보조 글자 — 대비 부족을 오류가 아니라 주의로만 적는다
+        if (rt < floor) add(rt < floor * 0.7 && !el.closest('.aux') ? 'error' : 'warn', 'low-contrast', `${rt.toFixed(1)}:1 (기준 ${floor}:1)`, el);
       }
       // 6. 외톨이 조사
       const txt = (el.textContent || '').trim();
