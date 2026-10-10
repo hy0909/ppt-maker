@@ -328,6 +328,8 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   var padL = 20, padR = 20, padT = fs * 2.2, padB = fs * 2.6;   // 좌우 여백 20px, 위는 값 라벨, 아래는 축 라벨 자리
   var n = Math.max.apply(null, [labels.length].concat(series.map(function(sr) { return (sr.values || []).length; })));
   var dot = fs * 0.3, inset = b.kind === 'bar' ? 0 : dot;
+  // 시리즈가 둘 이상이면 값 숫자가 다른 선·막대와 겹쳐 안 보일 수 있어, 숫자에 흰 테두리 3px(글자 뒤에 그려짐)
+  var halo = series.length > 1 ? ' stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round" paint-order="stroke"' : '';
   var x = function(i) { return padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1)); };
   var y = function(v) { return padT + (H - padT - padB) * (1 - (v - min) / (max - min)); };
   var gw = (W - padL - padR) / Math.max(n, 1);
@@ -352,13 +354,13 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
       var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
       var top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
       out += '<path d="M' + bx + ',' + bot + ' V' + (top + rr) + ' Q' + bx + ',' + top + ' ' + (bx + rr) + ',' + top + ' H' + (bx + w - rr) + ' Q' + (bx + w) + ',' + top + ' ' + (bx + w) + ',' + (top + rr) + ' V' + bot + ' Z" fill="' + cols[si] + '"/>';
-      out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '">' + esc(v) + '</text>';
+      out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '"' + halo + '>' + esc(v) + '</text>';
     }); });
   } else {
     series.forEach(function(sr, si) {
       var pts = (sr.values || []).map(function(v, i) { return [x(i), y(v)]; });
       out += '<path d="' + smooth(pts) + '" fill="none" stroke="' + cols[si] + '" stroke-width="' + (fs * 0.18) + '" stroke-linejoin="round" stroke-linecap="round"/>';
-      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - fs * 0.85) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '">' + esc((sr.values || [])[i]) + '</text>'; });
+      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - fs * 0.85) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '"' + halo + '>' + esc((sr.values || [])[i]) + '</text>'; });
     });
   }
   return out + '</svg>';
