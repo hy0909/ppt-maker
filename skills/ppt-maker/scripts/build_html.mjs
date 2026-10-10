@@ -250,9 +250,10 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 /* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
-.chart .chh b{color:var(--text);font-weight:700;font-size:var(--fs-body);} .chart .chh span{color:var(--text-light);font-size:calc(var(--fs-small) - 2px);}   /* 단위: 2px 작게, 두 단계 연하게 */
+.chart .chh b{color:var(--body);font-weight:700;font-size:calc(var(--fs-body) * .94);}   /* 그래프 제목 = 카드 안 소제목(.sh2)과 같은 글자 */
+.chart .chh span{color:var(--text-light);font-size:calc(var(--fs-small) - 4px);}   /* 단위 = 캡션 톤, 작은 글보다 4px 작게 */
 .chart .cplot{flex:1;min-height:0;margin-top:.5em;display:flex;} .chart .cplot svg{width:100%;height:100%;display:block;}
-.chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--text);margin-top:.35em;} .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
+.chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--body);font-weight:500;margin-top:.35em;}   /* 범례 = 작은 라벨 톤 */ .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
 /* cover / toc / divider / closing */
 /* 표지 배경 — meta.coverBg 로 고른 이미지. 마무리 장표는 브랜드 그라디언트로 따로 간다 */
 .cover{position:absolute;inset:0;overflow:hidden;color:#fff;}
@@ -328,8 +329,8 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   var padL = 20, padR = 20, padT = fs * 2.2, padB = fs * 2.6;   // 좌우 여백 20px, 위는 값 라벨, 아래는 축 라벨 자리
   var n = Math.max.apply(null, [labels.length].concat(series.map(function(sr) { return (sr.values || []).length; })));
   var dot = fs * 0.3, inset = b.kind === 'bar' ? 0 : dot;
-  // 시리즈가 둘 이상이면 값 숫자가 다른 선·막대와 겹쳐 안 보일 수 있어, 숫자에 흰 테두리 3px(글자 뒤에 그려짐)
-  var halo = series.length > 1 ? ' stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round" paint-order="stroke"' : '';
+  // 시리즈가 둘 이상이면 값 숫자가 다른 선·막대와 겹쳐 안 보일 수 있어, 숫자에 흰 테두리 5px(글자 뒤에 그려짐)
+  var halo = series.length > 1 ? ' stroke="#FFFFFF" stroke-width="5" stroke-linejoin="round" paint-order="stroke"' : '';
   var x = function(i) { return padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1)); };
   var y = function(v) { return padT + (H - padT - padB) * (1 - (v - min) / (max - min)); };
   var gw = (W - padL - padR) / Math.max(n, 1);
@@ -347,26 +348,26 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   };
   var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
   for (var g = 0; g <= 4; g++) { var gy = (padT + (H - padT - padB) * g / 4).toFixed(1); out += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="' + C.border + '" stroke-opacity=".6" stroke-width="1"/>'; }
-  labels.forEach(function(l, i) { out += '<text x="' + lx(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + (fs * 0.9) + '" fill="' + C.textMid + '">' + esc(l) + '</text>'; });
+  labels.forEach(function(l, i) { out += '<text x="' + lx(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + (fs * 0.9) + '" font-weight="500" fill="' + C.body + '">' + esc(l) + '</text>'; });   // 축 라벨 = 작은 라벨(.stat .sl)
   if (b.kind === 'bar') {
     var bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5;
     series.forEach(function(sr, si) { (sr.values || []).forEach(function(v, i) {
       var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
       var top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
       out += '<path d="M' + bx + ',' + bot + ' V' + (top + rr) + ' Q' + bx + ',' + top + ' ' + (bx + rr) + ',' + top + ' H' + (bx + w - rr) + ' Q' + (bx + w) + ',' + top + ' ' + (bx + w) + ',' + (top + rr) + ' V' + bot + ' Z" fill="' + cols[si] + '"/>';
-      out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '"' + halo + '>' + esc(v) + '</text>';
+      out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc(v) + '</text>';
     }); });
   } else {
     series.forEach(function(sr, si) {
       var pts = (sr.values || []).map(function(v, i) { return [x(i), y(v)]; });
       out += '<path d="' + smooth(pts) + '" fill="none" stroke="' + cols[si] + '" stroke-width="' + (fs * 0.18) + '" stroke-linejoin="round" stroke-linecap="round"/>';
-      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - fs * 0.85) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" fill="' + C.text + '"' + halo + '>' + esc((sr.values || [])[i]) + '</text>'; });
+      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - fs * 0.85) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc((sr.values || [])[i]) + '</text>'; });
     });
   }
   return out + '</svg>';
 }`;
 const chartDraw = new Function('return (' + CHART_DRAW_SRC + ')')();
-const chartColors = () => ({ series: SERIES_COLORS(), border: P.border, textMid: P.textMid, text: P.text });
+const chartColors = () => ({ series: SERIES_COLORS(), border: P.border, textMid: P.textMid, body: P.body, text: P.text });
 function chartSvg(b, H = 416) { return chartDraw(b, 1200, H, chartColors()); }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
 /** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */

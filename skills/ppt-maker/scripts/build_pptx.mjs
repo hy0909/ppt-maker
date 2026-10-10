@@ -427,8 +427,8 @@ function chartPanel(slide, c, x, y, w, h, k) {
   // shadcn/ui Charts 모양: 회색 패널 없이 카드 위에 바로, 가로 격자선만, 축선 없음, 선은 부드럽게 + 선 색 점. (막대 위 모서리 둥글리기는 PowerPoint 차트에 없어 생략)
   const em = D.body * k, padX = em * 1.2, padY = em * 0.6;
   const hh = em * 1.5;
-  text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.body, k, bold: true, color: P.text, valign: 'middle' });
-  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small - 2, k, color: P.textLight, align: 'right', valign: 'middle' });   // 2px 작게, 두 단계 연하게
+  text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.body * 0.94, k, bold: true, color: P.body, valign: 'middle' });   // 그래프 제목 = 카드 안 소제목
+  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small - 4, k, color: P.textLight, align: 'right', valign: 'middle' });   // 단위 = 캡션 톤, 4px 작게
   const series = (c.series || []).slice(0, 4), labels = c.labels || [];
   const ch = h - padY - hh - em * 0.6;
   if (!series.length || ch < 30) return;
@@ -437,10 +437,10 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const max = Math.max(1, ...all);
   const common = {
     x: IN(x + padX * 0.4), y: IN(y + padY + hh), w: IN(w - padX * 0.8), h: IN(ch),
-    chartColors: SERIES().map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(10.5, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
-    catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(10.5, k), catAxisLabelColor: colorToHex(P.textMid), catAxisLineShow: false, catGridLine: { style: 'none' },
+    chartColors: SERIES().map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
+    catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(D.small * 0.9, k), catAxisLabelColor: colorToHex(P.body), catAxisLineShow: false, catGridLine: { style: 'none' },
     valAxisHidden: true, valGridLine: { color: colorToHex(P.border), style: 'solid', size: 0.75 }, valAxisMinVal: Math.min(0, ...all), valAxisMaxVal: Math.ceil(max * 1.3), valAxisLineShow: false, valAxisMajorUnit: Math.ceil(max * 1.3 / 4),
-    showLegend: series.length > 1, legendPos: 'b', legendFontFace: FONT, legendFontSize: PT(10, k), legendColor: colorToHex(P.textMid),
+    showLegend: series.length > 1, legendPos: 'b', legendFontFace: FONT, legendFontSize: PT(D.small, k), legendColor: colorToHex(P.body),
     plotArea: { fill: { color: colorToHex(P.white) } }, chartArea: { fill: { color: colorToHex(P.white) } },
   };
   if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
