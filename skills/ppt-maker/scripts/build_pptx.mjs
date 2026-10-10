@@ -295,7 +295,7 @@ const labeledCard = (slide, box, k, label, fill = P.white) =>
 /** "| 소제목" sub heading */
 function sh2(slide, str, x, y, w, k, color = P.body) {
   const h = D.body * k * 1.3;
-  text(slide, str, x, y, w, h, { size: D.body * 0.94, k, bold: true, color, valign: 'middle' });
+  text(slide, str, x, y, w, h, { size: D.small, k, bold: true, color, valign: 'middle' });
   return h;
 }
 /** bullet list ("ul.rl"): k bold + v (small, next line) or "row" (inline). Returns paragraphs + estimated height. */
@@ -385,7 +385,7 @@ function fragKv(rows, hl, k, w) {
       rect(slide, hx, y, hw, h, { fill: P.softerBlue, radius: 10 });
       const lh = D.small * k * 1.5, vh = D.stat * k * 0.62 * 1.15, top = y + (h - lh - vh) / 2;
       text(slide, hl.label || '', hx, top, hw, lh, { size: D.small, k, color: P.text, align: 'center', valign: 'middle' });
-      text(slide, hl.value || '', hx, top + lh, hw, vh, { size: D.stat * 0.62, k, color: P.text, bold: true, align: 'center', valign: 'middle' });
+      text(slide, hl.value || '', hx, top + lh, hw, vh, { size: D.cardTitle, k, color: P.text, bold: true, align: 'center', valign: 'middle' });
     }
   } };
 }
@@ -427,8 +427,8 @@ function chartPanel(slide, c, x, y, w, h, k) {
   // shadcn/ui Charts 모양: 회색 패널 없이 카드 위에 바로, 가로 격자선만, 축선 없음, 선은 부드럽게 + 선 색 점. (막대 위 모서리 둥글리기는 PowerPoint 차트에 없어 생략)
   const em = D.body * k, padX = em * 1.2, padY = em * 0.6;
   const hh = em * 1.5;
-  text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.body * 0.94, k, bold: true, color: P.body, valign: 'middle' });   // 그래프 제목 = 카드 안 소제목
-  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.small - 4, k, color: P.textLight, align: 'right', valign: 'middle' });   // 단위 = 캡션 글자(작은 글 −4px, --text-light)
+  text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.small, k, bold: true, color: P.body, valign: 'middle' });   // 그래프 제목 = 카드 안 소제목
+  if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.caption, k, color: P.textLight, align: 'right', valign: 'middle' });   // 단위 = 캡션
   const series = (c.series || []).slice(0, 4), labels = c.labels || [];
   const ch = h - padY - hh - em * 0.6;
   if (!series.length || ch < 30) return;
@@ -438,7 +438,7 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const common = {
     x: IN(x + padX * 0.4), y: IN(y + padY + hh), w: IN(w - padX * 0.8), h: IN(ch),
     chartColors: SERIES().map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
-    catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(D.small * 0.9, k), catAxisLabelColor: colorToHex(P.body), catAxisLineShow: false, catGridLine: { style: 'none' },
+    catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(D.label, k), catAxisLabelColor: colorToHex(P.body), catAxisLineShow: false, catGridLine: { style: 'none' },
     valAxisHidden: true, valGridLine: { color: colorToHex(P.border), style: 'solid', size: 0.75 }, valAxisMinVal: Math.min(0, ...all), valAxisMaxVal: Math.ceil(max * 1.3), valAxisLineShow: false, valAxisMajorUnit: Math.ceil(max * 1.3 / 4),
     showLegend: series.length > 1, legendPos: 'b', legendFontFace: FONT, legendFontSize: PT(D.small, k), legendColor: colorToHex(P.body),
     plotArea: { fill: { color: colorToHex(P.white) } }, chartArea: { fill: { color: colorToHex(P.white) } },
@@ -462,7 +462,7 @@ function fragImage(src, caption, k, w, ratio) {
       rect(slide, bx, by, bw, bh, { fill: P.bgSoft, line: { color: '#C3CAD5', width: 1.5 }, radius: 8, dash: 'dash' });
       const lab = String(caption || '이미지 자리').trim();
       text(slide, /^\[.*\]$/.test(lab) ? lab : `[ ${lab} ]`, bx, by, bw, bh, { size: D.small, k, color: '#6F7C92', align: 'center', valign: 'middle' });
-    } else if (capH) text(slide, caption, x, y + h - capH, w, capH, { size: D.small - 4, k, color: P.textLight, align: 'center', valign: 'middle' });   // 캡션 글자
+    } else if (capH) text(slide, caption, x, y + h - capH, w, capH, { size: D.caption, k, color: P.textLight, align: 'center', valign: 'middle' });   // 캡션
   } };
 }
 /** stack fragments inside a box: fixed ones keep their height, flex ones share the remaining space; leftover is distributed evenly (space-evenly). */
@@ -561,10 +561,10 @@ const B = {
     const toW = tasks.some(t => t.to) ? fs * 3.4 : 0;   // 오른쪽 끝 to 라벨 자리
     const nameW = inner.w * 0.24, gx = inner.x + nameW, gw = inner.w - nameW - toW, hdrH = fs * 2.1;
     rect(slide, inner.x - 8, inner.y, inner.w + 16, hdrH, { fill: P.primaryDeep, radius: 6 });   // 띠는 내용보다 좌우 8px 넓게
-    if (b.nameHeader) text(slide, String(b.nameHeader), inner.x, inner.y, nameW - em, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
+    if (b.nameHeader) text(slide, String(b.nameHeader), inner.x, inner.y, nameW - em, hdrH, { size: D.label, k, color: P.white, bold: true, valign: 'middle' });
     cols.forEach((c, i) => {
       if (i) rect(slide, gx + gw * i / n, inner.y + hdrH * 0.2, 1, hdrH * 0.6, { fill: mix(P.white, P.primaryDeep, 0.78) });
-      text(slide, String(c), gx + gw * i / n + em * 0.5, inner.y, gw / n - em * 0.5, hdrH, { size: D.small * 0.9, k, color: P.white, bold: true, valign: 'middle' });
+      text(slide, String(c), gx + gw * i / n + em * 0.5, inner.y, gw / n - em * 0.5, hdrH, { size: D.label, k, color: P.white, bold: true, valign: 'middle' });
     });
     const rowsY = inner.y + hdrH + 8, rowsH = Math.max(1, inner.h - hdrH - 8), rowH = rowsH / Math.max(1, tasks.length);   // 띠 아래 8px
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
@@ -576,10 +576,10 @@ const B = {
       const bx = gx + gw * (s - 1) / n, bw = Math.max(3, gw * (e - s + 1) / n), bh = Math.min(rowH * 0.55, fs * 1.45);
       const fromW = t.from ? estW(String(t.from), fs * 0.85) + em * 0.5 : 0;
       if (bx - fromW - gx > 2) rect(slide, gx, cy, bx - fromW - gx, 1, { fill: P.borderStrong });   // 안내선
-      if (t.from) text(slide, String(t.from), bx - fromW, y, fromW - em * 0.25, rowH, { size: D.small * 0.85, k, color: P.textMid, align: 'right', valign: 'middle' });
+      if (t.from) text(slide, String(t.from), bx - fromW, y, fromW - em * 0.25, rowH, { size: D.label, k, color: P.textMid, align: 'right', valign: 'middle' });
       rect(slide, bx, cy - bh / 2, bw, bh, { fill: tone(t), radius: 3 });
-      if (t.label) text(slide, String(t.label), bx, cy - bh / 2, bw, bh, { size: D.small * 0.85, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
-      if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.small * 0.85, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
+      if (t.label) text(slide, String(t.label), bx, cy - bh / 2, bw, bh, { size: D.label, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
+      if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.label, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
     });
   },
   org(slide, b, box, k) {
@@ -593,16 +593,16 @@ const B = {
     const hh = roleH + nameH + bodyH;
     rect(slide, hx, box.y, hw, hh, { fill: P.bgSoft, line: { color: P.primaryDeep, width: 1.1 }, radius: 10 });
     rect(slide, hx, box.y, hw, roleH, { fill: P.primaryDeep, radius: 10 }); rect(slide, hx, box.y + roleH / 2, hw, roleH / 2, { fill: P.primaryDeep });
-    text(slide, hd.role || 'CEO', hx, box.y, hw, roleH, { size: D.small * 1.15, k, bold: true, color: P.white, align: 'center', valign: 'middle' });
+    text(slide, hd.role || 'CEO', hx, box.y, hw, roleH, { size: D.body, k, bold: true, color: P.white, align: 'center', valign: 'middle' });
     rect(slide, hx + 1, box.y + roleH, hw - 2, nameH, { fill: P.white });
-    text(slide, hd.name || '', hx, box.y + roleH, hw, nameH, { size: D.small * 1.1, k, bold: true, align: 'center', valign: 'middle', letterSpacing: 3 });
+    text(slide, hd.name || '', hx, box.y + roleH, hw, nameH, { size: D.body, k, bold: true, align: 'center', valign: 'middle', letterSpacing: 3 });
     rect(slide, hx, box.y + roleH + nameH, hw, 1, { fill: P.border });
     const by = box.y + roleH + nameH, pw = fs * 5.2, ph = pw * 4 / 3, padX = fs * 0.9;
     rect(slide, hx + padX, by + fs * 0.7, pw, ph, { fill: P.border, radius: 4 });   // 사진 빈 칸
     const tx = hx + padX + pw + em, tw = hw - padX - pw - em - fs;
     let ty = by + fs * 0.8;
     if (hd.title) { text(slide, hd.title, tx, ty, tw, fs * 1.6, { size: D.small, k, bold: true, color: P.primary, valign: 'middle' }); ty += fs * 1.6; }
-    items.forEach((t, i) => text(slide, '• ' + t, tx + (i % 2) * (tw / 2 + fs * 0.5), ty + Math.floor(i / 2) * fs * 1.3, tw / 2 - fs * 0.5, fs * 1.3, { size: D.small * 0.92, k, color: P.textMid, valign: 'middle' }));
+    items.forEach((t, i) => text(slide, '• ' + t, tx + (i % 2) * (tw / 2 + fs * 0.5), ty + Math.floor(i / 2) * fs * 1.3, tw / 2 - fs * 0.5, fs * 1.3, { size: D.label, k, color: P.textMid, valign: 'middle' }));
     // 연결선
     const ly = box.y + hh, lh = 28;
     rect(slide, box.x + box.w / 2, ly, 1, lh / 2, { fill: P.borderStrong });
@@ -618,13 +618,13 @@ const B = {
       rect(slide, x, ty0, cw, th, { fill: P.white, line: { color: P.softerBlue, width: 1 }, radius: 10 });
       rect(slide, x, ty0, cw, tnH, { fill: P.softerBlue, radius: 10 }); rect(slide, x, ty0 + tnH / 2, cw, tnH / 2, { fill: P.softerBlue });
       rect(slide, x, ty0 + tnH - 1, cw, 1, { fill: P.border });
-      text(slide, `${t.name || ''}${t.count ? ` (${t.count})` : ''}`, x, ty0, cw, tnH, { size: D.small * 1.05, k, bold: true, color: P.primary, align: 'center', valign: 'middle' });
+      text(slide, `${t.name || ''}${t.count ? ` (${t.count})` : ''}`, x, ty0, cw, tnH, { size: D.small, k, bold: true, color: P.primary, align: 'center', valign: 'middle' });
       const leader = t.leader || '', badge = t.leaderRole || '';
-      const lw = estW(leader, fs * 1.1) + fs * 1.1 * 0.15 * Math.max(0, leader.length - 1), bw = badge ? estW(badge, fs * 0.72) + fs * 1.4 : 0, tot = lw + (badge ? fs * 0.5 + bw : 0);
+      const lw = estW(leader, fs * 1.1) + fs * 1.1 * 0.15 * Math.max(0, leader.length - 1), bw = badge ? estW(badge, fs * (D.caption / D.small)) + fs * 1.4 : 0, tot = lw + (badge ? fs * 0.5 + bw : 0);
       const lx = x + (cw - tot) / 2, lyy = ty0 + tnH + fs * 0.9, lH = fs * 1.6;
-      text(slide, leader, lx, lyy, lw, lH, { size: D.small * 1.1, k, bold: true, valign: 'middle', letterSpacing: 2 });
-      if (badge) { rect(slide, lx + lw + fs * 0.5, lyy + lH / 2 - fs * 0.55, bw, fs * 1.1, { fill: P.bgSoft, radius: fs * 0.55 }); text(slide, badge, lx + lw + fs * 0.5, lyy + lH / 2 - fs * 0.55, bw, fs * 1.1, { size: D.small * 0.72, k, color: P.textMid, align: 'center', valign: 'middle' }); }
-      if (t.desc) text(slide, t.desc, x + fs * 0.8, lyy + lH + fs * 0.5, cw - fs * 1.6, Math.max(fs * 1.2, descH(t)), { size: D.small * 0.88, k, color: P.textMid, align: 'center', lineSpacing: 1.35 });
+      text(slide, leader, lx, lyy, lw, lH, { size: D.body, k, bold: true, valign: 'middle', letterSpacing: 2 });
+      if (badge) { rect(slide, lx + lw + fs * 0.5, lyy + lH / 2 - fs * 0.55, bw, fs * 1.1, { fill: P.bgSoft, radius: fs * 0.55 }); text(slide, badge, lx + lw + fs * 0.5, lyy + lH / 2 - fs * 0.55, bw, fs * 1.1, { size: D.caption, k, color: P.textMid, align: 'center', valign: 'middle' }); }
+      if (t.desc) text(slide, t.desc, x + fs * 0.8, lyy + lH + fs * 0.5, cw - fs * 1.6, Math.max(fs * 1.2, descH(t)), { size: D.label, k, color: P.textMid, align: 'center', lineSpacing: 1.35 });
     });
   },
   history(slide, b, box, k) {
@@ -657,7 +657,7 @@ const B = {
     groups.forEach((g, i) => {
       const x = inner.x + i * (cw + colGap);
       slide_dot(slide, x + fs * 0.3, inner.y + hdrH / 2 - d0 / 2, d0, P.white);
-      text(slide, g.period || '', x + fs * 0.3 + d0 + fs * 0.6, inner.y, cw - d0 - fs, hdrH, { size: D.small * 0.95, k, bold: true, color: P.white, valign: 'middle' });
+      text(slide, g.period || '', x + fs * 0.3 + d0 + fs * 0.6, inner.y, cw - d0 - fs, hdrH, { size: D.label, k, bold: true, color: P.white, valign: 'middle' });
     });
     const top = inner.y + hdrH + 12, yH = fs * 1.3, d = fs * 0.65;
     groups.forEach((g, i) => {
@@ -671,7 +671,7 @@ const B = {
         slide_dot(slide, lineX - d / 2 + 0.5, y + yH / 2 - d / 2, d, P.primary);
         text(slide, (it.year || '') + (it.month ? '  ' + it.month : ''), tx, y, tw, yH, { size: D.small, k, bold: true, valign: 'middle' });
         const th = tH(it.text || '');
-        text(slide, it.text || '', tx, y + yH, tw, th, { size: D.small * 0.95, k, color: P.textMid, lineSpacing: 1.35 });
+        text(slide, it.text || '', tx, y + yH, tw, th, { size: D.label, k, color: P.textMid, lineSpacing: 1.35 });
         y += yH + th + 12;
       });
     });
@@ -728,7 +728,7 @@ const B = {
           const [bg, fg] = /^(달성|완료|충족)$/.test(t) ? [P.softerBlue, P.primary] : /^(조기달성|초과달성|초과)$/.test(t) ? ['#DDEEFF', P.primary2] : /^(진행중|진행 중|예정|계획)$/.test(t) ? ['#FFF6E1', P.warning] : [P.bgSoft, P.textMid];
           const bw = estW(t, fs * 0.8) + fs * 2.2, bh = fs * 1.6;
           rect(slide, x + padX, y + h / 2 - bh / 2, bw, bh, { fill: bg, radius: bh / 2 });
-          text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.table * 0.8, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
+          text(slide, '● ' + t, x + padX, y + h / 2 - bh / 2, bw, bh, { size: D.body, k: kk, bold: true, color: fg, align: 'center', valign: 'middle' });
         } else {
           text(slide, isEm ? c : clean(c), x + padX, y, colW[i] - padX * 2, h, { size: D.table, k: kk, bold: (rh && i === 0) || tot, color: isEm ? P.primary : rh && i === 0 ? P.textMid : P.text, align: numCol[i] ? 'right' : 'left', valign: 'middle', lineSpacing: 1.3 });
         }
@@ -789,7 +789,7 @@ const B = {
   callout(slide, b, box, k) {
     // 둥근 박스 하나. 왼쪽에 라벨, 오른쪽에 본문 — 라벨은 본문 첫 줄과 같은 높이에서 시작한다(가운데 정렬 아님).
     // 위계: 기본(연한 메인 컬러 바탕 + 테두리) · light(흰 카드) · warn(빨강 바탕·흰 글자) · strong(검정 바탕·흰 라벨·연회색 본문)
-    const tone = b.tone, em = D.small * k, fs = D.small * 1.05 * k;
+    const tone = b.tone, em = D.small * k, fs = D.small * k;
     const label = b.label || '핵심 요약';
     const h = box.h;
     const tones = {
@@ -802,7 +802,7 @@ const B = {
     else rect(slide, box.x, box.y, box.w, h, { fill: T.bg, line: { color: T.line, width: 1.1 }, radius: 14 });
     const padX = em * 1.6, padY = em * 0.75, gap = em * 1.6;
     const lw = Math.max(estW(label, fs), fs * 3.2);
-    text(slide, label, box.x + padX, box.y + padY, lw, h - padY * 2, { size: D.small * 1.05, k, color: T.label, bold: true, align: 'left', valign: 'top', lineSpacing: 1.3 });
+    text(slide, label, box.x + padX, box.y + padY, lw, h - padY * 2, { size: D.small, k, color: T.label, bold: true, align: 'left', valign: 'top', lineSpacing: 1.3 });
     const tx = box.x + padX + lw + gap, tw = Math.max(1, box.x + box.w - padX - tx);
     if (b.items && b.items.length) listBox(slide, b.items, tx, box.y + padY, tw, h - padY * 2, k, { dark: false, valign: 'top', availH: h - padY * 2, tight: true, size: D.small, plainColor: T.text });
     else if (b.text) text(slide, b.text, tx, box.y + padY, tw, h - padY * 2, { size: D.small, k, color: T.text, valign: 'top', lineSpacing: 1.3 });
@@ -810,7 +810,7 @@ const B = {
 };
 /** 배너 높이(레이아웃 단계용). callout() 과 같은 여백·글자 크기로 계산한다. */
 function calloutBoxH(b, k, W) {
-  const em = D.small * k, fs = D.small * 1.05 * k, label = b.label || '핵심 요약';
+  const em = D.small * k, fs = D.small * k, label = b.label || '핵심 요약';
   const padY = em * 0.75, gap = em * 1.6;
   const tw = W - em * 3.2 - Math.max(estW(label, fs), fs * 3.2) - gap;
   const th = b.items && b.items.length ? listParas(b.items, k, tw, { tight: true, size: D.small }).h : lines(b.text || '', D.small * k, tw) * D.small * k * 1.3;

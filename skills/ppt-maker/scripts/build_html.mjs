@@ -54,7 +54,7 @@ deck-stage:not(:defined){visibility:hidden;}
   --fs-body:calc(${D.body}px * var(--k));--fs-small:calc(${D.small}px * var(--k));
   --fs-card:calc(${D.cardTitle}px * var(--k));--fs-stat:calc(${D.stat}px * var(--k));
   --fs-table:calc(${D.table}px * var(--k));--fs-tableh:calc(${D.tableH}px * var(--k));
-  --fs-caption:calc(var(--fs-small) - 4px);   /* 캡션·단위: 작은 글보다 4px 작게, 색은 --text-light (2026-10-11 고정) */
+  --fs-label:calc(${D.label}px * var(--k));--fs-caption:calc(${D.caption}px * var(--k));   /* 라벨 14 · 캡션 12 (2026-10-11 글자 크기 7단계로 묶음) */
   --gap:calc(${D.gap}px * var(--k));
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -92,7 +92,7 @@ body{font-family:var(--font);-webkit-font-smoothing:antialiased;color:var(--text
 .card.dark .cd{color:rgba(255,255,255,.85);}
 .card .fill{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;}   /* 위에서부터 채움, 덩어리 사이 12px */
 /* sub heading inside card: "| 채널 전체" */
-.sh2{font-size:calc(var(--fs-body) * .94);font-weight:700;color:var(--body);line-height:1.3;margin-bottom:.5em;}
+.sh2{font-size:var(--fs-small);font-weight:700;color:var(--body);line-height:1.3;margin-bottom:.5em;}
 /* list */
 ul.rl{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:var(--rl-gap,.5em);}
 ul.rl li{position:relative;padding-left:1.05em;color:var(--text);font-size:var(--fs-body);line-height:1.25;}
@@ -132,19 +132,19 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .rt.kvt td{padding:.55em .3em;}
 .rt.kvt td:first-child{color:var(--text-mid);font-weight:500;}
 .rt.kvt td:last-child{text-align:right;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
-.badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:.8em;font-weight:600;white-space:nowrap;}
+.badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;font-size:calc(var(--fs-body) * var(--kt, 1));font-weight:600;white-space:nowrap;}
 .badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor;}
 .badge.ok{background:var(--primary-softer);color:var(--primary);} .badge.up{background:#DDEEFF;color:var(--primary-2);} .badge.wip{background:#FFF6E1;color:var(--warning);}   /* .prog 는 표지 진행 줄이 쓰는 이름이라 겹치지 않게 wip */ .badge.n{background:var(--bg-soft);color:var(--text-mid);}
 /* highlight box (used by kv/stat pairs) */
 .hbox{background:var(--primary-softer);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.8em 1em;text-align:center;}
-.hbox .hl{font-size:var(--fs-small);color:var(--text);} .hbox .hv{font-size:calc(var(--fs-stat) * .62);font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
+.hbox .hl{font-size:var(--fs-small);color:var(--text);} .hbox .hv{font-size:var(--fs-card);font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1;}
 /* banner (callout): 연하늘 바탕 + 연하늘 테두리 둥근 박스 — 왼쪽에 라벨(포인트 컬러), 오른쪽에 본문. 모두 박스 안에 들어간다 */
 /* 출처·각주: 본문 아래 비워 둔 자리에 깐다. 줄이 늘면 본문이 그만큼 위로 올라간다. */
 .foot{position:absolute;left:var(--pad);right:var(--pad);bottom:${SLIDE_FOOT.bottom}px;z-index:3;
   font-size:${px(SLIDE_FOOT.size)}px;line-height:${px(SLIDE_FOOT.line)}px;letter-spacing:${SLIDE_FOOT.spc}pt;color:var(--text-light);}
 .foot>div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .banner{background:var(--banner);border:1.5px solid var(--banner-border);color:var(--text);padding:.75em 1.6em;border-radius:${SHAPE.banner}px;display:flex;align-items:baseline;gap:1.6em;flex-shrink:0;font-size:var(--fs-small);}
-.banner .lead{color:var(--banner-label);font-size:calc(var(--fs-small) * 1.05);font-weight:700;white-space:nowrap;line-height:1.3;flex:0 0 auto;text-align:center;}
+.banner .lead{color:var(--banner-label);font-size:var(--fs-small);font-weight:700;white-space:nowrap;line-height:1.3;flex:0 0 auto;text-align:center;}
 .banner .msg{font-size:var(--fs-small);font-weight:500;line-height:1.3;flex:1;min-width:0;}
 .banner .msg ul.rl li{color:var(--banner-text);font-size:var(--fs-small);} .banner .msg ul.rl li::before{color:var(--banner-text);} .banner .msg b{color:var(--primary);font-weight:800;} .banner .msg ul.rl li .v{color:var(--text-mid);}
 .banner.light{background:#fff;border-color:transparent;color:var(--text);box-shadow:var(--card-shadow);} .banner.light .lead{color:var(--primary);} .banner.light .msg ul.rl li{color:var(--body);} .banner.light .msg ul.rl li::before{color:var(--body);} .banner.light .msg b{color:var(--primary);}
@@ -199,59 +199,59 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 /* org(조직도·인력 배치, 2026-10-09) — 위 대표 카드(진한 머리띠 "CEO" · 이름 줄 · 사진 빈 칸 + 이력 두 열) → 연결선 → 팀 카드 2~5개(연한 머리띠 "팀 (인원)" · 팀장 이름 + 역할 배지 · 이력 한 줄) */
 .org{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);align-items:center;}
 .org .ohead{width:46%;background:#fff;border:1.5px solid var(--primary-deep);border-radius:10px;overflow:hidden;box-shadow:var(--card-shadow);flex:0 0 auto;}
-.org .ohead .orole{background:var(--primary-deep);color:#fff;text-align:center;font-weight:700;font-size:1.15em;padding:.4em;}
-.org .ohead .oname{text-align:center;font-weight:600;font-size:1.1em;padding:.35em;border-bottom:1px solid var(--border);letter-spacing:.2em;}
+.org .ohead .orole{background:var(--primary-deep);color:#fff;text-align:center;font-weight:700;font-size:var(--fs-body);padding:.4em;}
+.org .ohead .oname{text-align:center;font-weight:600;font-size:var(--fs-body);padding:.35em;border-bottom:1px solid var(--border);letter-spacing:.2em;}
 .org .ohead .obody{display:grid;grid-template-columns:5.2em 1fr;gap:1em;padding:.7em 1em .8em .9em;background:var(--bg-soft);}
 .org .ohead .ophoto{aspect-ratio:3/4;background:var(--border);border-radius:4px;}
 .org .ohead .otitle{color:var(--primary);font-weight:600;margin-bottom:.3em;}
-.org .ohead .oitems{display:grid;grid-template-columns:1fr 1fr;column-gap:1em;row-gap:.15em;color:var(--text-mid);font-size:.92em;line-height:1.4;}
+.org .ohead .oitems{display:grid;grid-template-columns:1fr 1fr;column-gap:1em;row-gap:.15em;color:var(--text-mid);font-size:var(--fs-label);line-height:1.4;}
 .org .ohead .oitems div::before{content:'• ';}
 .org .olines{position:relative;width:100%;height:28px;flex:0 0 auto;}
 .org .olines i{position:absolute;background:var(--border-strong);}
 .org .oteams{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:1.2em;width:100%;flex:0 0 auto;align-items:start;}   /* 팀 카드는 내용 높이만큼 */
 .org .oteam{background:#fff;border:1px solid var(--pill-glow-border,var(--primary-softer));border-radius:10px;overflow:hidden;box-shadow:var(--card-shadow);display:flex;flex-direction:column;}
-.org .oteam .tname{background:var(--primary-softer);color:var(--primary);text-align:center;font-weight:600;font-size:1.05em;padding:.5em .6em;border-bottom:1px solid var(--border);}
+.org .oteam .tname{background:var(--primary-softer);color:var(--primary);text-align:center;font-weight:600;font-size:var(--fs-small);padding:.5em .6em;border-bottom:1px solid var(--border);}
 .org .oteam .tbody{padding:.9em .8em;text-align:center;}
-.org .oteam .tlead{font-weight:600;font-size:1.1em;letter-spacing:.15em;}
-.org .oteam .tbadge{display:inline-block;margin-left:.5em;background:var(--bg-soft);color:var(--text-mid);border-radius:1em;padding:.1em .7em;font-size:.72em;font-weight:500;letter-spacing:0;vertical-align:middle;}
-.org .oteam .tdesc{color:var(--text-mid);font-size:.88em;margin-top:.5em;line-height:1.35;}
+.org .oteam .tlead{font-weight:600;font-size:var(--fs-body);letter-spacing:.15em;}
+.org .oteam .tbadge{display:inline-block;margin-left:.5em;background:var(--bg-soft);color:var(--text-mid);border-radius:1em;padding:.1em .7em;font-size:var(--fs-caption);font-weight:500;letter-spacing:0;vertical-align:middle;}
+.org .oteam .tdesc{color:var(--text-mid);font-size:var(--fs-label);margin-top:.5em;line-height:1.35;}
 /* history(연혁, 2026-10-09) — layout columns(기본): 간트와 같은 진한 머리띠(기간 + 흰 원), 열마다 세로 점선 + 점 + 연도·내용
    layout list: 왼쪽 기간(포인트 컬러), 오른쪽 연·월·내용 줄. 글이 많은 제출용 */
 .hist{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);}
 .hist .hh{display:grid;grid-template-columns:repeat(var(--n),1fr);background:var(--primary-deep);color:#fff;border-radius:6px;margin:0 -8px 12px;padding:0 8px;flex:0 0 auto;}
-.hist .hh span{display:flex;align-items:center;gap:.6em;padding:.5em .6em .5em 0;font-weight:700;font-size:.95em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist .hh span{display:flex;align-items:center;gap:.6em;padding:.5em .6em .5em 0;font-weight:700;font-size:var(--fs-label);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hist .hh span::before{content:'';width:.7em;height:.7em;border-radius:50%;background:#fff;flex:0 0 auto;box-shadow:0 0 0 .22em var(--primary-deep),0 0 0 .32em rgba(255,255,255,.55);margin-left:.32em;}
 .hist .hcols{display:grid;grid-template-columns:repeat(var(--n),1fr);column-gap:1.2em;flex:1;min-height:0;}
 .hist .hcol{position:relative;padding-left:1.3em;}
 .hist .hcol::before{content:'';position:absolute;left:.3em;top:.6em;bottom:.6em;border-left:1px dashed var(--border-strong);}
 .hist .hi{position:relative;margin-bottom:12px;}
 .hist .hi::before{content:'';position:absolute;left:-1.3em;top:.4em;width:.65em;height:.65em;border-radius:50%;background:var(--primary);}
-.hist .hy{font-weight:700;color:var(--text);line-height:1.3;} .hist .hy small{font-weight:500;color:var(--text-mid);font-size:.9em;margin-left:.3em;}
-.hist .ht{color:var(--text-mid);line-height:1.35;font-size:.95em;}
+.hist .hy{font-weight:700;color:var(--text);line-height:1.3;} .hist .hy small{font-weight:500;color:var(--text-mid);font-size:var(--fs-label);margin-left:.3em;}
+.hist .ht{color:var(--text-mid);line-height:1.35;font-size:var(--fs-label);}
 .hist.list{gap:14px;}
 .hist.list .hg{display:grid;grid-template-columns:7.5em 1fr;column-gap:1.4em;}
 .hist.list .hp{font-weight:700;color:var(--primary);line-height:1.55;}
 .hist.list .hrow{display:grid;grid-template-columns:3.2em max-content 1fr;column-gap:.6em;line-height:1.55;}   /* 월 칸은 글자 너비만큼 — 내용이 바로 옆에서 시작 */
-.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);} .hist.list .hrow .ht{color:var(--text);font-size:1em;margin-left:-4px;}   /* 월과 내용 사이: 칸 간격 .6em 에서 4px 뺌 */
+.hist.list .hrow .hy{font-weight:600;} .hist.list .hrow .hm{color:var(--text-mid);font-size:var(--fs-label);} .hist.list .hrow .ht{color:var(--text);font-size:var(--fs-small);margin-left:-4px;}   /* 월과 내용 사이: 칸 간격 .6em 에서 4px 뺌 */
 /* gantt(2026-10-09, 레퍼런스 "시간표" 모양) — 위에 진한 머리띠(열 라벨 흰 글자) · 왼쪽 항목 이름 · 이름 끝에서 막대까지 가는 안내선 ·
    막대는 두껍게, 라벨은 막대 안 흰 글자 · 막대 앞뒤에 시작·끝 표시(from·to). 세로 격자선·가로 구분선 없음 */
 .gantt{display:flex;flex-direction:column;flex:1;min-height:0;font-size:var(--fs-small);--gl:24%;}
 .gantt .gh,.gantt .gr{display:grid;grid-template-columns:var(--gl) 1fr;min-height:0;}
 .gantt .gh{flex:0 0 auto;background:var(--primary-deep);color:#fff;border-radius:6px;overflow:hidden;margin:0 -8px 8px;padding:0 8px;}   /* 띠는 내용보다 좌우 8px 넓게, 글자는 내용 끝선에 맞춤, 아래 행과 8px */ .gantt .gr{flex:1;}
-.gantt .gh .gnh{display:flex;align-items:center;padding:.45em .8em .45em 0;font-weight:700;font-size:.9em;}
-.gantt .gcols{display:grid;grid-template-columns:repeat(var(--n),1fr);text-align:left;color:#fff;font-weight:600;font-size:.9em;margin-right:var(--gto,3.4em);}
+.gantt .gh .gnh{display:flex;align-items:center;padding:.45em .8em .45em 0;font-weight:700;font-size:var(--fs-label);}
+.gantt .gcols{display:grid;grid-template-columns:repeat(var(--n),1fr);text-align:left;color:#fff;font-weight:600;font-size:var(--fs-label);margin-right:var(--gto,3.4em);}
 .gantt .gcols span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.45em .5em;border-left:1px solid rgba(255,255,255,.22);}
 .gantt .gname{display:flex;align-items:center;padding-right:.8em;color:var(--text);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .gantt .gtrack{position:relative;min-height:1.9em;margin-right:var(--gto,3.4em);}   /* 오른쪽은 to 라벨 자리 */
 .gantt .glead{position:absolute;left:0;top:50%;height:1px;background:var(--border-strong);}   /* 이름 끝 → 막대 시작 안내선 */
-.gantt .gbar{position:absolute;top:50%;height:1.45em;font-style:normal;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:.85em;white-space:nowrap;overflow:hidden;padding:0 .4em;}
+.gantt .gbar{position:absolute;top:50%;height:1.45em;font-style:normal;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:var(--fs-label);white-space:nowrap;overflow:hidden;padding:0 .4em;}
 .gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--pill-glow);} .gantt .gbar.muted{background:var(--text-mid);}
-.gantt .gfrom,.gantt .gto{position:absolute;top:50%;transform:translateY(-50%);font-size:.85em;color:var(--text-mid);white-space:nowrap;}
+.gantt .gfrom,.gantt .gto{position:absolute;top:50%;transform:translateY(-50%);font-size:var(--fs-label);color:var(--text-mid);white-space:nowrap;}
 .gantt .gfrom{transform:translate(-100%,-50%);padding-right:.5em;} .gantt .gto{padding-left:.5em;} .gantt .gto.end{left:auto!important;right:calc(-1 * var(--gto,3.4em));text-align:right;padding-left:0;}
 /* chart — shadcn/ui Charts: 회색 패널 없이 카드 위에 바로. 제목 왼쪽·단위 오른쪽, 범례는 아래 가운데(작은 둥근 네모) */
 .chart{background:transparent;border-radius:0;padding:.2em 0 0;display:flex;flex-direction:column;flex:1;min-height:0;}
 .chart .chh{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--fs-small);}
-.chart .chh b{color:var(--body);font-weight:700;font-size:calc(var(--fs-body) * .94);}   /* 그래프 제목 = 카드 안 소제목(.sh2)과 같은 글자 */
+.chart .chh b{color:var(--body);font-weight:700;font-size:var(--fs-small);}   /* 그래프 제목 = 카드 안 소제목(.sh2)과 같은 글자 */
 .chart .chh span{color:var(--text-light);font-size:var(--fs-caption);}   /* 단위 = 캡션 글자 */
 .chart .cplot{flex:1;min-height:0;margin-top:.5em;display:flex;} .chart .cplot svg{width:100%;height:100%;display:block;}
 .chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--body);font-weight:500;margin-top:.35em;}   /* 범례 = 작은 라벨 톤 */ .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
@@ -349,7 +349,8 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   };
   var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
   for (var g = 0; g <= 4; g++) { var gy = (padT + (H - padT - padB) * g / 4).toFixed(1); out += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="' + C.border + '" stroke-opacity=".6" stroke-width="1"/>'; }
-  labels.forEach(function(l, i) { out += '<text x="' + lx(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + (fs * 0.9) + '" font-weight="500" fill="' + C.body + '">' + esc(l) + '</text>'; });   // 축 라벨 = 작은 라벨(.stat .sl)
+  var fl = fs * (C.labelRatio || 0.875);   // 축 라벨 = 라벨 토큰(14/16)
+  labels.forEach(function(l, i) { out += '<text x="' + lx(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + fl + '" font-weight="500" fill="' + C.body + '">' + esc(l) + '</text>'; });   // 축 라벨 = 작은 라벨(.stat .sl)
   if (b.kind === 'bar') {
     var bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5;
     series.forEach(function(sr, si) { (sr.values || []).forEach(function(v, i) {
@@ -368,7 +369,7 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   return out + '</svg>';
 }`;
 const chartDraw = new Function('return (' + CHART_DRAW_SRC + ')')();
-const chartColors = () => ({ series: SERIES_COLORS(), border: P.border, textMid: P.textMid, body: P.body, text: P.text });
+const chartColors = () => ({ series: SERIES_COLORS(), border: P.border, textMid: P.textMid, body: P.body, text: P.text, labelRatio: D.label / D.small });
 function chartSvg(b, H = 416) { return chartDraw(b, 1200, H, chartColors()); }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
 /** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */

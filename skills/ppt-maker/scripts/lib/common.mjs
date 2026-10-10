@@ -119,11 +119,11 @@ const DEFAULT_TOKENS = {
   color:   { primary: C_MAIN, secondary: C_SECOND },
   type:    { h0: { size: 48, line: 58.6, spc: -1 }, h1: { size: 40, line: 48, spc: -1 },
              h2: { size: 22, line: 31.8, spc: -0.2 }, body2: { size: 18, line: 26.6, spc: -0.8 } },
-  head:    { eyebrow: 17, pgno: 13, stitle: 46, lead: 24, ruleColor: '#CFD4DC' },
+  head:    { eyebrow: 16, pgno: 14, stitle: 46, lead: 24, ruleColor: '#CFD4DC' },
   frame:   { pad: 40, safeBottom: 44, bodyTop: 220 },
   shape:   { card: 19, banner: 14, label: 8, pill: 12, shadowY: 2, shadowBlur: 12, shadowOpacity: 7 },
-  density: { dense: { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, gap: 12 },
-             airy:  { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, gap: 12 } },
+  density: { dense: { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, label: 14, caption: 12, gap: 12 },
+             airy:  { body: 18, small: 16, cardTitle: 24, stat: 34, table: 22, tableH: 22, label: 14, caption: 12, gap: 12 } },
 };
 /** 읽어 온 값을 기본값 위에 덮는다. 빠진 칸은 기본값이 남는다. */
 const overlay = (base, over) => {
@@ -403,7 +403,7 @@ export function coverBgFile(design) {
 }
 /** 본문 장표 맨 아래 출처·각주 줄. 근거 표기를 요구하는 문서가 있어 자리를 잡아 뒀다.
  *  safe 는 출처가 없을 때 본문 아래로 비워 두는 여백(px). 출처가 길어지면 그만큼 본문을 위로 올린다. */
-export const SLIDE_FOOT = { size: 11, line: 15.4, spc: -0.2, bottom: 13, safe: 44 };
+export const SLIDE_FOOT = { size: 10.5, line: 15.4, spc: -0.2, bottom: 13, safe: 44 };   // 10.5pt = 14px = 라벨 토큰
 
 /** 장표의 출처·각주를 줄 배열로 만든다. 문자열도 배열도 받는다.
  *  각주는 한 줄에 하나씩, 출처는 여럿이어도 ' · ' 로 묶어 한 줄로 적는다.

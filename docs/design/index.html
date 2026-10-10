@@ -276,7 +276,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 .d-label{display:inline-flex;align-items:center;height:2.1em;padding:0 1.05em;background:var(--p);color:#fff;
   font-size:calc(var(--fs-card)*var(--k));font-weight:700;border-radius:var(--r-label);line-height:1}
 .d-badge{display:inline-flex;align-items:center;gap:.35em;height:1.9em;padding:0 .8em;border-radius:1em;
-  font-size:calc(var(--fs-table)*var(--k)*.8);font-weight:600;white-space:nowrap}
+  font-size:calc(var(--fs-body)*var(--k));font-weight:600;white-space:nowrap}
 .d-badge::before{content:'';width:.4em;height:.4em;border-radius:50%;background:currentColor}
 .b-ok{background:var(--p-softer);color:var(--p)}.b-up{background:#DDEEFF;color:var(--p2)}
 .b-prog{background:#FFF6E1;color:#C97A1F}.b-n{background:#F5F7FA;color:#4A5568}
@@ -562,14 +562,14 @@ function derive(primary,secondary){
 
 /* ── state ── */
 var DENSITY={
-  dense:{body:18,small:16,cardTitle:24,stat:34,table:22,tableH:22,gap:12},
-  airy: {body:18,small:16,cardTitle:24,stat:34,table:22,tableH:22,gap:12}
+  dense:{body:18,small:16,cardTitle:24,stat:34,table:22,tableH:22,label:14,caption:12,gap:12},
+  airy: {body:18,small:16,cardTitle:24,stat:34,table:22,tableH:22,label:14,caption:12,gap:12}
 };
 var DEFAULTS={
   density:'dense', k:1,
   primary:'#2B0CDD', secondary:'#5D48FF',
   h0:48,h0l:58.6,h0s:-1, h1:40,h1l:48,h1s:-1, h2:22,h2l:31.8,h2s:-0.2, b2:18,b2l:26.6,b2s:-0.8,
-  eyebrow:17, stitle:46, lead:24, pgno:13,
+  eyebrow:16, stitle:46, lead:24, pgno:14,
   pad:40, safeBottom:44, bodyTop:220,
   rCard:19, rBanner:14, rLabel:8, rPill:12,
   shY:2, shBlur:12, shOp:7,
@@ -610,7 +610,7 @@ function apply(){
   set('--r-pill',S.rPill+'px');
   set('--card-shadow','0 '+S.shY+'px '+S.shBlur+'px rgba(20,40,80,'+(S.shOp/100).toFixed(3)+')');
   set('--fs-body',d.body+'px'); set('--fs-small',d.small+'px'); set('--fs-card',d.cardTitle+'px');
-  set('--fs-stat',d.stat+'px'); set('--fs-table',d.table+'px'); set('--fs-tableh',d.tableH+'px');
+  set('--fs-stat',d.stat+'px'); set('--fs-table',d.table+'px'); set('--fs-tableh',d.tableH+'px'); set('--fs-label',(d.label||14)+'px'); set('--fs-caption',(d.caption||12)+'px');
   set('--gap',d.gap+'px'); set('--k',S.k);
   $('#reset').disabled=!isDirty();
   paintSwatches(); paintDirty();
@@ -848,6 +848,12 @@ function buildBodyType(){
     {tok:'DENSITY.tableH', name:'표 헤더', sub:'연회색 바탕 · 회색 글자 · 강조 열만 메인 컬러',
       fields:[f('tableH',{step:0.5,min:6,max:32})],
       preview:pvBox(function(d){d.innerHTML='<table class="d-tbl"><tr><th>지표</th><th class="em">결과</th></tr></table>'})},
+    {tok:'DENSITY.label', name:'라벨', sub:'축 라벨 · 간트·연혁 머리띠 · 월 · 조직도 이력 · 장 번호 · 출처',
+      fields:[f('label',{step:0.5,min:6,max:32})],
+      preview:pvBox(function(d){d.innerHTML='<div style="font-size:calc(var(--fs-label)*var(--k));color:#515B75;font-weight:500">5월 · 6월 · 7월</div>'})},
+    {tok:'DENSITY.caption', name:'캡션', sub:'그림 캡션 · 그래프 단위 · 역할 배지 · --text-light',
+      fields:[f('caption',{step:0.5,min:6,max:32})],
+      preview:pvBox(function(d){d.innerHTML='<div style="font-size:calc(var(--fs-caption)*var(--k));color:#8B95A7">단위 : 만 회</div>'})},
     {tok:'DENSITY.gap', name:'칸 사이', sub:'카드 사이는 이 값 × 1.6',
       fields:[f('gap',{min:0,max:60,alt:function(v){return '· 카드 '+(v*1.6*S.k).toFixed(0)}})],
       preview:pvBox(function(d){d.innerHTML='<div style="display:flex;gap:calc(var(--gap)*var(--k));height:24px">'+
