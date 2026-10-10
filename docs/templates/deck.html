@@ -561,6 +561,8 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   var dot = fs * 0.3, inset = b.kind === 'bar' ? 0 : dot;
   var x = function(i) { return padL + inset + (n <= 1 ? (W - padL - padR - inset * 2) / 2 : (W - padL - padR - inset * 2) * i / (n - 1)); };
   var y = function(v) { return padT + (H - padT - padB) * (1 - (v - min) / (max - min)); };
+  var gw = (W - padL - padR) / Math.max(n, 1);
+  var lx = function(i) { return b.kind === 'bar' ? padL + gw * i + gw / 2 : x(i); };   // 축 라벨: 막대는 묶음 가운데, 선은 점 아래
   var smooth = function(pts) {
     if (pts.length < 2) return pts.length ? 'M' + pts[0][0] + ',' + pts[0][1] : '';
     var k = pts.length, dx = [], m = [], t = [], i;
@@ -574,9 +576,9 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   };
   var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
   for (var g = 0; g <= 4; g++) { var gy = (padT + (H - padT - padB) * g / 4).toFixed(1); out += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="' + C.border + '" stroke-opacity=".6" stroke-width="1"/>'; }
-  labels.forEach(function(l, i) { out += '<text x="' + x(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + (fs * 0.9) + '" fill="' + C.textMid + '">' + esc(l) + '</text>'; });
+  labels.forEach(function(l, i) { out += '<text x="' + lx(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + (fs * 0.9) + '" fill="' + C.textMid + '">' + esc(l) + '</text>'; });
   if (b.kind === 'bar') {
-    var gw = (W - padL - padR) / Math.max(n, 1), bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5;
+    var bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5;
     series.forEach(function(sr, si) { (sr.values || []).forEach(function(v, i) {
       var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
       var top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
