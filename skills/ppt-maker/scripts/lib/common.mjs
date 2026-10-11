@@ -110,7 +110,7 @@ export const COLORS = readJson('colors.json', {
 if (COLORS.gray && COLORS.gray.role) for (const [name, step] of Object.entries(COLORS.gray.role)) if (COLORS.gray[name] === undefined) COLORS.gray[name] = COLORS.gray[step];
 /** "primary.600"·"gray.400"·"accent.teal" 같은 색 경로를 hex 로 */
 export const colorAt = (path, fallback = '#888888') => { const [g, k] = String(path).split('.'); const v = COLORS[g] && COLORS[g][k]; return typeof v === 'string' ? v : fallback; };
-/** 그래프 시리즈 색 — emphasis(1~3)를 준 시리즈만 색을 받고 나머지는 연한 회색. ranked 면 primary 600→400→200, 아니면 primary→teal→gold.
+/** 그래프 시리즈 색 — emphasis(1~3)를 준 시리즈만 색을 받고 나머지는 연한 회색. ranked 면 primary 600→350→200, 아니면 primary→teal→gold.
  *  emphasis 를 아무도 안 적었으면 첫 시리즈만 강조(1). */
 export function chartSeriesColors(chart) {
   const series = (chart.series || []).slice(0, 4);

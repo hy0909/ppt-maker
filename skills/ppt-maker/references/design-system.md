@@ -6,14 +6,14 @@
 
 ---
 
-## 현재 기본 디자인: 미니멀 카드 리포트 (2026-09-14 채택, 예시 덱 `examples/breezehome` 기준 · 포인트 컬러 #2F0CC5 보라 계열, 2026-09-14 변경)
+## 현재 기본 디자인: 미니멀 카드 리포트 (2026-09-14 채택, 예시 덱 `examples/breezehome` 기준 · 메인 컬러 primary 600 #2B0CDD, 2026-10-09 부터 `design-system/colors.json` 이 원본)
 
 `scripts/build_html.mjs`(HTML)와 `scripts/build_pptx.mjs`(PPTX)가 구현한다. 예전 디자인은 `*_classic.mjs`(초기)와 스크래치 백업(연차보고서 헤더 바 스타일)에만 남아 있다.
 
 - **알약 제목**(2026-10-09): 모서리 12px(`shape.pill`), 바탕은 메인 컬러에 오른쪽 위에서 초록(`accent.glow` #19E68C 60%)이 내려오는 그라데이션(`linear-gradient(225deg)`, 70% 지점까지). PPTX 는 단색.
 - **글자 크기 7단계**(2026-10-11, 파생 배율을 없애고 묶음): 헤드라인 46 · 큰 수치 34 · 카드 제목 24(알약·비교 소제목·리드·강조 박스 값) · 본문 18(불릿·단계 번호·조직도 띠와 이름·표 배지) · 작은 글 16(보조줄·수치 라벨·배너·카드 소제목·그래프 제목·범례·값·간트 항목명·연혁 연도·조직도 직함·팀명·아이브로우) · 라벨 14(축 라벨·간트 머리띠와 막대 글자·연혁 머리띠와 월·조직도 이력·장 번호·출처) · 캡션 12(그림 캡션·그래프 단위·역할 배지, 색은 `--text-light`). 표는 전용 22. 값은 `design-tokens.json` density 의 body·small·cardTitle·stat·table·label·caption.
 - **컬러·글꼴 원본**(2026-10-09): 컬러는 `design-system/colors.json`(primary 800·700·600·400·300·200, 회색, 상태색), 글꼴은 `design-system/fonts.json`. 크기·여백·모서리는 `design-tokens.json`. 메인 = primary 600 `#2B0CDD`, 보조 = primary 400 `#5D48FF`. 메인이 스케일의 600 과 같으면 진한 단계(간지 그라데이션 등)는 스케일의 800·700 을 그대로 쓴다.
-- **팔레트**: 배경 연회색 `--page` #E9ECF0, 카드 흰색 + 그림자 `0 2px 12px rgba(20,40,80,.07)`, `--primary` 포인트 컬러(#2F0CC5 보라, 카드 상단 띠·강조), `--primary-2` 파랑(#1E5BB8, 보조 수치 문장·그래프 선), 연파랑 틴트(`--primary-softer`, 강조 박스·TO-BE 카드), 본문 #1A2438 / 보조 #4A5568. 이모지·그라디언트 텍스트·다중 그림자 금지. Pretendard, 자간 -0.015em~-0.03em(제목).
+- **팔레트**: 배경 `--page`(gray 100 #E9ECF0), 카드 흰색 + 그림자 `0 2px 12px rgba(20,40,80,.07)`, `--primary` 메인(primary 600 #2B0CDD, 알약 제목·강조), `--primary-2` 보조(primary 400 #5D48FF, 보조 수치 문장·그래프 선), 연보라 틴트(`--primary-soft`·`--primary-softer`, 강조 박스·TO-BE 카드), 본문 `--text`(gray 800 #1A2438) / 보조 `--text-mid`(gray 700 #4A5568) / 연한 글 `--text-light`(gray 500). 이모지·그라디언트 텍스트·다중 그림자 금지. Pretendard, 자간 -0.015em~-0.03em(제목).
 - **본문 장표 골격**(1280×720, **좌우 여백 40px** — 사용자 원본 PPTX 기준): 아이브로우 16px(y=30, `--primary-deep` #2815B0 진보라(primary 800), **그 장표가 속한 목차(섹션) 이름 하나만**) · 장 번호(몇 번째 장인지, 13px `--text-light`)는 아이브로우 줄과 따로 **오른쪽 위 모서리**(y=22)에 → 헤드라인 **34.5pt(46px)** 검정 계열 `--title` #10141C(y=61, `**강조**` 는 같은 색 800 굵기) → lead 18pt(24px) 회색(헤드라인 바로 아래 12px, y≈124, 줄간격 150%. 구분선은 2026-10-09 없앰) → 본문(카드, 리드 1줄이면 y=220 부터) → 맨 아래 배너 → 출처·각주(있을 때만). 헤더 바 없음. 표지·간지·마무리는 그라디언트 배경.
 - **글자 크기·간격(원본 PPTX 와 동일하게)**: 본문 불릿 17pt·진한 색(`--text`), 카드 안 소제목 16pt 굵게·연한 회색(`--body`), 알약 제목 18pt 굵게 흰색, 배너 라벨 15pt·본문 14pt. **자간은 전부 −0.8pt**(`letter-spacing:-.8pt` / `charSpacing:-0.8`). 불릿 줄높이 1.25, 항목 사이 간격은 0.4~0.9em 에서 자동.
 - **제목 규칙**(2026-09-14): 헤드라인은 **문장이 아니라 명사형으로 끝낸다** — "…세 기능으로 구성", "…24주 일정". "~한다/~합니다/~이다" 금지. 강조는 색이 아니라 굵기로만 준다.
@@ -190,37 +190,31 @@ python3 skills/ppt-maker/scripts/prepare_cover_bg.py <내보낸파일> <키> --l
 
 ---
 
-아래 0~N 장은 예전(classic) 디자인과 deck-stage 공통 규칙이다.
+## 공통 규칙 (디자인이 바뀌어도 그대로)
 
----
+> 2026-10-12 정리. 예전 파랑 브랜드와 `t28`·`c-primary` 같은 옛 변수·클래스 설명은 지웠다. 현재 코드에 없다.
 
-## 0. 아키텍처 (deck-stage.js)
+### 0. 뷰어 (deck-stage.js)
 
-덱은 `deck-stage.js` 웹 컴포넌트가 구동합니다 (**수정 금지** — 레퍼런스와 동일하게 유지).
-슬라이드는 `<deck-stage width="1280" height="720">` 안의 직속 `<section class="slide" data-label="...">`.
+덱은 `assets/deck-stage.js` 웹 컴포넌트가 구동한다(**수정 금지** — safeai-deck-template 레퍼런스와 동일하게 유지). `scripts/build_html.mjs` 가 `outline.json` 을 읽어 `<deck-stage width="1280" height="720">` 안의 `<section class="slide">` 를 만든다. 사람도 AI 도 `deck.html` 을 직접 고치지 않는다.
 
-- 좌측 **썸네일 레일**, 캔버스 **자동 스케일**(뷰포트 꽉 채움), **인쇄**(Cmd+P → 슬라이드당 1페이지), 하단 네비 오버레이를 컴포넌트가 자동 제공.
-- 조작: `←→`/`Space`/`Home`/`End`/`1~9`/`R`, **`F` 전체화면**, **`T` 레일 토글**.
-- ⚠️ `<deck-stage>` 직속 자식은 `<section>`·주석만. 슬라이드 라벨은 `data-label` 속성 사용 (`<p class="slide-label">` 금지 — 슬라이드로 오인됨).
+- 좌측 썸네일 레일, 캔버스 자동 스케일, 인쇄(Cmd+P → 장표당 1쪽), 하단 네비를 컴포넌트가 제공한다.
+- 조작: `←→`/`Space`/`Home`/`End`/`1~9`/`R`, `F` 전체화면, `T` 레일 토글.
 
----
+### 1. "AI 스럽지 않게"
 
-## 1. 핵심 원칙: "AI스럽지 않게"
-
-AI가 만든 자료처럼 보이는 가장 큰 원인은 **공간을 채우지 않는 것**과 **장식 과잉**이다.
-
-### 반드시 지킬 것
+AI 가 만든 자료처럼 보이는 가장 큰 원인은 **공간을 채우지 않는 것**과 **장식 과잉**이다.
 
 | 금지 패턴 | 이유 | 대체 방법 |
 |-----------|------|-----------|
-| 이모지 (🚀🎯💡) | 즉시 AI 생성 티가 남 | Feather 스타일 인라인 SVG 아이콘 |
-| `background-clip: text` 그라디언트 텍스트 | PDF 깨짐 + AI 클리셰 | 단색 `color: #hex` |
-| 과도한 `box-shadow` (여러 레이어) | 과장된 입체감 = AI 스타일 | border 또는 단순 그림자 |
-| "카드 속 카드" 중첩 구조 | 정보 위계 파괴 | 1단계 카드만 사용 |
-| 글머리 기호 남용 (bullet 5개 이상) | 파워포인트 클리셰 | 2–3개 핵심만, 나머지는 삭제 |
-| 빈 `img-ph` 자리표시자 그대로 납품 | 미완성처럼 보임 | 실제 이미지로 교체하거나 슬라이드 삭제 |
-| 텍스트로만 채운 슬라이드 (이미지 0개) | 콘텐츠 밀도 부족 | 차트·스크린샷·다이어그램 삽입 |
-| 슬라이드 절반 이상 여백 | 공간 낭비 = AI가 만든 것처럼 보임 | 레이아웃 변경 또는 콘텐츠 보강 |
+| 이모지 (🚀🎯💡) | 즉시 AI 생성 티가 남 | 쓰지 않는다. 글과 숫자로 말한다 |
+| `background-clip: text` 그라디언트 텍스트 | PDF 깨짐 + AI 클리셰 | 단색 글자 |
+| 과도한 `box-shadow` (여러 레이어) | 과장된 입체감 = AI 스타일 | 카드 기본 그림자 하나(`shape.shadow*`) |
+| "카드 속 카드" 중첩 구조 | 정보 위계 파괴 | 1단계 카드만 |
+| 글머리 기호 남용 (bullet 5개 이상) | 파워포인트 클리셰 | 2~3개로 줄이거나 cards·columns 로 나눔 |
+| 없는 파일 경로를 적은 `image` 블록 | 자리표시자가 그대로 나가 미완성처럼 보임 | 실제 파일을 받거나 블록을 뺀다 |
+| 글만 있는 장표가 연달아 이어짐 | 밀도 부족 | 표·그래프·수치(stats)·그림 블록으로 바꿈 |
+| 장표 절반 이상 여백 | 공간 낭비 = AI 가 만든 것처럼 보임 | 블록을 합치거나 바꿈 |
 
 ### 글은 사람이 쓴 것처럼 (2026-09-14 추가)
 
@@ -234,194 +228,57 @@ AI가 만든 자료처럼 보이는 가장 큰 원인은 **공간을 채우지 �
 
 이 규칙은 `app/server.mjs` 의 `systemPrompt()` 에도 같은 내용으로 들어가 있다(AI 생성 시 적용).
 
-### 채워야 할 것
+**채워야 할 것**: 장표 여백이 40% 이상이면 구성을 바꾼다. 글이 짧으면 stats·callout 처럼 큰 글자 블록으로, 목록이 짧으면 그림이나 그래프를 붙이고, 카드가 작으면 2열을 1열로.
 
-**Fill-Space 원칙**: 슬라이드 여백이 40% 이상이면 레이아웃을 바꿔라.
-- 텍스트가 짧으면 → 폰트 키우기 (`t28` → `t36`)
-- 리스트가 짧으면 → 이미지나 차트 추가
-- 카드가 작으면 → `flex:1`로 늘리거나 2열 → 1열로 변경
+### 2. 색·글꼴·크기는 파일에만 있다
 
----
+- **컬러** `design-system/colors.json`: primary 800·700·600·400·350·300·200, gray 50~900, accent(glow·teal·gold), status(success·warning·danger), chart(강조 1~3 · ranked). 장표에서 쓰는 자리 이름은 그 파일의 `role` 과 `gray.role` 이 정한다 → CSS 변수 `--primary`(main) `--primary-2`(secondary) `--primary-deep`(deep) `--page` `--text` `--text-mid` `--text-light` `--title`.
+- **글꼴** `design-system/fonts.json`, **크기·여백·모서리** `design-tokens.json`. 코드와 문서에 hex 나 글꼴 이름을 직접 쓰지 않는다. 값을 바꾸면 `templates/build.sh` 로 견본을 한 번 다시 만든다.
+- **그래프 색**: `emphasis` 1~3 을 준 시리즈만 색을 받고 나머지는 gray 400. `ranked` 면 primary 600→350→200, 아니면 primary 600→teal→gold.
+- **로고**: `meta.logo.light`·`dark` 에 파일이 있을 때만 표지·마무리에 그린다. 없으면 비운다. "LOGO" 같은 글자로 대신하지 않는다. 기본 파일은 `assets/logo_h_white.png`(어두운 배경), `assets/logo_v_blue.png`(밝은 배경).
 
-## 2. 브랜드 토큰
+### 3. 틀과 안전 여백 (1280×720)
 
-```css
-/* 반드시 아래 변수만 사용. 임의 hex 값 사용 금지 */
---primary:       #3242C6;   /* 브랜드 블루 — 제목·헤더·아이콘·액센트 */
---primary-dark:  #2937A7;   /* 진한 블루 — 호버 / 테이블 헤더 */
---primary-mid:   #2A38B0;   /* 그라디언트 대신 사용 */
---primary-light: #E1E9F7;   /* 라이트블루 틴트 — 배지·콜아웃·아이콘 배경 */
---accent:        #0EA5E9;   /* 포인트 — sparingly 사용 */
---dark:          #1B2456;   /* 다크 슬라이드 배경 — navy (거의-검정 #0F172A 폐기) */
---ink:           #222A35;   /* 본문 near-black slate */
-```
+값은 `design-tokens.json` 의 `frame` 과 `head`.
 
-### 색상 사용 규칙 (검정·navy 남용 금지)
-- **슬라이드 제목 `h2`는 `c-primary`** (밝은 브랜드 블루 #3242C6). `c-dark`(검정 슬레이트) 쓰지 말 것 — 제목이 밋밋한 검정으로 보임.
-- **본문**은 `c-dark`(=`--ink` 슬레이트) 또는 `c-muted`(--g6).
-- **다크 슬라이드**는 `style="background:var(--dark)"`(navy) + 흰색 텍스트(`c-white`). `#0F172A` 같은 거의-검정 배경 금지.
-- 강조 숫자·아이콘도 `--primary`(브랜드 블루).
-- **헤더 바(claude-ppt-guide 연차보고서 스타일)**: 본문 장표 상단에 64px 높이 `--primary` 띠. 좌측 반투명 태그(`rgba(255,255,255,.12)` 배경, 12px 굵게, `i · 2` 로마숫자·장표 순번), 이어서 장 제목 20px 굵게 흰색 + 부제 13.5px(흰색 78%), 우측 끝 흰 로고 20px. 그 아래 본문은 기존 디자인(제목 h2 → 리드 박스 → 블록) 그대로. 예전 아이브로우(— 1. 섹션명)와 우상단 로고는 헤더 바로 대체되어 사용하지 않는다.
+- 좌우 여백 `pad` 40px. 아이브로우 y=30, 장 번호 y=22(오른쪽 위), 헤드라인 y=61, 리드는 헤드라인 아래 12px.
+- 본문 블록은 `.body` 안에만 그려진다: 왼쪽·오른쪽 = pad, 위 = `bodyTop` 220px(리드가 2줄이면 자동으로 내려감), 아래 = `safeBottom` 44px.
+- 넘침은 `fit_slides` → `check_overflow` 가 잡는다. **오버플로 0** 이 완료 조건이다. 글을 줄이거나 블록을 나누지, 글자를 임의로 줄이지 않는다.
+- 그림은 칸 안에 `object-fit:contain`. 잘라서 채우지 않는다.
 
-### 로고 사용 규칙
+### 4. 글자 크기
 
-| 배경 | 로고 파일 | 높이 |
-|------|-----------|------|
-| 다크 (navy/dark) 슬라이드 | `assets/logo_h_white.png` | `height:24px` |
-| 라이트 (white/gray) 슬라이드 | `assets/logo_v_blue.png` | `height:26px` |
+위 "글자 크기 7단계" 토큰만 쓴다. CSS 변수 `--fs-body` `--fs-small` `--fs-card` `--fs-stat` `--fs-label` `--fs-caption` `--fs-table`. 블록 코드에 px 를 직접 쓰지 않는다. 한 장표에 서로 다른 크기를 3단계 넘게 섞지 않는다.
 
-로고는 반드시 `.logo-wrap` (우측 상단 고정) 또는 헤더 내 inline으로만 배치.
-로고 자리를 "LOGO" 같은 글자로 대신하지 **않는다**.
+### 5. 장 번호·간지·어두운 배경
 
----
+- 장 번호(`.pgno`)는 본문 장표 오른쪽 위에만 붙는다. 표지·목차·간지·마무리에는 없다.
+- 표지·간지·마무리는 primary 진한 단계(800·700)로 내려오는 그라데이션 배경(표지는 `meta.coverBg` 로 그림을 깔 수 있다). 검정이나 남색 단색 배경은 쓰지 않는다. 그 위 글자는 흰색, 로고는 흰색판(`meta.logo.dark`).
 
-## 3. 레이아웃 안전 여백
+### 6. PDF 변환 금지 규칙
 
-슬라이드 크기: **1280 × 720px** (16:9 고정)
-
-```
-┌──────────────────────────────────────────────────────────┐  y=0
-│  ██ .logo-wrap  top:26px, height≈26px → 하단 y=52px       │
-│ ─────────────── --safe-top: 76px ──────────────────────── │  y=76  ← 콘텐츠 시작
-│                                                           │
-│  LEFT --pad: 52px ←──────────────────────→ RIGHT --pad   │
-│                                                           │
-│ ─────────────── --safe-bottom: 52px ───────────────────── │  y=668 ← 콘텐츠 끝
-│  .pg  bottom:22px                                        │
-└──────────────────────────────────────────────────────────┘  y=720
-```
-
-**황금 규칙**: `position:absolute;inset:0` 콘텐츠 컨테이너는 **반드시**:
-```html
-padding: var(--safe-top) var(--pad) var(--safe-bottom)
-```
-`padding:var(--pad)` 단독 사용 금지 — 상단은 로고(y=26~52), 하단은 페이지 번호(y=698~720)와 겹칩니다.
-
-**커버/일러스트 이미지**: 반드시 `object-fit:contain` 사용. `cover`는 이미지 잘림 발생.
-```html
-<img src="assets/cover.png" style="width:100%;height:auto;object-fit:contain;display:block;">
-```
-
----
-
-## 4. 타이포그래피 위계
-
-| 용도 | 클래스 | 크기 |
-|------|--------|------|
-| 커버 제목 | `t56 fw8 lh11 tight` | 56px |
-| 섹션 제목 | `t36 fw7 tight c-primary` | 36px |
-| 슬라이드 제목 | `t28 fw7 tight c-primary` | 28px |
-| 소제목 | `t20 fw6` | 20px |
-| 본문 | `t16 lh16` | 16px |
-| 보조 | `t14 lh16 c-muted` | 14px |
-| 레이블/태그 | `t12 wide` | 12px |
-
-**절대 지시사항**:
-- 한 슬라이드에 3단계 이상 폰트 크기 혼용 금지
-- `font-size` 직접 지정 금지 — 위 클래스 사용
-- 줄바꿈이 어색하면 `<br>` 추가 (CSS hyphens 금지)
-
----
-
-## 5. 아이콘 규칙
-
-Feather Icons 스타일 인라인 SVG만 사용.
-
-```html
-<!-- 올바른 예 -->
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-     stroke="currentColor" stroke-width="1.5"
-     stroke-linecap="round" stroke-linejoin="round">
-  <path d="..."/>
-</svg>
-
-<!-- 금지 -->
-🚀 💡 ⚡ 🛡 (이모지)
-<i class="fa fa-rocket"> (Font Awesome)
-```
-
-아이콘 배경 컨테이너:
-```html
-<div style="width:40px;height:40px;border-radius:10px;
-            background:var(--primary-light);
-            display:flex;align-items:center;justify-content:center;
-            color:var(--primary);flex-shrink:0;">
-  <!-- SVG here -->
-</div>
-```
-
----
-
-## 6. 슬라이드별 사용 가이드
-
-### 페이지 번호(`.pg`) 부여 규칙
-- **커버** (`data-label`에 "커버/Cover"): 번호 **없음**.
-- **섹션 디바이더** (다크 전체배경 + 짧은 타이틀만): 번호 **없음** (로고와 겹침).
-- **전면 이미지 / 클로징**: 번호 없음.
-- 우측 상단에 **버튼(데모 등)이 오는 슬라이드**: `.logo-wrap` 로고 **제거** (겹침 방지).
-- 그 외 일반 콘텐츠 슬라이드: 커버를 01로 세고 **02부터** 순번 부여.
-
-### 다크 배경 슬라이드
-- 배경: `style="background:var(--dark)"` (navy `#1B2456` — 거의-검정 금지)
-- 텍스트: `c-white` 또는 `rgba(255,255,255,0.7)`
-- 로고: `logo_h_white.png`
-- 페이지 번호: `.pg pg-light` (흰색)
-
-### 콘텐츠 슬라이드 공통 구조
-```html
-<section class="slide" data-label="슬라이드 이름" id="sNN">
-  <div style="position:absolute;inset:0;display:flex;flex-direction:column;
-              padding:var(--safe-top) var(--pad) var(--safe-bottom);">
-    <!-- 헤더 영역 -->
-    <div style="flex-shrink:0;margin-bottom:32px;">
-      <div class="eyebrow g8" style="margin-bottom:10px;"><span class="ep"></span>섹션명</div>
-      <h2 class="t36 fw7 tight c-primary">슬라이드 제목</h2>   <!-- 제목은 브랜드 블루 -->
-    </div>
-    <!-- 콘텐츠 영역 (flex:1 = 나머지 공간 모두 사용) -->
-    <div style="flex:1;min-height:0;">
-      <!-- 내용 -->
-    </div>
-  </div>
-  <div class="logo-wrap"><img src="assets/logo_v_blue.png" style="height:26px;display:block;"></div>
-  <div class="pg">NN</div>
-</section>
-```
-
----
-
-## 7. PDF 변환 금지 규칙
-
-Chrome 인쇄 시 깨지는 패턴:
+`export_pdf.mjs` 가 Playwright Chromium 으로 인쇄한다. 인쇄에서 깨지는 패턴:
 
 | 금지 | 대체 |
 |------|------|
-| `background-clip: text` | `color: #hex` 직접 지정 |
+| `background-clip: text` | 단색 글자 |
 | colored `rgba` box-shadow | `rgba(0,0,0,.1)` 단색 그림자 또는 border |
 | `filter: blur()` | 제거 |
 | `mask-image` / `-webkit-mask-image` | `opacity` 조절 (마스크 무시 → 배경 통째 인쇄됨) |
 | `backdrop-filter: blur()` | solid background-color |
 | `::before` content 장식 | 실제 `<span>` 태그 사용 |
 
-### `.no-print` — PDF 탈출구
-원칙은 위 패턴 **금지**다. 그러나 화면 연출용으로 꼭 써야 한다면 `class="no-print"`를 붙여
-인쇄(PDF)에서만 숨긴다. deck.html에 `@media print { .no-print { display:none !important; } }` 내장.
+**`.no-print` — PDF 탈출구**: 화면 연출용으로 꼭 써야 한다면 `class="no-print"` 를 붙여 인쇄(PDF)에서만 숨긴다. `build_html.mjs` 가 `@media print { .no-print { display:none !important; } }` 를 넣는다. 대상은 mesh·grid `background-image`, 장식용 glow `box-shadow`, 그라디언트 글자 같은 순수 장식뿐이다. **글자·핵심 도형에는 절대 쓰지 않는다** — PDF 에서 사라진다.
 
-- 대상: `mask-image`, mesh·grid `background-image`(격자 인쇄됨), 장식용 glow `box-shadow`(사각 음영),
-  `background-clip:text` 그라디언트(깨짐 → 단색 fallback 별도 제공).
-- **콘텐츠(텍스트·핵심 도형)에는 절대 쓰지 말 것** — PDF에서 사라진다. 순수 장식 전용.
+### 7. 완료 전 체크리스트
 
----
-
-## 8. AI 에이전트 체크리스트
-
-슬라이드를 추가하거나 수정한 후 반드시 확인:
-
-- [ ] 이모지가 있는가? → SVG 아이콘으로 교체
-- [ ] 로고가 텍스트인가? → img 태그로 교체
-- [ ] `--safe-bottom` 없이 `bottom:0` 컨테이너를 썼는가? → padding-bottom 52px 이상 확보
-- [ ] 빈 `img-ph` 자리표시자가 있는가? → 실제 이미지 또는 슬라이드 삭제
-- [ ] 슬라이드 여백이 절반 이상인가? → 레이아웃 재설계
-- [ ] 한 슬라이드에 4개 이상 bullet이 있는가? → 2–3개로 압축
-- [ ] 임의 hex 색상을 썼는가? → CSS 변수로 교체
-- [ ] PDF 금지 CSS를 썼는가? → 위 표 참고하여 수정
-- [ ] 페이지 번호가 커버(01, 02)에 있는가? → 제거
+- [ ] 이모지·장식 아이콘이 있는가 → 뺀다
+- [ ] 로고가 글자인가 → `meta.logo` 파일로, 없으면 비움
+- [ ] 없는 이미지 경로가 있는가 → 파일을 받거나 블록 삭제
+- [ ] 장표 절반 이상이 비었는가 → 블록을 합치거나 바꿈
+- [ ] 불릿이 5개 이상인가 → 2~3개로 줄이거나 cards 로
+- [ ] 코드나 문서에 hex 를 직접 썼는가 → `colors.json` 이름으로
+- [ ] PDF 금지 CSS 를 썼는가 → 위 표
+- [ ] 장 번호가 표지·간지에 있는가 → 제거
+- [ ] 원문에 없는 수치·로고·회사 정보를 만들었는가 → 제거
+- [ ] `check_overflow` 0, `verify_pptx` out-of-bounds 0 인가
