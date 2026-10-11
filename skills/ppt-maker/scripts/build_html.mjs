@@ -262,6 +262,36 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .cv .cbg{background-image:url('${coverBgFile(meta.coverBg)}');}
 /* 제목이 놓이는 왼쪽을 살짝 눌러 글씨가 밝은 부분에 걸쳐도 읽히게 한다 */
 .cv .scrim{position:absolute;inset:0;z-index:1;background:${coverScrim(meta.coverBg)};}
+/* 표지 본문 — 원본 PPTX 좌표·여백 그대로 */
+.cover .clead{position:absolute;left:${C.lead.x}px;top:${C.lead.y}px;width:${C.lead.w}px;height:${C.lead.h}px;${typeCss(TYPE.body2)}color:#E7E6E6;z-index:2;word-break:keep-all;}
+.cover .ctitle{position:absolute;left:${C.title.x}px;top:${C.title.y}px;width:${C.title.w}px;height:${C.title.h}px;${typeCss(TYPE.h0)}color:#fff;z-index:2;word-break:keep-all;}
+.cover .clogo{position:absolute;left:${C.logo.x}px;top:${C.logo.y}px;width:${C.logo.w}px;height:${C.logo.h}px;object-fit:contain;object-position:left center;z-index:2;}
+.cover .cbadge{position:absolute;right:${1280 - C.badge.x - C.badge.w}px;bottom:${720 - C.badge.y - C.badge.h}px;height:${C.badge.h}px;min-width:${C.badge.w}px;display:flex;align-items:center;justify-content:flex-end;padding:0 ${+(C.badge.x + C.badge.w - C.badgeText.x - C.badgeText.w).toFixed(1)}px;background:var(--cover-badge);font-size:${px(C.badgeText.size)}px;font-weight:700;letter-spacing:${C.badgeText.spc}pt;color:#fff;white-space:nowrap;z-index:2;}
+.cover .logo{position:absolute;top:30px;right:53px;height:22px;z-index:3;}   /* 마무리 장표의 오른쪽 위 로고 */
+.cin{position:relative;z-index:2;padding:66px 66px 56px;height:100%;display:flex;flex-direction:column;justify-content:space-between;}
+.prog{font-size:17px;font-weight:500;letter-spacing:.02em;color:rgba(255,255,255,.82);display:flex;align-items:center;gap:10px;}
+.pill{display:inline-block;padding:4px 11px;background:var(--gold);color:var(--primary);border-radius:3px;font-size:12px;font-weight:700;white-space:nowrap;}
+/* 목차 — 원본 PPTX 좌표·여백 그대로. 왼쪽 위 '목차', 오른쪽에 번호 + 섹션명 2열 */
+.tocp{position:absolute;inset:0;background:var(--page);}
+.tocp .lb{position:absolute;left:${A.title.x}px;top:${A.title.y}px;width:${A.title.w}px;height:${A.title.h}px;${typeCss(TYPE.h1)}color:var(--title);}
+.tocp .items{position:absolute;left:${A.cols[0].n}px;top:${A.rowTop}px;width:${A.cols[1].t + A.itemW - A.cols[0].n}px;display:grid;grid-auto-flow:column;grid-template-columns:${A.cols[0].t - A.cols[0].n + A.itemW}px ${A.cols[1].t - A.cols[1].n + A.itemW}px;column-gap:${+(A.cols[1].n - A.cols[0].t - A.itemW).toFixed(1)}px;row-gap:${+(A.rowPitch - A.itemH).toFixed(1)}px;align-content:start;}
+.tocp .it{display:grid;grid-template-columns:${A.itemH - 10}px 1fr;column-gap:${+(A.cols[0].t - A.cols[0].n - A.itemH + 10).toFixed(1)}px;min-height:${A.itemH}px;}
+.tocp .it .n{text-align:center;align-self:start;font-family:'${TYPE.h0.face}',${FALLBACK_FACES};font-weight:400;font-size:${px(A.numSize)}px;line-height:${A.itemH}px;letter-spacing:${A.numSpc}pt;color:var(--primary);}
+.tocp .it .t{${typeCss(TYPE.h2)}color:var(--title);word-break:keep-all;margin:${+((A.itemH - px(TYPE.h2.line)) / 2).toFixed(2)}px 0;}
+.tocp .it.apx .n{font-family:'${FONTS.face.regular}',${FALLBACK_FACES};font-size:${px(20)}px;}
+.tocp .it.apx .t{font-family:'${FONTS.face.regular}',${FALLBACK_FACES};}
+.tocp .ft{position:absolute;left:${A.foot.x}px;top:${A.foot.y}px;width:${A.foot.w}px;height:${A.foot.h}px;font-size:${px(A.foot.size)}px;line-height:${A.foot.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
+.tocp .pn{position:absolute;left:${A.pageNo.x}px;top:${A.pageNo.y}px;width:${A.pageNo.w}px;height:${A.pageNo.h}px;text-align:right;font-size:${px(A.foot.size)}px;line-height:${A.pageNo.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
+/* 간지: 포인트 컬러 한 면 + 좌상단 라벨·큰 제목 + 우하단 로고 워터마크 + 하단 정보줄 */
+.dv{position:absolute;inset:0;overflow:hidden;background:linear-gradient(118deg,var(--primary-deep) 0%,var(--primary) 54%,var(--primary-2) 100%);color:#fff;}
+.dv .wm{position:absolute;right:var(--pad);bottom:86px;width:620px;opacity:.12;pointer-events:none;}
+${DIVIDER_BG ? `.dv .dbg{position:absolute;inset:0;background:#000 url('${DIVIDER_BG}') center center / cover no-repeat;}
+.dv .dsc{position:absolute;inset:0;background:${DIVIDER_SCRIM};}` : ''}
+.dv .in{position:absolute;inset:0;padding:56px var(--pad) 42px;display:flex;flex-direction:column;z-index:2;}
+.dv .eb{font-size:15px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.62);text-transform:uppercase;}
+.dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:26px;max-width:1000px;word-break:keep-all;}
+.dv .s{font-size:18px;color:rgba(255,255,255,.72);margin-top:18px;max-width:820px;line-height:1.55;}
+.dv .ft{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
 .closing .cbg{background:${P.primaryDeep};}   /* 2026-10-09 마무리: 진한 메인 단색, 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
 .closing .cin{display:block;padding:0;}
 .closing .big{position:absolute;left:66px;top:70px;width:760px;font-family:var(--font-title-b);font-size:40px;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.35;}

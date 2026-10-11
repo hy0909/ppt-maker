@@ -236,6 +236,35 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .cv .cbg{background-image:url('assets/cover-bg/cube.jpg');}
 /* 제목이 놓이는 왼쪽을 살짝 눌러 글씨가 밝은 부분에 걸쳐도 읽히게 한다 */
 .cv .scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,3,18,.42) 0%,rgba(5,3,18,.48) 42%,rgba(5,3,18,.30) 58%,rgba(5,3,18,0) 74%);}
+/* 표지 본문 — 원본 PPTX 좌표·여백 그대로 */
+.cover .clead{position:absolute;left:61.5px;top:56px;width:530.2px;height:83.6px;font-family:'Pretendard Light','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;font-weight:400;font-size:24px;line-height:35.47px;letter-spacing:-0.8pt;color:#E7E6E6;z-index:2;word-break:keep-all;}
+.cover .ctitle{position:absolute;left:59.4px;top:117px;width:720px;height:172.1px;font-family:'Paperlogy 7 Bold','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;font-weight:400;font-size:64px;line-height:78.13px;letter-spacing:-1pt;color:#fff;z-index:2;word-break:keep-all;}
+.cover .clogo{position:absolute;left:60.4px;top:613.4px;width:202.5px;height:50.6px;object-fit:contain;object-position:left center;z-index:2;}
+.cover .cbadge{position:absolute;right:47.29999999999998px;bottom:43.50000000000002px;height:39.6px;min-width:246.6px;display:flex;align-items:center;justify-content:flex-end;padding:0 18.4px;background:var(--cover-badge);font-size:18.67px;font-weight:700;letter-spacing:-0.8pt;color:#fff;white-space:nowrap;z-index:2;}
+.cover .logo{position:absolute;top:30px;right:53px;height:22px;z-index:3;}   /* 마무리 장표의 오른쪽 위 로고 */
+.cin{position:relative;z-index:2;padding:66px 66px 56px;height:100%;display:flex;flex-direction:column;justify-content:space-between;}
+.prog{font-size:17px;font-weight:500;letter-spacing:.02em;color:rgba(255,255,255,.82);display:flex;align-items:center;gap:10px;}
+.pill{display:inline-block;padding:4px 11px;background:var(--gold);color:var(--primary);border-radius:3px;font-size:12px;font-weight:700;white-space:nowrap;}
+/* 목차 — 원본 PPTX 좌표·여백 그대로. 왼쪽 위 '목차', 오른쪽에 번호 + 섹션명 2열 */
+.tocp{position:absolute;inset:0;background:var(--page);}
+.tocp .lb{position:absolute;left:47.3px;top:40.6px;width:320px;height:64px;font-family:'Paperlogy 7 Bold','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;font-weight:400;font-size:53.33px;line-height:64px;letter-spacing:-1pt;color:var(--title);}
+.tocp .items{position:absolute;left:560px;top:62px;width:679.5px;display:grid;grid-auto-flow:column;grid-template-columns:313px 313px;column-gap:53.5px;row-gap:29.5px;align-content:start;}
+.tocp .it{display:grid;grid-template-columns:22px 1fr;column-gap:16.5px;min-height:32px;}
+.tocp .it .n{text-align:center;align-self:start;font-family:'Paperlogy 7 Bold','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;font-weight:400;font-size:29.33px;line-height:32px;letter-spacing:-0.5pt;color:var(--primary);}
+.tocp .it .t{font-family:'Paperlogy 5 Medium','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;font-weight:400;font-size:29.33px;line-height:42.4px;letter-spacing:-0.2pt;color:var(--title);word-break:keep-all;margin:-5.2px 0;}
+.tocp .it.apx .n{font-family:'Paperlogy 4 Regular','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;font-size:26.67px;}
+.tocp .it.apx .t{font-family:'Paperlogy 4 Regular','Pretendard','Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans KR',sans-serif;}
+.tocp .ft{position:absolute;left:47.3px;top:658.1px;width:999.3px;height:18px;font-size:16px;line-height:18px;letter-spacing:-0.2pt;color:var(--text-light);}
+.tocp .pn{position:absolute;left:1200px;top:658.1px;width:40px;height:18px;text-align:right;font-size:16px;line-height:18px;letter-spacing:-0.2pt;color:var(--text-light);}
+/* 간지: 포인트 컬러 한 면 + 좌상단 라벨·큰 제목 + 우하단 로고 워터마크 + 하단 정보줄 */
+.dv{position:absolute;inset:0;overflow:hidden;background:linear-gradient(118deg,var(--primary-deep) 0%,var(--primary) 54%,var(--primary-2) 100%);color:#fff;}
+.dv .wm{position:absolute;right:var(--pad);bottom:86px;width:620px;opacity:.12;pointer-events:none;}
+
+.dv .in{position:absolute;inset:0;padding:56px var(--pad) 42px;display:flex;flex-direction:column;z-index:2;}
+.dv .eb{font-size:15px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.62);text-transform:uppercase;}
+.dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:26px;max-width:1000px;word-break:keep-all;}
+.dv .s{font-size:18px;color:rgba(255,255,255,.72);margin-top:18px;max-width:820px;line-height:1.55;}
+.dv .ft{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
 .closing .cbg{background:#2815B0;}   /* 2026-10-09 마무리: 진한 메인 단색, 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
 .closing .cin{display:block;padding:0;}
 .closing .big{position:absolute;left:66px;top:70px;width:760px;font-family:var(--font-title-b);font-size:40px;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.35;}
