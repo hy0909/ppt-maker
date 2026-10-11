@@ -178,7 +178,9 @@ export function loadOutline(file) {
   meta.brand = Object.assign({ primary: TOKENS.color.primary }, meta.brand);   // 기본값은 design-tokens.json
   // 기본 로고가 있고, `logo: { light:'', dark:'' }` 로 비우면 그 자리를 비워 둔다.
   meta.logo = Object.assign({ light: 'assets/logo_v_blue.png', dark: 'assets/logo_h_white.png' }, meta.logo);
-  const sections = (raw.sections || []).map((s, i) => Object.assign({ no: i + 1, title: '', subtitle: '', slides: [] }, s));
+  let sections = (raw.sections || []).map((s, i) => Object.assign({ no: i + 1, title: '', subtitle: '', slides: [] }, s));
+  // 회사 소개서(company-intro)는 회사 소개·연혁·인력 배치 장표를 코드가 보장한다 — AI 가 빠뜨려도 들어가게 (2026-10-11)
+  if (meta.type === 'company-intro') sections = ensureCompanySlides(sections);
   // 간지는 챕터가 시작되는 자리에 들어간다. 챕터를 두지 않는 문서만 dividers:false 로 끈다.
   meta.dividers = meta.dividers !== false;   // 옛 아웃라인의 'auto' 도 넣는 쪽으로 읽는다
   // 표지·마무리가 비면 사내 기본값(templates/company-default.json 의 meta)으로 채운다 — AI 가 지어내지 않게 (2026-10-11)
@@ -215,6 +217,37 @@ export function flattenSlides(outline) {
     s.pageNo = (s.kind === 'content' || s.kind === 'appendix') ? String(n).padStart(2, '0') : null;
   }
   return out;
+}
+
+/** 회사 소개서에 회사 소개·연혁·인력 배치 장표가 없으면 templates/*-default.json 으로 채운다.
+ *  회사 소개와 연혁은 맨 앞 "회사 소개" 섹션에, 인력 배치는 맨 뒤 "팀과 추진체계" 섹션에 넣는다. 이미 있는 블록은 건드리지 않는다. */
+function ensureCompanySlides(sections) {
+  const readTpl = f => { try { return JSON.parse(fs.readFileSync(path.join(DS_DIR, '..', 'templates', f), 'utf8')); } catch { return null; } };
+  const has = type => sections.some(s => (s.slides || []).some(sl => (sl.blocks || []).some(b => b.type === type)));
+  const hasCompany = sections.some(s => (s.slides || []).some(sl => (sl.blocks || []).some(b => b.type === 'table' && (b.rows || []).some(r => /^기업명$/.test(String((r || [])[0] || ''))))));
+  const C = readTpl('company-default.json'), H = readTpl('history-default.json'), O = readTpl('org-default.json');
+  const front = [];
+  if (!hasCompany && C) front.push({ title: C.title, lead: C.lead, blocks: C.blocks });
+  if (!has('history') && H) {
+    const g = H.groups || [];
+    // 항목이 많은 묶음은 세로형(list), 적은 묶음은 가로형(columns). 연혁 전체를 두 장으로
+    const many = g.filter(x => (x.items || []).length > 6), few = g.filter(x => (x.items || []).length <= 6);
+    if (few.length) front.push({ title: 'SafeAI **연혁**', lead: '기간별로 묶은 주요 계약·선정·투자입니다.', blocks: [{ type: 'history', groups: few }] });
+    if (many.length) front.push({ title: 'SafeAI **연혁** (계속)', lead: '항목이 많은 해는 연·월·내용 순으로 적었습니다.', blocks: [{ type: 'history', layout: 'list', groups: many }] });
+  }
+  if (front.length) {
+    const first = sections[0];
+    if (first && /회사|개요|소개/.test(first.title || '')) first.slides = front.concat(first.slides || []);
+    else sections = [{ no: 1, title: '회사 소개', subtitle: '회사 개요와 연혁', slides: front }].concat(sections);
+  }
+  if (!has('org') && O) {
+    const slide = { title: '영상 AI 분야 **전문 인력 배치**', lead: '대표와 팀장 중심의 조직 구성입니다.', blocks: [{ type: 'org', head: O.head, teams: O.teams }] };
+    const team = sections.find(s => /팀|조직|인력|추진체계/.test(s.title || ''));
+    if (team) team.slides = (team.slides || []).concat([slide]);
+    else sections.push({ no: sections.length + 1, title: '팀과 추진체계', subtitle: '대표와 팀장 구성', slides: [slide] });
+  }
+  sections.forEach((s, i) => { s.no = i + 1; });
+  return sections;
 }
 
 /** 표가 한 장에 다 안 들어가면 행을 나눠 여러 장으로 편다(머리글은 장마다 반복, 제목 뒤에 "(계속)").
