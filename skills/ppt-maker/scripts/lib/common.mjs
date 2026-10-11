@@ -98,12 +98,12 @@ const DS_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..
 const readJson = (f, fallback) => { try { return JSON.parse(fs.readFileSync(path.join(DS_DIR, f), 'utf8')); }
   catch (e) { console.warn(`design-system/${f} 을 읽지 못해 기본값을 썼습니다: ${e.message}`); return fallback; } };
 export const COLORS = readJson('colors.json', {
-  primary: { 800: '#2815B0', 700: '#2A14C8', 600: '#2B0CDD', 400: '#5D48FF', 300: '#7B69FF', 200: '#9B8EFF' },
+  primary: { 800: '#2815B0', 700: '#2A14C8', 600: '#2B0CDD', 400: '#5D48FF', 350: '#6C59FF', 300: '#7B69FF', 200: '#9B8EFF' },
   role: { main: '600', secondary: '400', deep: '800', mid: '700' },
   gray: { 50: '#F5F7FA', 100: '#E9ECF0', 200: '#D9DEE6', 300: '#CFD4DC', 400: '#B9C3D2', 500: '#8B95A7', 600: '#515B75', 700: '#4A5568', 800: '#1A2438', 900: '#10141C',
           role: { bgSoft: '50', page: '100', border: '200', rule: '300', borderStrong: '400', textLight: '500', body: '600', textMid: '700', text: '800', title: '900' }, white: '#FFFFFF' },
   accent: { glow: '#19E68C', glowMix: 0.6, teal: '#00A89D', gold: '#C8A24B' },
-  chart: { flat: ['primary.600', 'accent.teal', 'accent.gold'], ranked: ['primary.600', 'primary.400', 'primary.200'], other: 'gray.400' },
+  chart: { flat: ['primary.600', 'accent.teal', 'accent.gold'], ranked: ['primary.600', 'primary.350', 'primary.200'], other: 'gray.400' },
   status: { success: '#138A4E', warning: '#C97A1F', danger: '#C9302C' },
 });
 // gray.role(이름 → 단계)을 풀어 COLORS.gray.text 처럼 이름으로도 읽히게 한다(옛 형식의 colors.json 도 그대로 동작)

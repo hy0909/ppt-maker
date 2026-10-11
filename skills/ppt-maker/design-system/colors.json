@@ -5,6 +5,7 @@
     "700": "#2A14C8",
     "600": "#2B0CDD",
     "400": "#5D48FF",
+    "350": "#6C59FF",
     "300": "#7B69FF",
     "200": "#9B8EFF"
   },
@@ -49,7 +50,7 @@
     "gold": "#C8A24B"
   },
   "chart": {
-    "_": "그래프 시리즈 색 규칙. emphasis 1~3 을 준 시리즈만 색을 받고 나머지는 연한 회색(gray 400). ranked 가 true 면 강조끼리 위계가 있어 primary 600→400→200, 아니면 primary→teal→gold",
+    "_": "그래프 시리즈 색 규칙. emphasis 1~3 을 준 시리즈만 색을 받고 나머지는 연한 회색(gray 400). ranked 가 true 면 강조끼리 위계가 있어 primary 600→350→200, 아니면 primary→teal→gold",
     "flat": [
       "primary.600",
       "accent.teal",
@@ -57,7 +58,7 @@
     ],
     "ranked": [
       "primary.600",
-      "primary.400",
+      "primary.350",
       "primary.200"
     ],
     "other": "gray.400"
