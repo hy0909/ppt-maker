@@ -181,7 +181,14 @@ export function loadOutline(file) {
   const sections = (raw.sections || []).map((s, i) => Object.assign({ no: i + 1, title: '', subtitle: '', slides: [] }, s));
   // 간지는 챕터가 시작되는 자리에 들어간다. 챕터를 두지 않는 문서만 dividers:false 로 끈다.
   meta.dividers = meta.dividers !== false;   // 옛 아웃라인의 'auto' 도 넣는 쪽으로 읽는다
-  const closing = raw.closing === false ? null : Object.assign({ message: '감사합니다', sub: '' }, raw.closing || {});
+  // 표지·마무리가 비면 사내 기본값(templates/company-default.json 의 meta)으로 채운다 — AI 가 지어내지 않게 (2026-10-11)
+  let CD = {};
+  try { CD = JSON.parse(fs.readFileSync(path.join(DS_DIR, '..', 'templates', 'company-default.json'), 'utf8')).meta || {}; } catch {}
+  if (!meta.company && CD.company) meta.company = CD.company;
+  meta.contact = Object.assign({}, CD.contact || {}, Object.fromEntries(Object.entries(meta.contact || {}).filter(([, v]) => v)));
+  if (!meta.docType) meta.docType = (CD.docTypeLabel || {})[meta.type] || '';
+  if (!meta.event) meta.event = meta.docType;   // 표지 오른쪽 아래 상자는 늘 채운다
+  const closing = raw.closing === false ? null : Object.assign({}, CD.closing || { message: '감사합니다', sub: '' }, Object.fromEntries(Object.entries(raw.closing || {}).filter(([, v]) => v)));
   const appendix = raw.appendix || [];
   return { meta, sections, closing, appendix, _file: path.resolve(file) };
 }

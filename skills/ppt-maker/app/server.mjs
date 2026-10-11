@@ -123,11 +123,14 @@ ${templates}
 # 장표 글 규칙
 ${writing}
 
-# 사내(SafeAI) 기본값 — 원문에 해당 정보가 없을 때 그대로 넣는다
-- 회사 소개(20): company-default.json 의 title·lead·blocks 를 그대로. **직원 수는 비워 두고** "[입력 필요: 직원 수]" 로 남긴다(만드는 사람에게 묻는다).
-- 연혁(25·26): history-default.json 의 groups 를 그대로(**굵게** 표시 포함). 항목이 많으면 layout "list" 로 두 장에 나눈다.
-- 인력 배치·조직도(27): org-default.json 의 head·teams 를 그대로. 사진은 넣지 않는다(빈 칸).
-- 다른 회사 문서(고객사·타사 소개)에는 이 기본값을 쓰지 않는다.
+# 사내(SafeAI) 기본값
+- **회사 소개서(company-intro)에만** 아래 세 장표를 넣는다. 다른 유형(제안서·보고서·IR)에는 원문이 따로 말하지 않는 한 넣지 않는다.
+  - 회사 소개(20): 첫 섹션 첫 장. company-default.json 의 title·lead·blocks 를 그대로. **직원 수는 비워 두고** "[입력 필요: 직원 수]" 로 남긴다(만드는 사람에게 묻는다).
+  - 연혁(25·26): 회사 소개 다음 장. history-default.json 의 groups 를 그대로(**굵게** 표시 포함). 항목이 많으면 layout "list" 로 두 장에 나눈다.
+  - 인력 배치·조직도(27): 팀·조직 섹션. org-default.json 의 head·teams 를 그대로. 사진은 넣지 않는다(빈 칸).
+- 표지(meta): company 는 "SafeAI", event 는 원문의 행사·공고명(없으면 문서 종류 한 구절, 예 "고객사 제안서"), docType 도 채운다. **비워 두지 않는다.**
+- 마무리(closing): **쓰지 않는다.** 렌더러가 기본 문구를 넣는다. closing 키 자체를 넣지 않는다.
+- 이 기본값은 SafeAI 가 만드는 문서용이다. 다른 회사를 소개하는 문서(타사 소개서)에는 쓰지 않는다.
 ${defaults}`;
 }
 

@@ -41,5 +41,25 @@
         ]
       ]
     }
-  ]
+  ],
+  "meta": {
+    "_": "표지·마무리 기본값. 아웃라인에 비어 있으면 렌더러가 채운다(AI 가 지어내지 않게).",
+    "company": "SafeAI",
+    "contact": {
+      "email": "contact@safeai.kr",
+      "web": "http://www.safeai.kr"
+    },
+    "closing": {
+      "message": "We are defining the future of AI,<br>where safety and<br>privacy are guaranteed.",
+      "sub": ""
+    },
+    "docTypeLabel": {
+      "gov-proposal": "정부 과제 제안서",
+      "client-proposal": "고객사 제안서",
+      "annual-report": "연차보고서",
+      "internal-report": "내부 진행보고",
+      "company-intro": "회사 소개서",
+      "ir": "투자 제안서"
+    }
+  }
 }

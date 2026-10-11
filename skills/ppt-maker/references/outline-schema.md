@@ -48,7 +48,7 @@
       ]
     }
   ],
-  "closing": { "message": "감사합니다", "sub": "한 줄" },   // false 로 생략
+  "closing": { "message": "…" },   // 보통 넣지 않는다 — 비우면 렌더러가 사내 기본 문구(company-default.json meta.closing)를 넣는다. false 면 장표 생략
   "appendix": [ /* slide 객체 배열. 헤더 태그가 APPENDIX 로 표기 */ ]
 }
 ```
