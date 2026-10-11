@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns,
+import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
@@ -344,17 +344,17 @@ function statFrag(st) {
   return `${st.sub ? `<div class="sl">${rich(st.sub)}</div>` : ''}<div class="sv">${val}</div>${st.desc ? `<div class="sn">${rich(st.desc)}</div>` : ''}`;
 }
 function chartPanel(b) {
-  const data = esc(JSON.stringify({ kind: b.kind, labels: b.labels || [], series: (b.series || []).slice(0, 4).map(sr => ({ values: sr.values || [] })) }));
-  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span class="aux">${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS()[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
+  const data = esc(JSON.stringify({ kind: b.kind, labels: b.labels || [], colors: SERIES_COLORS(b), series: (b.series || []).slice(0, 4).map(sr => ({ values: sr.values || [] })) }));
+  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span class="aux">${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS(b)[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
 }
-const SERIES_COLORS = () => [P.primary2, P.primary, P.teal, P.gold];
+const SERIES_COLORS = (b) => chartSeriesColors(b || {});   // 규칙은 common.mjs chartSeriesColors(강조 개수·위계)
 /** 그래프 — shadcn/ui Charts(recharts) 모양을 따른다: 가로 격자선만, 축선·눈금선 없음, 막대는 위 모서리만 둥글게, 선은 부드러운 곡선 + 점, 값 라벨은 위.
  *  그리는 코드는 CHART_DRAW_SRC 하나다. 서버는 기본 높이로 먼저 그려 두고(스크립트 없이도 보이게), 브라우저는 그래프 칸의 실제 가로세로 비율에 맞춰
  *  같은 함수로 다시 그린다(2026-10-10 — 그래야 가로를 꽉 채운다. viewBox 비율이 칸과 다르면 meet 때문에 좌우가 비었다). */
 const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   fs = fs || 21;   // 글자 기준 크기(px) = 장표의 작은 글(--fs-small × 배율). 그림 좌표 1 = 화면 1px
   var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
-  var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = C.series;
+  var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = b.colors || C.series;
   var all = [].concat.apply([], series.map(function(sr) { return sr.values || []; })).filter(function(v) { return typeof v === 'number'; });
   var max = Math.max.apply(null, [1].concat(all)) * 1.25, min = Math.min.apply(null, [0].concat(all));
   var padL = 20, padR = 20, padT = fs * 2.2, padB = fs * 2.6;   // 좌우 여백 20px, 위는 값 라벨, 아래는 축 라벨 자리
@@ -399,8 +399,8 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   return out + '</svg>';
 }`;
 const chartDraw = new Function('return (' + CHART_DRAW_SRC + ')')();
-const chartColors = () => ({ series: SERIES_COLORS(), border: P.border, textMid: P.textMid, body: P.body, text: P.text, labelRatio: D.label / D.small });
-function chartSvg(b, H = 416) { return chartDraw(b, 1200, H, chartColors()); }
+const chartColors = () => ({ series: SERIES_COLORS({}), border: P.border, textMid: P.textMid, body: P.body, text: P.text, labelRatio: D.label / D.small });
+function chartSvg(b, H = 416) { return chartDraw({ ...b, colors: SERIES_COLORS(b) }, 1200, H, chartColors()); }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
 /** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */
 export const IMAGE_RATIOS = { '16:9': [16, 9], '4:3': [4, 3], '1:1': [1, 1], '9:16': [9, 16], '3:4': [3, 4] };

@@ -100,11 +100,29 @@ const readJson = (f, fallback) => { try { return JSON.parse(fs.readFileSync(path
 export const COLORS = readJson('colors.json', {
   primary: { 800: '#2815B0', 700: '#2A14C8', 600: '#2B0CDD', 400: '#5D48FF', 300: '#7B69FF', 200: '#9B8EFF' },
   role: { main: '600', secondary: '400', deep: '800', mid: '700' },
-  gray: { title: '#10141C', text: '#1A2438', textMid: '#4A5568', body: '#515B75', textLight: '#8B95A7', borderStrong: '#B9C3D2',
-          rule: '#CFD4DC', border: '#D9DEE6', page: '#E9ECF0', bgSoft: '#F5F7FA', white: '#FFFFFF' },
-  accent: { glow: '#19E68C', glowMix: 0.6 },
+  gray: { 50: '#F5F7FA', 100: '#E9ECF0', 200: '#D9DEE6', 300: '#CFD4DC', 400: '#B9C3D2', 500: '#8B95A7', 600: '#515B75', 700: '#4A5568', 800: '#1A2438', 900: '#10141C',
+          role: { bgSoft: '50', page: '100', border: '200', rule: '300', borderStrong: '400', textLight: '500', body: '600', textMid: '700', text: '800', title: '900' }, white: '#FFFFFF' },
+  accent: { glow: '#19E68C', glowMix: 0.6, teal: '#00A89D', gold: '#C8A24B' },
+  chart: { flat: ['primary.600', 'accent.teal', 'accent.gold'], ranked: ['primary.600', 'primary.400', 'primary.200'], other: 'gray.400' },
   status: { success: '#138A4E', warning: '#C97A1F', danger: '#C9302C' },
 });
+// gray.role(이름 → 단계)을 풀어 COLORS.gray.text 처럼 이름으로도 읽히게 한다(옛 형식의 colors.json 도 그대로 동작)
+if (COLORS.gray && COLORS.gray.role) for (const [name, step] of Object.entries(COLORS.gray.role)) if (COLORS.gray[name] === undefined) COLORS.gray[name] = COLORS.gray[step];
+/** "primary.600"·"gray.400"·"accent.teal" 같은 색 경로를 hex 로 */
+export const colorAt = (path, fallback = '#888888') => { const [g, k] = String(path).split('.'); const v = COLORS[g] && COLORS[g][k]; return typeof v === 'string' ? v : fallback; };
+/** 그래프 시리즈 색 — emphasis(1~3)를 준 시리즈만 색을 받고 나머지는 연한 회색. ranked 면 primary 600→400→200, 아니면 primary→teal→gold.
+ *  emphasis 를 아무도 안 적었으면 첫 시리즈만 강조(1). */
+export function chartSeriesColors(chart) {
+  const series = (chart.series || []).slice(0, 4);
+  const spec = COLORS.chart || {};
+  const ladder = (chart.ranked ? spec.ranked : spec.flat) || ['primary.600', 'accent.teal', 'accent.gold'];
+  const other = colorAt(spec.other || 'gray.400');
+  const anyEm = series.some(s => s.emphasis);
+  return series.map((s, i) => {
+    const e = anyEm ? s.emphasis : (i === 0 ? 1 : 0);
+    return e >= 1 && e <= ladder.length ? colorAt(ladder[e - 1]) : other;
+  });
+}
 export const FONTS = readJson('fonts.json', {
   face: { coverTitle: 'Paperlogy 7 Bold', agendaTitle: 'Paperlogy 7 Bold', h2: 'Paperlogy 5 Medium', body2: 'Pretendard Light',
           headline: 'Paperlogy 6 SemiBold', headlineBold: 'Paperlogy 8 ExtraBold', regular: 'Paperlogy 4 Regular', body: 'Pretendard' },

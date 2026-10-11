@@ -11,7 +11,7 @@ const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // �
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -250,7 +250,7 @@ const dividerBg = (slide) => {
 // pptxgenjs 는 넘겨받은 옵션 객체를 제자리에서 변환한다 — 같은 객체를 재사용하면 값이 호출마다 곱해져
 // dir/blurRad 가 규격을 벗어나고 PowerPoint 가 '복구' 대화상자를 띄운다. 반드시 매번 새 객체를 만든다.
 const shadow = () => ({ type: 'outer', blur: 6, offset: 1.5, angle: 90, color: '14285A', opacity: 0.08 });
-const SERIES = () => [P.primary2, P.primary, P.teal, P.gold];
+const SERIES = (c) => chartSeriesColors(c || {});   // 규칙은 common.mjs chartSeriesColors
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** rounded card (white by default) with soft shadow */
@@ -437,7 +437,7 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const max = Math.max(1, ...all);
   const common = {
     x: IN(x + padX * 0.4), y: IN(y + padY + hh), w: IN(w - padX * 0.8), h: IN(ch),
-    chartColors: SERIES().map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
+    chartColors: SERIES(c).map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
     catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(D.label, k), catAxisLabelColor: colorToHex(P.body), catAxisLineShow: false, catGridLine: { style: 'none' },
     valAxisHidden: true, valGridLine: { color: colorToHex(P.border), style: 'solid', size: 0.75 }, valAxisMinVal: Math.min(0, ...all), valAxisMaxVal: Math.ceil(max * 1.3), valAxisLineShow: false, valAxisMajorUnit: Math.ceil(max * 1.3 / 4),
     showLegend: series.length > 1, legendPos: 'b', legendFontFace: FONT, legendFontSize: PT(D.small, k), legendColor: colorToHex(P.body),

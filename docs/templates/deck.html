@@ -584,7 +584,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   var draw = function(b, W, H, C, fs) {
   fs = fs || 21;   // 글자 기준 크기(px) = 장표의 작은 글(--fs-small × 배율). 그림 좌표 1 = 화면 1px
   var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
-  var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = C.series;
+  var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = b.colors || C.series;
   var all = [].concat.apply([], series.map(function(sr) { return sr.values || []; })).filter(function(v) { return typeof v === 'number'; });
   var max = Math.max.apply(null, [1].concat(all)) * 1.25, min = Math.min.apply(null, [0].concat(all));
   var padL = 20, padR = 20, padT = fs * 2.2, padB = fs * 2.6;   // 좌우 여백 20px, 위는 값 라벨, 아래는 축 라벨 자리
@@ -628,7 +628,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
   }
   return out + '</svg>';
 };
-  var C = {"series":["#5D48FF","#2B0CDD","#00A89D","#C8A24B"],"border":"#D9DEE6","textMid":"#4A5568","body":"#515B75","text":"#1A2438","labelRatio":0.875};
+  var C = {"series":[],"border":"#D9DEE6","textMid":"#4A5568","body":"#515B75","text":"#1A2438","labelRatio":0.875};
   function redraw() {
     document.querySelectorAll('.chart[data-chart]').forEach(function (el) {
       var plot = el.querySelector('.cplot'); if (!plot) return;
