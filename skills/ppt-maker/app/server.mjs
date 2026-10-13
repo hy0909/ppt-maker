@@ -86,6 +86,7 @@ function systemPrompt() {
   const schema = fs.readFileSync(path.join(REFS, 'outline-schema.md'), 'utf8');
   const templates = fs.readFileSync(path.join(REFS, 'outline-templates.md'), 'utf8');
   const writing = fs.readFileSync(path.join(REFS, 'writing.md'), 'utf8');
+  const blockChoice = fs.readFileSync(path.join(REFS, 'block-choice.md'), 'utf8');
   const TPL = path.join(REFS, '..', 'templates');
   const readTpl = f => { try { return fs.readFileSync(path.join(TPL, f), 'utf8'); } catch { return ''; } };
   const defaults = ['company-default.json', 'history-default.json', 'org-default.json'].map(f => `## ${f}\n${readTpl(f)}`).join('\n\n');
@@ -106,6 +107,7 @@ function systemPrompt() {
 - image 블록의 ratio 는 사용자가 정하지 않았으면 넣지 않는다(기본 16:9). 이미지 원본 비율이 다르면 사용자에게 정사각형(1:1)/가로형 1(16:9)/가로형 2(4:3)/세로형 1(9:16)/세로형 2(3:4)/원본 중 고르게 하고 그 값을 ratio 에 적는다.
 - 수치·인용이 있는 장표에는 slide.source 로 출처를 단다. 근거를 따지는 제출용 문서에서는 빠뜨리지 않는다. 원문에 적힌 출처만 옮기고, 근거가 필요한데 원문에 없으면 "[출처 필요]" 로 남긴다. 말머리 "출처:" 는 렌더러가 붙이니 빼고 쓰고, 여럿이면 배열로 준다. 단서·용어 풀이는 slide.footnote 에 한 줄로.
 - **수치는 텍스트로 나열하지 말고 시각화한다**: 전월/목표 대비 지표는 cards 의 rows(7월/8월 표) + highlight(전월대비 18% 증가), 월별 추이는 chart(line) 또는 columns 의 chart, 대표 수치 하나는 stat(큰 숫자 + 파란 보조 문장). 같은 종류의 그래프(채널별 월 추이 등)는 모두 같은 형식으로 통일한다. 그래프 시리즈는 **강조할 것에만 emphasis(1~3)** 를 주고 나머지는 두지 않는다(연한 회색으로 그려진다). 강조끼리 순위가 있으면 ranked: true.
+- **블록은 아래 "블록 고르는 기준"으로 고르고, 장표마다 why 에 근거를 "신호 → 블록" 한 줄로 쓴다**(예: "월별 방문자 6개월 추이 → chart(line)"). 같은 주 블록 3장 연속·한 블록 40% 초과는 피한다.
 - 한 텍스트 상자에 내용을 몰아넣지 않는다. 카드 안은 sections("| 소제목" + 불릿 2~3개)로 구조화하고, 굵기·크기로 강조를 분명히 한다. bullets 는 최후의 수단. 절차·로드맵은 process, 비교는 compare/table, 일정은 timeline.
 - 컬럼은 2~3개, 카드는 2~6개, 표 행은 3~7개. 한 장표에 블록 1~3개. 카드가 한 줄에 2~3개 나란히 놓이면 **항목 수(2~4개)와 문장 길이를 서로 비슷하게** 맞춘다(한 카드만 길거나 짧으면 어색하다). 각 항목은 한 줄짜리 명사구나 짧은 구로 쓴다. 장표 마지막에는 callout(label "핵심 요약"/"특이사항"/"참고", items 2~3개)로 닫는다. 배너 위계: 기본은 tone 없음, 위험·미달·주의사항은 tone "warn"(빨강), 덱 전체의 결론 한 줄은 tone "strong"(검정) — strong 은 덱에 한두 번만.
 - 강조: 표에는 emphasize(강조 열 index)와 leftAlign(글이 긴 열), 첫 열이 각 행의 항목 이름(세로 타이틀)이면 rowHeader: true, 마지막 단계 카드에 darkLast. 카드 본문은 늘 흰색이라 tint·primary 로는 강조되지 않는다. 어떤 열을 강조했는지 lead 나 notes 에 적지 않는다.
@@ -116,6 +118,9 @@ function systemPrompt() {
 
 # 스키마
 ${schema}
+
+# 블록 고르는 기준
+${blockChoice}
 
 # 문서 유형별 목차 템플릿
 ${templates}

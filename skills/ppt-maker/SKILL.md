@@ -71,10 +71,11 @@ python3 <skill>/scripts/prepare_cover_bg.py <원본이미지> <키> --label "이
 ### 2. 아웃라인 작성 — `references/outline-schema.md`
 1. 유형 템플릿의 섹션 순서를 따르되, 원문에 근거가 없는 섹션은 넣지 않는다(빈 자리는 `[입력 필요: …]`).
 2. 장표마다 `title`(주제)과 `lead`(결론 1~2문장)를 새로 쓴다. 원문을 그대로 붙이지 않는다.
-3. 본문은 `columns / cards / process / table / stats / compare / image / timeline / gantt / callout` 중 구조에 맞는 블록으로. 여러 일이 겹치는 일정은 `gantt`(왼쫙 항목 · 위 기간 · 가로 막대). `bullets`는 최후의 수단.
+3. **블록은 `references/block-choice.md` 순서대로 고른다**: 메시지 한 줄 → 원문 신호(숫자·시간·순서·대립) → 블록. 헷갈리는 짝(columns·cards / process·timeline·gantt / table·chart·stats)은 그 문서의 시험법으로 가른다. `bullets`는 최후의 수단.
+   장표마다 `why` 에 근거를 한 줄 적는다(`"월별 방문자 6개월 추이 → chart(line)"`). 다 쓰면 `node $S/check_blocks.mjs $W/outline.json` 으로 같은 블록 3연속·40% 쏠림·`why` 누락을 확인하고 고친다.
 4. **표를 넣을 때는 강조할 열을 사용자에게 먼저 묻는다.**
 5. 수치·시장규모·고객명은 원문에 있는 것만. 같은 개념은 문서 전체에서 한 표현으로 통일.
-6. 사용자에게 보여주고 확인받는다: 섹션 목록, 장표별 제목+리드+블록 타입, `[입력 필요]` 목록.
+6. 사용자에게 보여주고 확인받는다: 섹션 목록, 장표별 제목+리드+블록 타입+**고른 근거(`why`)**, `[입력 필요]` 목록. 근거가 보여야 사용자가 "여기는 표 말고 그래프" 처럼 바로 짚는다.
 7. **이미지 상자는 기본 16:9.** 이미지 파일을 받으면 원본 비율을 잰다(`sips -g pixelWidth -g pixelHeight <파일>`). 16:9 가 아니면 이렇게 묻는다 — "이미지 비율을 몇으로 할까요? 정사각형(1:1) / 가로형 1(16:9) / 가로형 2(4:3) / 세로형 1(9:16) / 세로형 2(3:4) / 이미지 원본 비율". 고른 값을 그 블록의 `ratio` 에 적는다(`original` 은 원본 그대로, 나머지는 상자에 맞춰 가장자리가 잘림). 같은 장표에 이미지가 여럿이면 한 번에 묶어 묻는다.
 
 저장 위치: `<작업폴더>/outline.json`. 이미지는 `<작업폴더>/out/assets/`에 두고 `assets/파일명`으로 참조.
@@ -157,10 +158,11 @@ python3 $S/extract_pptx.py <원본.pptx> $W/outline.json --images $W/out/assets
 ppt-maker/
 ├── SKILL.md
 ├── app/       server.mjs (로컬 웹 화면: 설정→입력→장표 구성 편집→PPT 만들기→미리보기·다운로드) · index.html · workspace/
-├── scripts/   build_html.mjs · fit_slides.mjs · check_overflow.mjs · export_pdf.mjs · build_pptx.mjs (예전 디자인: *_classic.mjs)
-│              extract_pptx.py · verify_pptx.py · lib/common.mjs · package.json
+├── scripts/   build_html.mjs · fit_slides.mjs · check_blocks.mjs · check_overflow.mjs · export_pdf.mjs · build_pptx.mjs (예전 디자인: *_classic.mjs)
+│              eval_block_choice.mjs · extract_pptx.py · verify_pptx.py · lib/common.mjs · package.json
+├── tests/block-choice/cases.json  블록 선택 시험 세트 (원문 조각 → 정답 블록)
 ├── assets/    deck-stage.js · deck-editor.js · cover-bg/
-├── references/ outline-schema.md · outline-templates.md · intake-questions.md · design-system.md
+├── references/ outline-schema.md · block-choice.md · outline-templates.md · intake-questions.md · design-system.md
 └── agents/openai.yaml
 ```
 예제: `../../examples/breezehome/outline.json` (마케팅 월간 보고서) → `out/`.
