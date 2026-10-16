@@ -67,6 +67,7 @@ python3 <skill>/scripts/prepare_cover_bg.py <원본이미지> <키> --label "이
 | 소개서 | IR (투자자) | `ir` | 발표용 |
 
 목차 골격과 장수·레이아웃은 `references/outline-templates.md`.
+숫자가 이야기를 끌고 가는 리서치·결산 자료는 `references/style-data-report.md` 의 목차 골격과 제목 규칙을 함께 본다.
 
 ### 2. 아웃라인 작성 — `references/outline-schema.md`
 1. 유형 템플릿의 섹션 순서를 따르되, 원문에 근거가 없는 섹션은 넣지 않는다(빈 자리는 `[입력 필요: …]`).
@@ -163,6 +164,7 @@ ppt-maker/
 ├── tests/block-choice/cases.json  블록 선택 시험 세트 (원문 조각 → 정답 블록)
 ├── assets/    deck-stage.js · deck-editor.js · cover-bg/
 ├── references/ outline-schema.md · block-choice.md · outline-templates.md · intake-questions.md · design-system.md
+│              style-data-report.md  참고 화면에서 뽑은 데이터 리포트 스타일 (아직 템플릿 없음)
 └── agents/openai.yaml
 ```
 예제: `../../examples/breezehome/outline.json` (마케팅 월간 보고서) → `out/`.
