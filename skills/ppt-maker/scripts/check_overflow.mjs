@@ -207,7 +207,7 @@ for (let i = 0; i < n; i++) {
     }
 
     // 장 구성 지문 (연속 검사는 바깥에서)
-    const kinds = ['ul.rl', '.card', '.tbl', '.stat', '.rm', '.pic', '.cmp', '.chart', '.banner', '.msg', '.hbox'];
+    const kinds = ['ul.rl', '.card', '.tbl', '.stat', '.rm', '.pic', '.cmp', '.chart', '.banner', '.msg', '.hbox', '.fc', '.an', '.flow', '.strip', '.qa', '.rsl'];
     const sig = kinds.filter(k => sec.querySelector(k)).join('+') + '#' + sec.querySelectorAll('.card').length;
 
     return { label, isContent, sig, findings: out };

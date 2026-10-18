@@ -525,3 +525,14 @@ export const PAPERLOGY_FONT_FACE = PAPERLOGY_WEIGHTS.map(w => {
   const file = 'Paperlogy-' + w.replace(' ', '');
   return `@font-face{font-family:'Paperlogy ${w}';src:local('Paperlogy ${w}'),local('${file}'),url('https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/woff2/${file}.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}`;
 }).join('\n');
+
+/** 높이가 내용만큼인 블록(장표 아래에 붙는 띠). 나머지 블록은 flex 로 남는 높이를 나눠 갖는다. */
+export const AUTO_H_BLOCKS = new Set(['callout', 'flow', 'strip']);
+
+/** 제품 해부도 점 하나 → {x, y, lx, ly, label} (모두 그림 상자 안 %). 이름표 자리를 안 주면 가까운 바깥쪽으로 22% 띄운다. */
+export function annotPin(p) {
+  const x = Math.max(0, Math.min(100, Number(p.x) || 0)), y = Math.max(0, Math.min(100, Number(p.y) || 0));
+  const lx = p.lx !== undefined ? Number(p.lx) : Math.max(-8, Math.min(108, x + (x < 50 ? -22 : 22)));
+  const ly = p.ly !== undefined ? Number(p.ly) : y;
+  return { x, y, lx, ly, label: String(p.label || '') };
+}

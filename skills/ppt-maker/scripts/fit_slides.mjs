@@ -26,7 +26,7 @@ await page.evaluate(() => document.fonts.ready);
 const fits = await page.evaluate(({ kmin, kmax }) => {
   const overflows = (sec) => {
     const sr = sec.getBoundingClientRect();
-    for (const el of sec.querySelectorAll('.body, .blk, .colbody, .cardx, .step .sd, .side, .txt, .ph, .tbl, .colm, .bul, .card, .stat, .step, .pic, .fill, .rt, .banner, .inner, .chart, .msg')) {
+    for (const el of sec.querySelectorAll('.body, .blk, .colbody, .cardx, .step .sd, .side, .txt, .ph, .tbl, .colm, .bul, .card, .stat, .step, .pic, .fill, .rt, .banner, .inner, .chart, .msg, .fc, .an, .qi, .rsl, .fst, .strip, .cb, .hero, .lst, .sd, .cc')) {
       if (el.scrollHeight - el.clientHeight > 1 || el.scrollWidth - el.clientWidth > 1) return true;
     }
     for (const el of sec.querySelectorAll('.body *')) {
@@ -68,7 +68,7 @@ const gaps = await page.evaluate(({ MING, MAXG }) => {
   const secOver = (sec) => {
     if (!sec) return false;
     const sr = sec.getBoundingClientRect();
-    for (const el of sec.querySelectorAll('.body, .blk, .inner, .card, .stat, .side, .tbl, .rt, .chart, .banner, .bd, .fill, .step, .pic')) {
+    for (const el of sec.querySelectorAll('.body, .blk, .inner, .card, .stat, .side, .tbl, .rt, .chart, .banner, .bd, .fill, .step, .pic, .fc, .an, .qi, .rsl, .fst, .strip, .cb, .hero, .lst, .sd, .cc')) {
       if (el.scrollHeight - el.clientHeight > 1 || el.scrollWidth - el.clientWidth > 1) return true;
     }
     const body = sec.querySelector('.body');

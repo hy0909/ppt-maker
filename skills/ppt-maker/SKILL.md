@@ -73,6 +73,7 @@ python3 <skill>/scripts/prepare_cover_bg.py <원본이미지> <키> --label "이
 1. 유형 템플릿의 섹션 순서를 따르되, 원문에 근거가 없는 섹션은 넣지 않는다(빈 자리는 `[입력 필요: …]`).
 2. 장표마다 `title`(주제)과 `lead`(결론 1~2문장)를 새로 쓴다. 원문을 그대로 붙이지 않는다.
 3. **블록은 `references/block-choice.md` 순서대로 고른다**: 메시지 한 줄 → 원문 신호(숫자·시간·순서·대립) → 블록. 헷갈리는 짝(columns·cards / process·timeline·gantt / table·chart·stats)은 그 문서의 시험법으로 가른다. `bullets`는 최후의 수단.
+   그림·글을 함께 쓰는 장표(그림 카드·해부도·원형 단계·큰 숫자 패널·아래 띠)는 `references/layout-patterns.md` 의 구성 방식을 따른다. 사용자가 레퍼런스 장표를 주면 이미지는 저장하지 말고 구성만 이 문서에 글로 더한다.
    장표마다 `why` 에 근거를 한 줄 적는다(`"월별 방문자 6개월 추이 → chart(line)"`). 다 쓰면 `node $S/check_blocks.mjs $W/outline.json` 으로 같은 블록 3연속·40% 쏠림·`why` 누락을 확인하고 고친다.
 4. **표를 넣을 때는 강조할 열을 사용자에게 먼저 묻는다.**
 5. 수치·시장규모·고객명은 원문에 있는 것만. 같은 개념은 문서 전체에서 한 표현으로 통일.
@@ -163,7 +164,7 @@ ppt-maker/
 │              eval_block_choice.mjs · extract_pptx.py · verify_pptx.py · lib/common.mjs · package.json
 ├── tests/block-choice/cases.json  블록 선택 시험 세트 (원문 조각 → 정답 블록)
 ├── assets/    deck-stage.js · deck-editor.js · cover-bg/
-├── references/ outline-schema.md · block-choice.md · outline-templates.md · intake-questions.md · design-system.md
+├── references/ outline-schema.md · block-choice.md · layout-patterns.md · outline-templates.md · intake-questions.md · design-system.md
 │              style-data-report.md  참고 화면에서 뽑은 데이터 리포트 스타일 (아직 템플릿 없음)
 └── agents/openai.yaml
 ```

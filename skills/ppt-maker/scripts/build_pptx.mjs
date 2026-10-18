@@ -12,7 +12,7 @@ const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // �
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, coverTitleW, closingBgCss, coverScrim,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors, AUTO_H_BLOCKS, annotPin } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -309,6 +309,17 @@ function pill(slide, label, x, y, k, { fill = P.primary, color = P.white } = {})
   text(slide, label, x, y, w, h, { size: D.cardTitle, k, color, bold: true, align: 'center', valign: 'middle' });
   return w;
 }
+/** 색·굵기가 다른 글 조각을 한 줄로: parts = [[글, 색, 굵게?], …] */
+function runsText(slide, parts, x, y, w, h, { size, k = 1, bold = false, align = 'left', valign = 'top', lineSpacing = 1.3 } = {}) {
+  const runs = parts.map(([t, color, b]) => ({ text: String(t), options: { fontFace: FONT, fontSize: PT(size, k), color: colorToHex(color), bold: b ?? bold, charSpacing: -0.8 } }));
+  slide.addText(runs, { x: IN(x), y: IN(y), w: IN(Math.max(1, w)), h: IN(Math.max(1, h)), align, valign, margin: 0, lineSpacingMultiple: lineSpacing, fit: 'none', autoFit: false });
+}
+/** 그림 자리표시자: 점선 상자 + "[ 설명 ]" (HTML 의 .ph 와 같은 모양) */
+function placeholder(slide, label, x, y, w, h, k, fill = P.bgSoft) {
+  rect(slide, x, y, Math.max(1, w), Math.max(1, h), { fill, line: { color: '#C3CAD5', width: 1.5 }, radius: 8, dash: 'dash' });
+  const lab = String(label || '그림 자리').trim();
+  text(slide, /^\[.*\]$/.test(lab) ? lab : `[ ${lab} ]`, x, y, Math.max(1, w), Math.max(1, h), { size: D.small, k, color: '#6F7C92', align: 'center', valign: 'middle' });
+}
 /** 카드 = 둥근 알약(제목) + 간격 + 흰 본문 상자.
  *  알약: 완전히 둥근 피치, 주 컬러 배경, 흰 굵은 중앙 정렬 텍스트.
  *  본문: 별도의 둥근 카드(반지름 16, 부드러운 그림자).
@@ -520,6 +531,64 @@ function fragImage(src, caption, k, w, ratio) {
     } else if (capH) text(slide, caption, x, y + h - capH, w, capH, { size: D.caption, k, color: P.textLight, align: 'center', valign: 'middle' });   // 캡션
   } };
 }
+/** 카드 안 진행 막대(HTML .pbar): 큰 수치 + 오른쪽 라벨 → 둥근 막대 → 선 + 가운데 글. 카드 아래쪽에 붙는다 */
+function fragBar(bar, k, w) {
+  const v = Math.max(0, Math.min(100, Number(bar.value) || 0)), st = D.stat * k, em = D.body * k;
+  const th = bar.foot ? D.label * k * 1.4 + em * 0.55 : 0, h = st * 1.05 + em * 0.45 + em * 0.75 + (th ? em * 0.45 + th : 0);
+  return { h, flex: 1, draw: (slide, x, y, hh) => {
+    let yy = y + Math.max(0, hh - h);
+    text(slide, String(bar.text ?? v + '%'), x, yy, w * 0.5, st * 1.05, { size: D.stat, k, bold: true, color: P.primary, valign: 'bottom' });
+    if (bar.label) text(slide, bar.label, x + w * 0.4, yy, w * 0.6, st * 1.05, { size: D.small, k, color: P.textMid, align: 'right', valign: 'bottom' });
+    yy += st * 1.05 + em * 0.45;
+    rect(slide, x, yy, w, em * 0.75, { fill: P.bgSoft, radius: em * 0.37 });
+    if (v) rect(slide, x, yy, Math.max(em * 0.75, w * v / 100), em * 0.75, { fill: P.primary, radius: em * 0.37 });
+    yy += em * 0.75 + em * 0.45;
+    if (bar.foot) { rect(slide, x, yy, w, 1, { fill: P.border }); text(slide, bar.foot, x, yy + em * 0.3, w, th - em * 0.3, { size: D.label, k, bold: true, color: P.primary, align: 'center', valign: 'middle' }); }
+  } };
+}
+/** 원형 단계도: 지름이 같은 원 n 개(테두리만) + 점선 화살표 */
+function processCircle(slide, b, box, k) {
+  const steps = b.steps || [], n = steps.length, em = D.body * k;
+  const d = Math.min(box.h, (box.w - (n - 1) * em * 4) / n), gap = (box.w - d * n) / Math.max(1, n - 1), cy = box.y + box.h / 2;
+  steps.forEach((s, i) => {
+    const x = box.x + i * (d + gap), y = cy - d / 2;
+    slide.addShape(pres.shapes.OVAL, { x: IN(x), y: IN(y), w: IN(d), h: IN(d), fill: { color: 'FFFFFF' }, line: { color: colorToHex(s.highlight ? P.primary : P.title), width: s.highlight ? 1.9 : 1.1 } });
+    if (i) {
+      const ax = x - gap + em * 0.6, aw = gap - em * 1.2;
+      slide.addShape(pres.shapes.LINE, { x: IN(ax), y: IN(cy), w: IN(aw), h: IN(0.5), line: { color: colorToHex(P.title), width: 1.5, dashType: 'sysDot', endArrowType: 'triangle' } });
+    }
+    const iw = d - em * 2.4, parts = [];
+    if (s.period) parts.push([s.period, D.label, P.primary, true]);
+    parts.push([s.title || '', D.cardTitle, P.title, true]);
+    if (s.desc) parts.push([s.desc, D.label, P.textMid, false]);
+    const hs = parts.map(([t, sz]) => lines(t, sz * k, iw) * sz * k * 1.45), tot = hs.reduce((a, c) => a + c, 0) + em * 0.4 * (parts.length - 1);
+    let yy = cy - tot / 2;
+    parts.forEach(([t, sz, col, bold], j) => { text(slide, t, x + em * 1.2, yy, iw, hs[j], { size: sz, k, color: col, bold, align: 'center', lineSpacing: 1.45 }); yy += hs[j] + em * 0.4; });
+  });
+}
+/** 화살표 머리띠 단계: 위 갈매기 띠(연함 → 메인 → 진함) · 가운데 흰 카드(제목 + 목록) · 아래 진한 "완료 기준" 띠 */
+function processChevron(slide, b, box, k) {
+  const steps = b.steps || [], n = steps.length, em = D.body * k, gap = D.gap * k * 1.6;
+  const cw = (box.w - gap * (n - 1)) / n, hh = D.cardTitle * k * 2.6, dh = steps.some(s => s.done) ? D.small * k * 2.6 : 0, g = em * 0.7;
+  const tone = i => n === 1 ? [P.primary, P.white] : i === 0 ? [P.softerBlue, P.title] : i === n - 1 ? [P.primaryDeep, P.white] : [P.primary, P.white];
+  steps.forEach((s, i) => {
+    const x = box.x + i * (cw + gap), [bg, fg] = tone(i);
+    const w = i === n - 1 ? cw : cw + gap - em * 0.3;
+    slide.addShape(i === 0 ? pres.shapes.PENTAGON : pres.shapes.CHEVRON, { x: IN(x), y: IN(box.y), w: IN(w), h: IN(hh), fill: { color: colorToHex(bg) }, line: { type: 'none' } });
+    runsText(slide, [[`${i + 1}   `, fg, true], [String(s.title || '').replace(/\*\*/g, ''), fg, true], ...(s.period ? [[`   ${s.period}`, fg, false]] : [])], x + em * (i ? 1.8 : 1.2), box.y, w - em * 2.6, hh, { size: D.cardTitle, k, valign: 'middle' });
+    const by = box.y + hh + g, bh = box.y + box.h - by - (dh ? dh + g : 0);
+    rect(slide, x, by, cw, bh, { fill: P.white, line: { color: P.border, width: 0.75 }, radius: 6 });
+    const px = em * 1.4, iw = cw - px * 2; let yy = by + em;
+    if (s.heading) { const h = lines(s.heading, D.cardTitle * 1.1 * k, iw) * D.cardTitle * 1.1 * k * 1.3; text(slide, s.heading, x + px, yy, iw, h, { size: D.cardTitle * 1.1, k, bold: true, color: P.title }); yy += h + em * 0.6; }
+    if (s.items) listBox(slide, s.items, x + px, yy, iw, Math.max(1, by + bh - em - yy), k, { size: D.small });
+    else if (s.desc) text(slide, s.desc, x + px, yy, iw, Math.max(1, by + bh - em - yy), { size: D.small, k, color: P.body });
+    if (dh) {
+      const dy = box.y + box.h - dh;
+      rect(slide, x, dy, cw, dh, { fill: P.title, radius: 4 });
+      if (s.done) runsText(slide, [['완료 기준 : ', 'rgba(255,255,255,.75)', false], [String(s.done).replace(/\*\*/g, ''), P.white, true]], x, dy, cw, dh, { size: D.small, k, align: 'center', valign: 'middle' });
+    }
+  });
+}
 /** stack fragments inside a box: fixed ones keep their height, flex ones share the remaining space; leftover is distributed evenly (space-evenly). */
 function stack(slide, box, k, frags) {
   frags = frags.filter(Boolean);
@@ -546,6 +615,7 @@ function cardFrags(c, k, w, dark = false) {
     c.text ? fragText(c.text, k, w) : null,
     c.chart ? fragChart(c.chart, k, w) : null,
     c.image !== undefined ? fragImage(c.image, c.caption, k, w, c.ratio) : null,
+    c.bar ? fragBar(c.bar, k, w) : null,
   ];
 }
 
@@ -586,6 +656,8 @@ const B = {
   },
   process(slide, b, box, k) {
     const steps = b.steps || []; const n = steps.length; if (!n) return;
+    if (b.style === 'circle') return processCircle(slide, b, box, k);
+    if (b.style === 'chevron') return processChevron(slide, b, box, k);
     const em = D.body * k, gap = D.gap * k, sw = (box.w - gap * (n - 1)) / n;
     const csize = em * 2.6, lineY = box.y + em * 1.3;
     rect(slide, box.x + box.w * 0.04, lineY - 1, box.w * 0.92, 2, { fill: mix(P.primary, P.page, 0.55) });
@@ -798,7 +870,10 @@ const B = {
     rect(slide, box.x, box.y + tblH - 3, box.w, 3, { fill: P.textMid });
   },
   compare(slide, b, box, k) {
-    const em = D.body * k, mid = em * 3, w = (box.w - mid) / 2;
+    const em = D.body * k;
+    const res = b.result, cg = res ? D.gap * k * 0.8 : 0, mid = em * 3;
+    // 결과판이 있으면 1fr 1fr 3em 1.15fr (HTML .cmp.res 와 같은 비율), 없으면 1fr 3em 1fr
+    const w = res ? (box.w - mid - cg * 3) / 3.15 : (box.w - mid) / 2;
     const side = (s, x, to) => {
       const inner = bandCard(slide, { x, y: box.y, w, h: box.h }, k, s.tag || (to ? 'TO-BE' : 'AS-IS'), { body: to ? P.softerBlue : P.white, band: to ? P.primary : P.textMid });
       let y = inner.y;
@@ -811,6 +886,27 @@ const B = {
       stack(slide, rest, k, [s.sections ? fragSections(s.sections, k, inner.w) : null, s.items ? fragList(s.items, k, inner.w) : null]);
     };
     side(b.left || {}, box.x, false);
+    if (res) {
+      side(b.right || {}, box.x + w + cg, true);
+      const ax = box.x + w * 2 + cg * 2, cd = em * 1.9;
+      slide_dot(slide, ax + mid / 2 - cd / 2, box.y + box.h / 2 - cd / 2, cd, P.title);
+      text(slide, '▶', ax + mid / 2 - cd / 2 + cd * 0.06, box.y + box.h / 2 - cd / 2, cd, cd, { size: D.body * 0.8, k, color: P.white, align: 'center', valign: 'middle' });
+      const rx = ax + mid + cg, rw = box.x + box.w - rx, pad = em * 1.1;
+      rect(slide, rx, box.y, rw, box.h, { fill: P.softerBlue, radius: SHAPE.card });
+      let y = box.y + em;
+      if (res.heading) { const hh = lines(res.heading, D.cardTitle * 1.1 * k, rw - pad * 2) * D.cardTitle * 1.1 * k * 1.3; text(slide, res.heading, rx + pad, y, rw - pad * 2, hh, { size: D.cardTitle * 1.1, k, bold: true, color: P.primary }); y += hh + em * 0.55; }
+      const its = (res.items || []).map(it => typeof it === 'object' ? it : { k: it }), n = Math.max(1, its.length), g = em * 0.55;
+      const rh = (box.y + box.h - em - y - g * (n - 1)) / n;
+      its.forEach((it, i) => {
+        const ry = y + i * (rh + g), d = D.label * k * 2;
+        rect(slide, rx + pad, ry, rw - pad * 2, rh, { fill: P.white, radius: 8 });
+        slide_dot(slide, rx + pad + em * 0.9, ry + rh / 2 - d / 2, d, P.bgSoft);
+        text(slide, String(i + 1).padStart(2, '0'), rx + pad + em * 0.9, ry + rh / 2 - d / 2, d, d, { size: D.label, k, bold: true, color: P.textMid, align: 'center', valign: 'middle' });
+        const tx = rx + pad + em * 0.9 + d + em * 0.8, tw = rx + rw - pad - em * 0.9 - tx;
+        text(slide, [{ text: it.k || '', size: D.small, bold: true, color: P.primary }, ...(it.v ? [{ text: it.v, size: D.label, color: P.body }] : [])], tx, ry, tw, rh, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });
+      });
+      return;
+    }
     // 전/후 화살표 = 검정 원 안 흰 삼각형
     const cd = em * 1.9, cx = box.x + w + mid / 2 - cd / 2, cy = box.y + box.h / 2 - cd / 2;
     slide_dot(slide, cx, cy, cd, P.title);
@@ -832,6 +928,200 @@ const B = {
       const inner = labeledCard(slide, { x: tx, y: box.y, w: tw, h: box.h }, k, b.text.heading, P.white);
       stack(slide, inner, k, [b.text.sections ? fragSections(b.text.sections, k, inner.w) : null, b.text.items ? fragList(b.text.items, k, inner.w) : null]);
     }
+  },
+  /** 그림 카드 — HTML 의 .fcg 와 같은 배치. side: 글 왼쪽(세로 가운데)·그림 오른쪽 아래, top: 위 그림(높이 50%)·아래 글·아래 띠 */
+  figcards(slide, b, box, k) {
+    const cs = b.cards || [], n = cs.length; if (!n) return;
+    const side = b.layout !== 'top', em = D.body * k;
+    const cols = b.cols || (side ? (n === 4 ? 2 : Math.min(n, 3)) : Math.min(n, 4));
+    const arrows = !!b.arrows && !side && cols === n;
+    const gap = arrows ? em * 2 : D.gap * k * 1.6, rows = Math.ceil(n / cols);
+    const cw = (box.w - gap * (cols - 1)) / cols, ch = (box.h - D.gap * k * 1.6 * (rows - 1)) / rows;
+    const center = !side && b.align !== 'left';
+    const titleParas = (t, size, bold) => String(t || '').split(/<br\s*\/?>/i).map(s => ({ text: s, size, bold }));
+    cs.forEach((c, i) => {
+      const x = box.x + (i % cols) * (cw + gap), y = box.y + Math.floor(i / cols) * (ch + D.gap * k * 1.6);
+      card(slide, x, y, cw, ch, P.white);
+      if (arrows && i) text(slide, '›', x - gap, y, gap, ch, { size: D.body * 1.4, k, bold: true, color: P.primary, align: 'center', valign: 'middle' });
+      if (side) {
+        const tx = x + em * 1.5, tw = (cw - em * 1.5) * 1.25 / 2.25, iw = cw - em * 1.5 - tw;
+        const tSize = D.cardTitle * 1.25, tLines = String(c.title || '').split(/<br\s*\/?>/i).reduce((a, s) => a + lines(s, tSize * k, tw), 0);
+        const parts = [];
+        if (c.eyebrow) parts.push({ h: lines(c.eyebrow, D.label * k, tw) * D.label * k * 1.4, draw: (yy, h) => text(slide, c.eyebrow, tx, yy, tw, h, { size: D.label, k, color: P.textMid }) });
+        parts.push({ h: tLines * tSize * k * 1.3, draw: (yy, h) => text(slide, titleParas(c.title, tSize, false), tx, yy, tw, h, { size: tSize, k, color: P.text, lineSpacing: 1.3 }) });
+        if (c.desc) parts.push({ h: lines(c.desc, D.small * k, tw) * D.small * k * 1.5, draw: (yy, h) => text(slide, c.desc, tx, yy, tw, h, { size: D.small, k, color: P.textMid, lineSpacing: 1.5 }) });
+        if (c.note) parts.push({ h: lines(c.note, D.small * k, tw) * D.small * k * 1.4, draw: (yy, h) => text(slide, c.note, tx, yy, tw, h, { size: D.small, k, color: P.primary, bold: true }) });
+        const tot = parts.reduce((a, p) => a + p.h, 0) + em * 0.35 * (parts.length - 1);
+        let yy = y + em * 1.1 + Math.max(0, (ch - em * 2.2 - tot) / 2);
+        parts.forEach(p => { p.draw(yy, p.h); yy += p.h + em * 0.35; });
+        // 그림: 카드 오른쪽 아래 모서리에 붙인다(원본 비율)
+        const ix = x + cw - iw, iy = y + em * 1.1, ih = ch - em * 1.1;
+        const p = c.image ? path.resolve(outdir, c.image) : null, d = p && fs.existsSync(p) ? imgDims(p) : null;
+        if (d) { const sc = Math.min(iw / d.w, ih / d.h); slide.addImage({ path: p, altText: path.basename(c.image), x: IN(ix + iw - d.w * sc), y: IN(iy + ih - d.h * sc), w: IN(d.w * sc), h: IN(d.h * sc) }); }
+        else placeholder(slide, c.alt || '그림 자리', ix, iy, iw - em, ih - em, k);
+        return;
+      }
+      // top
+      const px = em * 1.1, ix = x + px, iw = cw - px * 2; let yy = y + em;
+      const bottom = y + ch - em * 1.1;
+      if (c.head) {
+        const hs = D.label * k, lab = `${c.head.no ?? ''}${c.head.text ? '   ' + c.head.text : ''}`, hw = estW(lab, hs) + hs * 1.8, hh = hs * 1.9;
+        rect(slide, ix, yy, hw, hh, { fill: P.softerBlue, radius: 6 });
+        runsText(slide, [[String(c.head.no ?? ''), P.primary, true], ...(c.head.text ? [['   ' + c.head.text, P.textMid, false]] : [])], ix, yy, hw, hh, { size: D.label, k, align: 'center', valign: 'middle' });
+        yy += hh + em * 0.55;
+      }
+      const footH = c.foot ? D.label * k * 1.4 + em : 0;
+      const ih = (y + ch - yy - em * 1.1) * 0.5 + (c.head ? 0 : em * 0.3);
+      if (!image(slide, c.image, ix, yy, iw, ih, false)) placeholder(slide, c.alt || '그림 자리', ix, yy, iw, ih, k);
+      yy += ih + em * 0.55;
+      const al = center ? 'center' : 'left', tSize = D.cardTitle * 1.1;
+      const th = lines(c.title, tSize * k, iw) * tSize * k * 1.3;
+      text(slide, titleParas(c.title, tSize, true), ix, yy, iw, th, { size: tSize, k, bold: true, color: P.text, align: al, lineSpacing: 1.3 }); yy += th + em * 0.35;
+      if (c.desc) { const h = lines(c.desc, D.small * k, iw) * D.small * k * 1.5; text(slide, c.desc, ix, yy, iw, h, { size: D.small, k, color: P.textMid, align: al, lineSpacing: 1.5 }); yy += h + em * 0.35; }
+      if (c.items) { const lp = listParas(c.items, k, iw, { size: D.small }); listBox(slide, c.items, ix, yy, iw, lp.h, k, { size: D.small }); yy += lp.h + em * 0.35; }
+      if (c.note) { const h = lines(c.note, D.small * k, iw) * D.small * k * 1.4; text(slide, c.note, ix, yy, iw, h, { size: D.small, k, bold: true, color: P.primary, align: al }); yy += h; }
+      if (c.foot) {
+        const fy = bottom - footH, ls = D.label * k, lw = estW(c.foot.label || '', ls);
+        rect(slide, ix, fy, iw, footH, { fill: P.bgSoft, radius: 8 });
+        text(slide, c.foot.label || '', ix + em * 0.9, fy, lw + 2, footH, { size: D.label, k, bold: true, color: P.primary, valign: 'middle' });
+        text(slide, c.foot.text || '', ix + em * 0.9 + lw + em * 0.8, fy, Math.max(1, iw - lw - em * 2.5), footH, { size: D.label, k, color: P.body, valign: 'middle' });
+      }
+    });
+  },
+  /** 제품 해부도 — 연회색 판 위 왼쪽 글, 오른쪽 사진(비율 상자) + 점·선·이름표 */
+  annotate(slide, b, box, k) {
+    const em = D.body * k, t = b.text, ims = b.images || [];
+    rect(slide, box.x, box.y, box.w, box.h, { fill: P.bgSoft, radius: SHAPE.card });
+    const ix0 = box.x + em * 1.6, iy0 = box.y + em, iw0 = box.w - em * 3.2, ih0 = box.h - em * 2;
+    let gx = ix0;
+    if (t) {
+      const tw = iw0 * 0.24, ts = D.cardTitle * 1.5;
+      const parts = [];
+      if (t.eyebrow) parts.push({ h: D.small * k * 1.5, draw: (y, h) => text(slide, t.eyebrow, gx, y, tw, h, { size: D.small, k, color: P.textMid }) });
+      const tl = lines(t.title, ts * k, tw) + (t.accent ? lines(t.accent, ts * k, tw) : 0);
+      parts.push({ h: tl * ts * k * 1.25 + em * 0.45, draw: (y, h) => {
+        text(slide, [{ text: t.title || '', color: P.text }, ...(t.accent ? [{ text: t.accent, color: P.primary }] : [])], gx, y, tw, h - em * 0.45, { size: ts, k, bold: true, lineSpacing: 1.25 });
+        rect(slide, gx, y + h, tw, 1, { fill: P.borderStrong });
+      } });
+      if (t.items) { const lp = listParas(t.items, k, tw, { size: D.small }); parts.push({ h: lp.h + em * 0.6, draw: (y, h) => listBox(slide, t.items, gx, y + em * 0.6, tw, h, k, { size: D.small }) }); }
+      const tot = parts.reduce((a, p) => a + p.h, 0) + em * 0.4 * (parts.length - 1);
+      let y = iy0 + Math.max(0, (ih0 - tot) / 2);
+      parts.forEach(p => { p.draw(y, p.h); y += p.h + em * 0.4; });
+      gx += tw + D.gap * k * 2;
+    }
+    const gap = D.gap * k * 1.6, aw = (ix0 + iw0 - gx - gap * (ims.length - 1)) / Math.max(1, ims.length);
+    ims.forEach((im, i) => {
+      const ax = gx + i * (aw + gap); let ay = iy0, ah = ih0;
+      if (im.caption) { const h = D.small * k * 1.5; text(slide, im.caption, ax, ay, aw, h, { size: D.small, k, bold: true, color: P.textMid, align: 'center' }); ay += h + em * 0.4; ah -= h + em * 0.4; }
+      const r = IMAGE_RATIOS[im.ratio] || IMAGE_RATIOS['4:3'];
+      const bw = Math.min(aw, ah * r), bh = bw / r, bx = ax + (aw - bw) / 2, by = ay + (ah - bh) / 2;
+      if (!image(slide, im.src, bx, by, bw, bh, true)) placeholder(slide, im.alt || '제품 사진 자리', bx, by, bw, bh, k, P.white);
+      const pins = (im.pins || []).map(annotPin), X = v => bx + bw * v / 100, Y = v => by + bh * v / 100;
+      pins.forEach(p => {
+        const x1 = X(p.x), y1 = Y(p.y), x2 = X(p.lx), y2 = Y(p.ly);
+        slide.addShape(pres.shapes.LINE, { x: IN(Math.min(x1, x2)), y: IN(Math.min(y1, y2)), w: IN(Math.max(0.5, Math.abs(x2 - x1))), h: IN(Math.max(0.5, Math.abs(y2 - y1))), flipH: (x2 < x1) !== (y2 < y1), line: { color: colorToHex(P.primary), width: 0.9 } });
+      });
+      pins.forEach(p => {
+        const d = em * 0.55; slide.addShape(pres.shapes.OVAL, { x: IN(X(p.x) - d / 2), y: IN(Y(p.y) - d / 2), w: IN(d), h: IN(d), fill: { color: colorToHex(P.primary) }, line: { color: 'FFFFFF', width: 1.5 } });
+        const ls = D.label * k, lw = estW(p.label, ls) + ls * 1.8, lh = ls * 1.75;
+        rect(slide, X(p.lx) - lw / 2, Y(p.ly) - lh / 2, lw, lh, { fill: P.white, line: { color: P.primary, width: 1.1 }, radius: lh / 2 });
+        text(slide, p.label, X(p.lx) - lw / 2, Y(p.ly) - lh / 2, lw, lh, { size: D.label, k, bold: true, color: P.text, align: 'center', valign: 'middle' });
+      });
+    });
+  },
+  /** 흐름 띠 — 왼쪽 라벨(선택) | 상자 › 상자 › … */
+  flow(slide, b, box, k) {
+    const em = D.body * k, st = b.steps || [], n = st.length; if (!n) return;
+    let x = box.x;
+    if (b.label) {
+      const lw = estW(b.label, D.small * k) + em;
+      text(slide, b.label, x, box.y, lw, box.h, { size: D.small, k, bold: true, color: P.text, valign: 'middle' });
+      rect(slide, x + lw, box.y + box.h * 0.15, 1, box.h * 0.7, { fill: P.borderStrong });
+      x += lw + em;
+    }
+    const aw = em * 1.2, sw = (box.x + box.w - x - aw * (n - 1)) / n;
+    st.forEach((s, i) => {
+      const sx = x + i * (sw + aw);
+      if (i) text(slide, '›', sx - aw, box.y, aw, box.h, { size: D.body * 1.2, k, bold: true, color: P.primary, align: 'center', valign: 'middle' });
+      rect(slide, sx, box.y, sw, box.h, { fill: P.white, line: { color: P.softerBlue, width: 1.1 }, radius: 10 });
+      const no = String(s.no ?? `STEP ${String(i + 1).padStart(2, '0')}`), cs = D.caption * k, cw = estW(no, cs) + cs * 1.6, chh = cs * 1.5;
+      const th = lines(s.title, D.small * k, sw - em) * D.small * k * 1.35, dh = s.desc ? lines(s.desc, D.label * k, sw - em) * D.label * k * 1.35 : 0;
+      let y = box.y + (box.h - (chh + em * 0.25 + th + (dh ? em * 0.25 + dh : 0))) / 2;
+      rect(slide, sx + (sw - cw) / 2, y, cw, chh, { fill: P.softerBlue, radius: chh / 2 });
+      text(slide, no, sx + (sw - cw) / 2, y, cw, chh, { size: D.caption, k, bold: true, color: P.primary, align: 'center', valign: 'middle' });
+      y += chh + em * 0.25;
+      text(slide, s.title || '', sx + em * 0.5, y, sw - em, th, { size: D.small, k, bold: true, color: P.text, align: 'center', lineSpacing: 1.35 });
+      if (s.desc) text(slide, s.desc, sx + em * 0.5, y + th + em * 0.25, sw - em, dh, { size: D.label, k, color: P.textMid, align: 'center', lineSpacing: 1.35 });
+    });
+  },
+  /** 라벨 띠 — 흰 띠 안 "라벨 | 항목 | 항목" 또는 "키 설명 | 키 설명" */
+  strip(slide, b, box, k) {
+    const em = D.small * k, its = b.items || [];
+    card(slide, box.x, box.y, box.w, box.h, P.white, 10);
+    let x = box.x + em * 1.4; const right = box.x + box.w - em * 1.4;
+    if (b.label) { const lw = estW(b.label, D.small * k) + em * 1.2; text(slide, b.label, x, box.y, lw, box.h, { size: D.small, k, bold: true, color: P.primary, valign: 'middle' }); x += lw; }
+    const iw = (right - x) / Math.max(1, its.length);
+    its.forEach((it, i) => {
+      const ix = x + i * iw;
+      if (i || b.label) rect(slide, ix, box.y + box.h * 0.22, 1, box.h * 0.56, { fill: P.borderStrong });
+      if (it && typeof it === 'object') {
+        const ks = D.cardTitle * 0.575, kw = estW(it.k, ks * k) + em * 0.8;
+        text(slide, it.k || '', ix + em, box.y, kw, box.h, { size: ks, k, bold: true, color: P.primary, valign: 'middle' });
+        text(slide, it.v || '', ix + em + kw, box.y, Math.max(1, iw - kw - em * 2), box.h, { size: D.small, k, color: P.body, valign: 'middle', lineSpacing: 1.35 });
+      } else text(slide, String(it), ix + em, box.y, iw - em * 2, box.h, { size: D.small, k, bold: true, color: P.text, align: 'center', valign: 'middle', lineSpacing: 1.35 });
+    });
+  },
+  /** 질문·답 격자 */
+  qa(slide, b, box, k) {
+    const its = b.items || [], n = its.length; if (!n) return;
+    const em = D.body * k, cols = b.cols || (n <= 3 ? n : 2), rows = Math.ceil(n / cols), gap = D.gap * k * 1.4;
+    const cw = (box.w - gap * (cols - 1)) / cols, ch = (box.h - gap * (rows - 1)) / rows;
+    its.forEach((it, i) => {
+      const x = box.x + (i % cols) * (cw + gap), y = box.y + Math.floor(i / cols) * (ch + gap);
+      rect(slide, x, y, cw, ch, { fill: P.white, line: { color: P.softerBlue, width: 1.1 }, radius: SHAPE.card });
+      const px = em * 1.3, w = cw - px * 2, qs = D.cardTitle * k;
+      const qh = lines('Q. ' + (it.q || ''), qs, w) * qs * 1.35;
+      runsText(slide, [['Q. ', P.primary], [it.q || '', P.text]], x + px, y + em * 0.9, w, qh, { size: D.cardTitle, k, bold: true, lineSpacing: 1.35 });
+      text(slide, it.a || '', x + px, y + em * 0.9 + qh + em * 0.4, w, Math.max(1, ch - qh - em * 2.2), { size: D.small, k, color: P.body, lineSpacing: 1.55 });
+    });
+  },
+  /** 큰 숫자 영웅 패널 + 지표 목록 + 옆 사양 카드 (HTML .bgs) */
+  bigstat(slide, b, box, k) {
+    const em = D.body * k, gap = D.gap * k * 2.4, side = !!b.side;
+    const fr = side ? [1, 1, 0.78] : [1, 1.2], tot = fr.reduce((a, c) => a + c, 0), uw = (box.w - gap * (fr.length - 1)) / tot;
+    const xs = []; let xx = box.x; fr.forEach(f => { xs.push([xx, f * uw]); xx += f * uw + gap; });
+    const split = v => { const m = String(v ?? '').match(/^([<>≤≥~+]?[\d.,]+[+]?)\s*(.*)$/); return m && m[2] && m[2].length <= 4 ? [m[1], m[2]] : [String(v ?? ''), '']; };
+    // 영웅 패널
+    const h = b.hero || {}, [hx, hw] = xs[0];
+    rect(slide, hx, box.y, hw, box.h, { fill: P.softerBlue, line: { color: P.border, width: 0.75 }, radius: 6 });
+    const vs = D.stat * 2.6, [vn, vu] = split(h.value), iw = hw - em * 2;
+    const parts = [];
+    if (h.title) parts.push([D.cardTitle * 1.35 * k * 1.4, (y, hh) => text(slide, h.title, hx + em, y, iw, hh, { size: D.cardTitle * 1.35, k, bold: true, color: P.title, align: 'center' })]);
+    parts.push([vs * k * 1.05, (y, hh) => runsText(slide, [[vn, P.primary, true], ...(vu ? [[vu, P.primary, true]] : [])], hx + em, y, iw, hh, { size: vs, k, align: 'center', valign: 'middle', lineSpacing: 1 })]);
+    if (h.sub) parts.push([D.small * k * 1.6, (y, hh) => text(slide, h.sub, hx + em, y, iw, hh, { size: D.small, k, color: P.textMid, align: 'center' })]);
+    if (h.note) { const ps = String(h.note).split(/<br\s*\/?>/i).map(t => ({ text: t })); parts.push([ps.length * D.cardTitle * k * 1.35, (y, hh) => text(slide, ps, hx + em, y, iw, hh, { size: D.cardTitle, k, bold: true, color: P.title, align: 'center', lineSpacing: 1.35 })]); }
+    const th = parts.reduce((a, [hh]) => a + hh, 0) + em * 0.4 * (parts.length - 1);
+    let y = box.y + (box.h - th) / 2; parts.forEach(([hh, draw]) => { draw(y, hh); y += hh + em * 0.4; });
+    // 지표 목록
+    const [lx, lw] = xs[1], its = b.items || [], rh = box.h / Math.max(1, its.length);
+    its.forEach((it, i) => {
+      const ry = box.y + i * rh; if (i) rect(slide, lx, ry, lw, 1, { fill: P.border });
+      const [n1, u1] = split(it.value), hs = [D.stat * k * 1.1, it.desc ? D.small * k * 1.5 : 0, it.note ? D.cardTitle * k * 1.4 : 0], tt = hs.reduce((a, c) => a + c, 0) + em * 0.2 * 2;
+      let yy = ry + (rh - tt) / 2;
+      runsText(slide, [[n1, P.primary, true], ...(u1 ? [[u1, P.primary, true]] : [])], lx, yy, lw, hs[0], { size: D.stat, k, valign: 'middle', lineSpacing: 1 }); yy += hs[0] + em * 0.2;
+      if (it.desc) { text(slide, it.desc, lx, yy, lw, hs[1], { size: D.small, k, color: P.textMid }); yy += hs[1] + em * 0.2; }
+      if (it.note) text(slide, it.note, lx, yy, lw, hs[2], { size: D.cardTitle, k, bold: true, color: P.title });
+    });
+    if (!side) return;
+    // 옆 사양 카드
+    const [sx, sw] = xs[2], sd = b.side; let sy = box.y;
+    if (sd.heading) { const ps = String(sd.heading).split(/<br\s*\/?>/i).map(t => ({ text: t })), hh = ps.length * D.cardTitle * k * 1.4; text(slide, ps, sx, sy, sw, hh, { size: D.cardTitle, k, bold: true, color: P.title, lineSpacing: 1.35 }); sy += hh + em * 0.6; }
+    const si = sd.items || [], g2 = em * 0.6, ch = (box.y + box.h - sy - g2 * (si.length - 1)) / Math.max(1, si.length);
+    si.forEach((it, i) => {
+      const cy = sy + i * (ch + g2);
+      rect(slide, sx, cy, sw, ch, { fill: P.white, line: { color: P.border, width: 0.75 }, radius: 6 });
+      text(slide, [{ text: it.k || '', size: D.cardTitle, bold: true, color: P.primary2 }, ...(it.v ? [{ text: it.v, size: D.small, color: P.textMid }] : [])], sx + em, cy, sw - em * 2, ch, { size: D.small, k, valign: 'middle', lineSpacing: 1.3 });
+    });
   },
   bullets(slide, b, box, k) {
     const inner = labeledCard(slide, box, k, b.heading);
@@ -870,6 +1160,21 @@ function calloutBoxH(b, k, W) {
   const tw = W - em * 3.2 - Math.max(estW(label, fs), fs * 3.2) - gap;
   const th = b.items && b.items.length ? listParas(b.items, k, tw, { tight: true, size: D.small }).h : lines(b.text || '', D.small * k, tw) * D.small * k * 1.3;
   return Math.max(fs * 2.1 + padY * 2, th + padY * 2);
+}
+
+/** 흐름 띠 높이: 번호 칩 + 제목(+설명) + 위아래 여백. flow() 와 같은 글자 크기로 */
+function flowBoxH(b, k, W) {
+  const em = D.body * k, st = b.steps || [], n = Math.max(1, st.length);
+  const lw = b.label ? estW(b.label, D.small * k) + em * 2 : 0, sw = (W - lw - em * 1.2 * (n - 1)) / n - em;
+  const th = Math.max(...st.map(s => lines(s.title, D.small * k, sw)), 1) * D.small * k * 1.35;
+  const dh = st.some(s => s.desc) ? Math.max(...st.map(s => s.desc ? lines(s.desc, D.label * k, sw) : 0)) * D.label * k * 1.35 + em * 0.25 : 0;
+  return D.caption * k * 1.5 + em * 0.25 + th + dh + em * 1.3;
+}
+/** 라벨 띠 높이 */
+function stripBoxH(b, k, W) {
+  const em = D.small * k, its = b.items || [], iw = (W - em * 2.8) / Math.max(1, its.length);
+  const ln = Math.max(1, ...its.map(it => it && typeof it === 'object' ? lines(it.v, em, iw - estW(it.k, D.cardTitle * 0.575 * k) - em * 3) : lines(it, em, iw - em * 2)));
+  return Math.max(D.cardTitle * 0.575 * k * 1.3, ln * em * 1.35) + em * 1.4;
 }
 
 // ─── top section of content slides (eyebrow · headline · rule · lead) ─────────
@@ -1012,13 +1317,13 @@ function content(sl) {
   const blocks = slide.blocks || [];
   const gap = D.gap * k;
   const em = D.body * k;
-  const labelH = b => (b.label && b.type !== 'callout') ? D.cardTitle * k * 2.1 + em * 0.8 : 0;
-  const fixed = blocks.map(b => b.type === 'callout' ? calloutBoxH(b, k, W) : 0);
-  const flexTotal = blocks.reduce((a, b) => a + (b.type === 'callout' ? 0 : (b.flex ?? 1)), 0) || 1;
+  const labelH = b => (b.label && !AUTO_H_BLOCKS.has(b.type)) ? D.cardTitle * k * 2.1 + em * 0.8 : 0;
+  const fixed = blocks.map(b => b.type === 'callout' ? calloutBoxH(b, k, W) : b.type === 'flow' ? flowBoxH(b, k, W) : b.type === 'strip' ? stripBoxH(b, k, W) : 0);
+  const flexTotal = blocks.reduce((a, b) => a + (AUTO_H_BLOCKS.has(b.type) ? 0 : (b.flex ?? 1)), 0) || 1;
   const freeH = Math.max(0, bodyH - fixed.reduce((a, c) => a + c, 0) - gap * Math.max(blocks.length - 1, 0));
   let by = bodyTop;
   blocks.forEach((b, i) => {
-    const h = b.type === 'callout' ? fixed[i] : Math.max(1, freeH * (b.flex ?? 1) / flexTotal);
+    const h = AUTO_H_BLOCKS.has(b.type) ? fixed[i] : Math.max(1, freeH * (b.flex ?? 1) / flexTotal);
     const fn = B[b.type];
     if (!fn) { text(s, `[ 알 수 없는 블록: ${b.type} ]`, PAD, by, W, h, { size: D.body, k, color: P.textLight, align: 'center', valign: 'middle' }); by += h + gap; return; }
     let y = by, hh = h;

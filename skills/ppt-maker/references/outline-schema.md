@@ -58,7 +58,8 @@
 
 ## 블록 타입
 
-**어떤 블록을 고를지는 `block-choice.md`** (신호 → 블록 표, 헷갈리는 짝, 다양성 규칙). 아래 표는 필드 형식이다.
+**어떤 블록을 고를지는 `block-choice.md`** (신호 → 블록 표, 헷갈리는 짝, 다양성 규칙), **그림·글을 어떻게 엮을지는 `layout-patterns.md`** (레퍼런스에서 뽑은 구성 방식). 아래 표는 필드 형식이다.
+`flow`·`strip`·`callout` 은 높이가 내용만큼인 띠라 장표 아래(또는 위)에 붙고, 이 셋의 `label` 은 블록 위 칩이 아니라 띠 안 라벨이다.
 
 모든 블록은 `"flex": 1` (세로 비중, 선택)과 `"label": "소제목"` (블록 위 네이비 칩, 선택)을 가질 수 있다. `callout`은 내용 높이만 차지한다.
 `items` 원소는 `"문장"` 또는 `{ "k": "키워드", "v": "설명" }` (k 는 굵게, v 는 아래 줄).
@@ -66,8 +67,8 @@
 | type | 필드 | 용도 | 권장 개수 |
 | --- | --- | --- | --- |
 | `columns` | `columns:[{heading, items?, sections?:[{heading, items}], stat?:{sub, value, desc}, chart?:{…chart 블록 필드}, rows?, highlight?, text?, image?, caption?, ratio?, flex?, tint?}]`, `tintLast?`, `rowItems?` | 소주제별 흰 카드(`heading` = 카드 위 라벨 칩). `sections` 는 카드 안 "| 소제목" + 목록, `stat` 은 큰 수치, `chart` 는 카드 안 그래프 | 컬럼 2~3 |
-| `cards` | `cards:[{title, desc?, items?, sections?, num?, tag?, rows?:[[라벨, 값]], highlight?:{label, value}, stat?, chart?, primary?, dark?}]`, `cols?` | 병렬 카드(`title` = 라벨 칩). **지표 비교는 `rows`(7월/8월 표) + `highlight`(전월대비 18% 증가 박스)**, `tag` 는 "| 소제목", `dark` 네이비 반전(`primary` 는 더 이상 바탕을 바꾸지 않는다) | 2~6 |
-| `process` | `steps:[{title, desc?, items?, period?, highlight?, dark?}]`, `darkLast?` | 좌→우 절차·로드맵(선 + 번호 원 + 단계 카드). `period` 는 "1단계 · 2026 상" 같은 위 라벨 | 3~5 |
+| `cards` | `cards:[{title, desc?, items?, sections?, num?, tag?, rows?:[[라벨, 값]], highlight?:{label, value}, stat?, chart?, primary?, dark?}]`, `cols?` | 병렬 카드(`title` = 라벨 칩). **지표 비교는 `rows`(7월/8월 표) + `highlight`(전월대비 18% 증가 박스)**, `tag` 는 "| 소제목", `dark` 네이비 반전(`primary` 는 더 이상 바탕을 바꾸지 않는다). **`bar:{value(0~100), label?, foot?, text?}`** 는 카드 아래쪽 진행 막대(큰 퍼센트 + 라벨 + 막대 + 한 줄) | 2~6 |
+| `process` | `steps:[{title, desc?, items?, period?, highlight?, dark?, heading?, done?}]`, `darkLast?`, `style?:"circle"\|"chevron"` | 좌→우 절차·로드맵(선 + 번호 원 + 단계 카드). `period` 는 "1단계 · 2026 상" 같은 위 라벨. **`circle`**: 테두리 원 + 점선 화살표, 원 안 `period`·`title`·`desc`(두 줄 이하). **`chevron`**: 갈매기 머리띠(`title` + 작은 `period`, 연함→메인→진함) · 흰 카드(`heading` + `items`) · 진한 "완료 기준 : `done`" 띠 | 3~5 |
 | `org` | `head:{role, name, title?, items?[]}, teams:[{name, count?, leader, leaderRole?, desc?}]`, `heading?` | **인력 배치·조직도.** 위 대표 카드(진한 머리띠·이름·사진 빈 칸·이력 두 열) → 연결선 → 팀 카드 2~5개(팀명(인원)·팀장 + 역할 배지·이력 한 줄). 사진은 넣지 않는다 | 팀 2~5 |
 | `history` | `groups:[{period, items:[{year, month?, text}]}]`, `layout?:"columns"\|"list"`, `heading?` | **연혁.** `columns`(기본·발표용): 위 진한 머리띠에 기간 2~4칸, 칸마다 세로 점선 + 연도·내용. `list`(제출용): 왼쪽 기간, 오른쪽 연·월·내용 줄. 연혁은 timeline 이 아니라 이 블록 | 기간 2~4 · 항목 3~6/칸 |
 | `timeline` | `phases:[{period, title, items?, desc?, highlight?}]`, `darkLast?` | process 와 같은 모양, 기간 중심 | 3~5 |
@@ -75,8 +76,14 @@
 | `table` | `headers, rows, emphasize?(열 index), leftAlign?([열 index]), widths?(["20%",…]), rowHeader?(true)` | 비교표, 평가지표 대응표, 예산. 강조 열은 글자색만 포인트 컬러(바탕·굵기는 그대로). `widths` 를 안 주면 열 너비는 칸 글자 양에 맞춰 자동으로 나뉜다. 한 장에 다 안 들어가는 표는 빌드할 때 행을 고르게 나눠 여러 장으로 편다(머리글 반복, 제목 뒤 "(계속)"). 첫 열이 각 행의 항목 이름(세로 타이틀)이면 `rowHeader: true` → 첫 열도 머리글처럼 연회색 바탕·회색 글자. 셀에 `**굵게**` 가능. "달성/조기달성/진행중" 은 배지로 표시 | 행 3~7 |
 | `stats` | `stats:[{label, sub?, value, desc?}]` | 핵심 수치 카드(`label` = 라벨 칩, `sub` = 작은 지표명, `value` 큰 숫자+단위, `desc` 파란 보조 문장 "전월 31만 회 · 35% 성장") | 2~4 |
 | `chart` | `kind:"line"\|"bar", title, unit?, labels:[…], series:[{name, values:[…], emphasis?:1\|2\|3}], ranked?:true, heading?` | **월별 추이 등 수치는 표로 나열하지 말고 그래프로**. 시리즈 1~3개. **색은 강조로 정한다**: `emphasis` 1~3 을 준 시리즈만 색을 받고 나머지는 연한 회색. 강조끼리 위계(1위>2위>3위)가 있으면 `ranked: true` → primary 600→350→200, 대등하면 primary→teal→gold. 아무것도 안 적으면 첫 시리즈만 강조. 채널별 추이 그래프는 형식을 통일 | 1 |
-| `compare` | `left:{tag?, heading, items}, right:{tag?, heading, items}` | AS-IS→TO-BE, 난제→해법. `tag` 기본 AS-IS/TO-BE, 오른쪽이 연파랑 강조 | 항목 3~4 |
+| `compare` | `left:{tag?, heading, items}, right:{tag?, heading, items}`, `result?:{heading, items:["…" \| {k, v}]}` | AS-IS→TO-BE, 난제→해법. `tag` 기본 AS-IS/TO-BE, 오른쪽이 연파랑 강조. **`result`** 를 주면 두 편을 붙여 놓고 ▶ 뒤에 번호 목록 결과판(비교 → 효과) | 항목 3~4 · 결과 3~4 |
 | `image` | `src, alt?, caption?, heading?, side:"left"\|"right"\|"full", ratio?:"16:9"\|"4:3"\|"1:1"\|"9:16"\|"3:4"\|"original", text?:{heading, items}, flex?` | 구성도·화면·사진. `src`가 비어 있으면 `[ alt ]` 점선 자리표시자. **`ratio` 기본 16:9** — 원본이 다르면 사용자에게 묻고, 고른 비율 상자에 맞춰 가장자리를 잘라 채운다(`original` 만 안 자름) | 1 |
+| `figcards` | `cards:[{head?:{no, text}, eyebrow?, title, desc?, items?, note?, foot?:{label, text}, image, alt?}]`, `layout:"side"\|"top"`, `cols?`, `arrows?`, `align?:"left"` | **그림 카드.** `side`: 글 왼쪽(작은 보조 → 큰 제목, 둘째 줄 `**굵게**`), 그림 오른쪽 아래 모서리. `top`: 위 그림(카드 높이 50%, 잘라 채움) → 제목 → 설명 → `note`(포인트 컬러 결론) → `foot` 띠("활용 \| …"). `arrows` 는 한 줄일 때 카드 사이 › | 2~4 |
+| `annotate` | `text?:{eyebrow, title, accent?, items}`, `images:[{src, alt, caption?, ratio?(기본 4:3), pins:[{x, y, label, lx?, ly?}]}]` | **제품 해부도.** 연회색 판 왼쪽 글(큰 제품명, `accent` 는 둘째 줄 포인트 컬러), 오른쪽 사진 1~2장 위 점 → 선 → 이름표. 좌표는 그림 상자 안 %, 이름표 자리를 안 주면 바깥쪽으로 자동 | 사진 1~2 · 점 3~5 |
+| `flow` | `label?`, `steps:[{no?, title, desc?}]` | **흐름 띠.** 상자를 › 로 잇는 한 줄, 높이는 내용만큼(callout 처럼 아래에 붙음). `no` 기본 STEP 01… `label` 은 띠 안 왼쪽 라벨 | 3~6 |
+| `strip` | `label?`, `items:["항목" \| {k, v}]` | **라벨 띠.** 흰 띠 한 줄을 세로 줄로 나눔. 문자열은 가운데 항목("주요 평가 지표 \| a \| b"), `{k, v}` 는 큰 포인트 컬러 키 + 설명("행정 \| 주민"). 높이는 내용만큼 | 2~5 |
+| `qa` | `items:[{q, a}]`, `cols?` | **질문·답 격자.** "Q." + 굵은 질문, 답 속 `**핵심**` 은 포인트 컬러 | 4~6 |
+| `bigstat` | `hero:{title, value, sub?, note?}`, `items:[{value, desc?, note?}]`, `side?:{heading, items:[{k, v}]}` | **큰 숫자 영웅 패널.** 연한 패널 안 아주 큰 숫자 + 지표 목록(큰 숫자 · 회색 조건 · 굵은 의미) + 옆 사양 카드 | 목록 2~4 · 카드 3~5 |
 | `bullets` | `heading?, items` | 최후의 수단. 항목이 4개 넘으면 columns/cards 로 | 3~5 |
 | `callout` | `items?:[…] 또는 text, label?("핵심 요약"·"특이사항"), tone?:"warn"\|"strong"\|"light"` | 장표 맨 아래 둥근 배너. **위계 셋** — 기본(연한 메인 컬러, tone 없음) · `warn` 주의(진보라 바탕: 위험·미달·주의사항) · `strong` 강조(검정 바탕: 결론 한 줄). 왼쪽 라벨은 본문 첫 줄과 같은 높이. **불릿 2~3개(`items`) 권장** | 1 |
 

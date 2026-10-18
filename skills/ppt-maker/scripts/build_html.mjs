@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, coverTitleW, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
-         tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
+         tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE, AUTO_H_BLOCKS, annotPin } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -186,6 +186,121 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .imgblk .cp{font-size:var(--fs-caption);color:var(--text-light);text-align:center;margin-top:.5em;}   /* 캡션 글자 = --fs-caption */
 .imgblk .txt{flex:1;min-height:0;display:flex;flex-direction:column;}
 .ph{border:1.5px dashed #C3CAD5;border-radius:8px;background:var(--bg-soft);color:#6F7C92;display:flex;align-items:center;justify-content:center;font-size:var(--fs-small);font-weight:500;padding:1em;text-align:center;width:100%;height:100%;min-height:4em;}
+/* figcards(그림 카드, 2026-10-14) — side: 왼쪽 글(작은 보조 → 큰 제목 2줄), 오른쪽 아래 그림이 카드 모서리에 붙음 · top: 위 그림, 아래 제목·설명·결론 한 줄(포인트 컬러)·아래 띠 */
+.fcg{display:grid;grid-auto-rows:minmax(0,1fr);gap:calc(var(--gap) * 1.6);flex:1;min-height:0;font-size:var(--fs-body);}
+.fcg.arw{gap:0;}
+.fc{background:#fff;border-radius:${SHAPE.card}px;box-shadow:var(--card-shadow);display:flex;min-height:0;overflow:hidden;position:relative;}
+.fc .fhd{font-size:var(--fs-label);font-weight:700;color:var(--primary);background:var(--primary-softer);border-radius:6px;padding:.3em .8em;align-self:flex-start;line-height:1.3;}
+.fc .fhd span{color:var(--text-mid);font-weight:500;margin-left:.6em;}
+.fc .fey{font-size:var(--fs-label);color:var(--text-mid);line-height:1.4;}
+.fc .ftl{font-size:calc(var(--fs-card) * 1.25);font-weight:500;color:var(--text);line-height:1.3;letter-spacing:-.02em;}
+.fc .ftl b{font-weight:800;}
+.fc .fds{font-size:var(--fs-small);color:var(--text-mid);line-height:1.5;}
+.fc .fnt{font-size:var(--fs-small);color:var(--primary);font-weight:700;line-height:1.4;}
+.fc .ffo{display:flex;gap:.8em;align-items:baseline;background:var(--bg-soft);border-radius:8px;padding:.5em .9em;font-size:var(--fs-label);line-height:1.4;margin-top:auto;}
+.fc .ffo b{color:var(--primary);white-space:nowrap;} .fc .ffo span{color:var(--body);}
+.fc ul.rl li{font-size:var(--fs-small);}
+.fc.fside{flex-direction:row;padding:1.1em 0 0 1.5em;}
+.fc.fside .ftx{flex:1.25;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:.35em;padding-bottom:1.1em;}
+.fc.fside .fim{flex:1;min-width:0;display:flex;align-items:flex-end;justify-content:flex-end;}
+.fc.fside .fim img{max-width:100%;max-height:100%;object-fit:contain;object-position:right bottom;display:block;}
+.fc.fside .fim .ph{margin:0 1em 1em 0;height:calc(100% - 1em);min-height:0;}
+.fc.ftop{flex-direction:column;padding:1em 1.1em 1.1em;gap:.55em;}
+.fc.ftop .fim{flex:0 0 50%;min-height:0;border-radius:8px;overflow:hidden;display:flex;}
+.fc.ftop .fim img{width:100%;height:100%;object-fit:cover;display:block;}
+.fc.ftop .fim .ph{min-height:0;}
+.fc.ftop .ftl{font-size:calc(var(--fs-card) * 1.1);font-weight:700;}
+.fc.ftop.ctr .ftl,.fc.ftop.ctr .fds,.fc.ftop.ctr .fnt{text-align:center;}
+.fca{display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:1.4em;font-weight:700;}
+/* annotate(제품 해부도) — 왼쪽 글(작은 보조 → 큰 제품명 → 사양 목록), 오른쪽 사진 1~2장 위 점·선·이름표 */
+.an{display:flex;gap:calc(var(--gap) * 2);flex:1;min-height:0;font-size:var(--fs-body);background:var(--bg-soft);border-radius:${SHAPE.card}px;padding:1em 1.6em;}
+.an .atx{flex:0 0 24%;display:flex;flex-direction:column;justify-content:center;gap:.4em;min-width:0;}
+.an .atx .aey{font-size:var(--fs-small);color:var(--text-mid);}
+.an .atx .atl{font-size:calc(var(--fs-card) * 1.5);font-weight:800;color:var(--text);line-height:1.25;letter-spacing:-.02em;padding-bottom:.45em;border-bottom:1px solid var(--border-strong);margin-bottom:.3em;}
+.an .atx .atl em{font-style:normal;color:var(--primary);}
+.an .atx ul.rl li{font-size:var(--fs-small);}
+.an .aims{flex:1;display:flex;gap:calc(var(--gap) * 1.6);min-width:0;min-height:0;}
+.an .aim{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;min-height:0;gap:.4em;}
+.an .acp{font-size:var(--fs-small);font-weight:700;color:var(--text-mid);}
+.an .afr{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;container-type:size;}
+.an .abox{position:relative;--arw:4;--arh:3;aspect-ratio:var(--arw) / var(--arh);width:min(100%, calc(100cqh * var(--arw) / var(--arh)));}
+.an .abox>img{width:100%;height:100%;object-fit:contain;display:block;}
+.an .abox>.ph{position:absolute;inset:0;min-height:0;background:#fff;}
+.an .pin{position:absolute;width:.55em;height:.55em;border-radius:50%;background:var(--primary);border:2px solid #fff;transform:translate(-50%,-50%);z-index:2;}
+.an svg.lns{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none;}
+.an .plb{position:absolute;transform:translate(-50%,-50%);z-index:3;background:#fff;border:1.5px solid var(--primary);color:var(--text);font-size:var(--fs-label);font-weight:700;border-radius:999px;padding:.2em .8em;white-space:nowrap;line-height:1.3;}
+/* flow(흐름 띠) — 단계 상자를 › 로 잇는 한 줄. 왼쪽 라벨(선택). 높이는 내용만큼 */
+.flow{display:flex;align-items:stretch;gap:.6em;font-size:var(--fs-body);}
+.flow .flb{display:flex;align-items:center;font-size:var(--fs-small);font-weight:800;color:var(--text);padding-right:1em;border-right:1px solid var(--border-strong);margin-right:.4em;white-space:nowrap;}
+.flow .fst{flex:1;min-width:0;background:#fff;border:1.5px solid var(--primary-softer);border-radius:10px;padding:.65em .6em;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.25em;}
+.flow .fst .fno{font-size:var(--fs-caption);font-weight:700;color:var(--primary);background:var(--primary-softer);border-radius:999px;padding:.1em .7em;letter-spacing:.03em;}
+.flow .fst .fti{font-size:var(--fs-small);font-weight:700;color:var(--text);line-height:1.35;}
+.flow .fst .fde{font-size:var(--fs-label);color:var(--text-mid);line-height:1.35;}
+.flow .far{display:flex;align-items:center;color:var(--primary);font-weight:700;font-size:1.2em;}
+/* strip(라벨 띠) — "라벨 | 항목 | 항목" 한 줄, 또는 "키 설명 | 키 설명" 두세 칸. 높이는 내용만큼 */
+.strip{display:flex;align-items:center;background:#fff;border-radius:10px;box-shadow:var(--card-shadow);padding:.7em 1.4em;font-size:var(--fs-small);gap:0;}
+.strip .slb{font-weight:800;color:var(--primary);white-space:nowrap;padding-right:1.2em;}
+.strip .sit{flex:1;min-width:0;text-align:center;color:var(--text);font-weight:600;line-height:1.35;padding:0 1em;border-left:1px solid var(--border-strong);}
+.strip .sit.kv{text-align:left;display:flex;align-items:baseline;gap:.8em;font-weight:500;color:var(--body);}
+.strip .sit.kv b{font-size:calc(var(--fs-card) * 0.575);   /* 키 글자는 예전(카드 제목 ×1.15)의 절반 — 2026-10-18 사용자 요청 */font-weight:800;color:var(--primary);white-space:nowrap;}
+.strip .slb+.sit,.strip .sit:first-child{border-left:0;}
+.strip .slb+.sit{border-left:1px solid var(--border-strong);}
+/* qa(질문·답 격자) */
+.qa{display:grid;grid-auto-rows:minmax(0,1fr);gap:calc(var(--gap) * 1.4);flex:1;min-height:0;font-size:var(--fs-body);}
+.qa .qi{background:#fff;border:1.5px solid var(--primary-softer);border-radius:${SHAPE.card}px;padding:.9em 1.3em;display:flex;flex-direction:column;gap:.4em;min-height:0;overflow:hidden;}
+.qa .qq{font-size:var(--fs-card);font-weight:700;color:var(--text);line-height:1.35;}
+.qa .qq i{font-style:normal;color:var(--primary);margin-right:.35em;}
+.qa .qa2{font-size:var(--fs-small);color:var(--body);line-height:1.55;}
+.qa .qa2 b{color:var(--primary);}
+/* compare + result(비교 → 결과): 두 편을 붙여 놓고 화살표 → 번호 목록 결과판 */
+.cmp.res{grid-template-columns:1fr 1fr 3em 1.15fr;column-gap:calc(var(--gap) * 0.8);}
+.cmp.res .arr{grid-column:3;}
+.rsl{background:var(--primary-softer);border-radius:${SHAPE.card}px;padding:1em 1.2em;display:flex;flex-direction:column;gap:.55em;min-height:0;overflow:hidden;}
+.rsl .rh{font-size:calc(var(--fs-card) * 1.1);font-weight:800;color:var(--primary);line-height:1.3;}
+.rsl .ri{background:#fff;border-radius:8px;padding:.55em .9em;display:flex;gap:.8em;align-items:center;flex:1;min-height:0;}
+.rsl .ri .rn{flex:0 0 auto;width:2em;height:2em;border-radius:50%;background:var(--bg-soft);color:var(--text-mid);font-size:var(--fs-label);font-weight:700;display:flex;align-items:center;justify-content:center;}
+.rsl .ri .rt2{font-size:var(--fs-small);font-weight:700;color:var(--primary);line-height:1.3;}
+.rsl .ri .rd{font-size:var(--fs-label);color:var(--body);line-height:1.35;}
+/* process style "circle"(원형 단계도) · "chevron"(화살표 머리띠 + 카드 + 완료 기준 띠), 2026-10-14 */
+.rmc{display:flex;align-items:center;justify-content:space-between;flex:1;min-height:0;font-size:var(--fs-body);container-type:size;}
+.rmc .cc{--d:min(calc((100cqw - (var(--n) - 1) * 4em) / var(--n)), 100cqh);width:var(--d);height:var(--d);flex:0 0 auto;border:1.5px solid var(--title);border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1.2em;gap:.4em;}
+.rmc .cc.hl{border-color:var(--primary);border-width:2.5px;}
+.rmc .cc .cn{font-size:var(--fs-label);font-weight:700;color:var(--primary);}
+.rmc .cc .ctt{font-size:var(--fs-card);font-weight:800;color:var(--title);line-height:1.3;}
+.rmc .cc .cds{font-size:var(--fs-label);color:var(--text-mid);line-height:1.5;}
+.rmc .ca{flex:1;min-width:2em;height:0;border-top:2px dotted var(--title);margin:0 .6em;position:relative;}
+.rmc .ca::after{content:'';position:absolute;right:-2px;top:-6px;border-left:8px solid var(--title);border-top:5px solid transparent;border-bottom:5px solid transparent;}
+.chv{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:.7em calc(var(--gap) * 1.6);flex:1;min-height:0;font-size:var(--fs-body);}
+.chv .ch{height:2.6em;display:flex;align-items:center;gap:.7em;padding:0 1.6em 0 1.2em;font-weight:800;font-size:var(--fs-card);clip-path:polygon(0 0,calc(100% - 1.1em) 0,100% 50%,calc(100% - 1.1em) 100%,0 100%,1.1em 50%);margin-right:calc(var(--gap) * -1.6 + .3em);}
+.chv .ch.cf{clip-path:polygon(0 0,calc(100% - 1.1em) 0,100% 50%,calc(100% - 1.1em) 100%,0 100%);}
+.chv .ch.cl{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,1.1em 50%);margin-right:0;}
+.chv .ch .cnum{font-size:1.1em;} .chv .ch small{font-size:.75em;font-weight:500;opacity:.85;}
+.chv .ch.t0{background:var(--primary-softer);color:var(--title);padding-left:1.4em;} .chv .ch.t1{background:var(--primary);color:#fff;} .chv .ch.t2{background:var(--primary-deep);color:#fff;}
+.chv .cb{background:#fff;border:1px solid var(--border);border-radius:6px;padding:1em 1.4em;display:flex;flex-direction:column;gap:.6em;min-height:0;overflow:hidden;}
+.chv .cb .cbh{font-size:calc(var(--fs-card) * 1.1);font-weight:800;color:var(--title);line-height:1.3;}
+.chv .cb ul.rl li{font-size:var(--fs-small);} .chv .cb b{color:var(--primary);}
+.chv .cd2{background:var(--title);color:rgba(255,255,255,.75);border-radius:4px;text-align:center;font-size:var(--fs-small);padding:.6em 1em;line-height:1.3;} .chv .cd2 b{color:#fff;}
+/* bigstat(큰 숫자 영웅 패널 + 지표 목록 + 옆 사양 카드) */
+.bgs{display:grid;grid-template-columns:1fr 1fr .78fr;gap:calc(var(--gap) * 2.4);flex:1;min-height:0;font-size:var(--fs-body);}
+.bgs .hero{background:linear-gradient(160deg,var(--primary-softer),#fff 120%);border:1px solid var(--border);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1em;gap:.3em;min-height:0;overflow:hidden;}
+.bgs .hero .ht{font-size:calc(var(--fs-card) * 1.35);font-weight:800;color:var(--title);}
+.bgs .hero .hv{font-size:calc(var(--fs-stat) * 2.6);font-weight:900;color:var(--primary);line-height:1;letter-spacing:-.04em;}
+.bgs .hero .hv small{font-size:.42em;font-weight:800;margin-left:.05em;}
+.bgs .hero .hs{font-size:var(--fs-small);color:var(--text-mid);margin-top:.4em;}
+.bgs .hero .hn{font-size:var(--fs-card);font-weight:700;color:var(--title);line-height:1.35;} .bgs .hero .hn b{color:var(--primary);}
+.bgs .lst{display:flex;flex-direction:column;justify-content:space-between;min-height:0;overflow:hidden;}
+.bgs .lst .li{flex:1;display:flex;flex-direction:column;justify-content:center;gap:.2em;} .bgs .lst .li+.li{border-top:1px solid var(--border);}
+.bgs .lst .lv{font-size:var(--fs-stat);font-weight:900;color:var(--primary);line-height:1.05;letter-spacing:-.03em;} .bgs .lst .lv small{font-size:.6em;font-weight:800;}
+.bgs .lst .ld{font-size:var(--fs-small);color:var(--text-mid);} .bgs .lst .ln{font-size:var(--fs-card);font-weight:700;color:var(--title);}
+.bgs .sd{display:flex;flex-direction:column;gap:.6em;min-height:0;overflow:hidden;}
+.bgs .sd .sh3{font-size:var(--fs-card);font-weight:700;color:var(--title);line-height:1.35;margin-bottom:.2em;} .bgs .sd .sh3 b{color:var(--primary);}
+.bgs .sd .sc{flex:1;background:#fff;border:1px solid var(--border);border-radius:6px;padding:.4em 1em;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+.bgs .sd .sc b{font-size:var(--fs-card);font-weight:800;color:var(--primary-2);line-height:1.25;} .bgs .sd .sc span{font-size:var(--fs-small);color:var(--text-mid);}
+/* 카드 안 진행 막대(bar) */
+.pbar{display:flex;flex-direction:column;gap:.45em;margin-top:auto;}
+.pbar .pbt{display:flex;align-items:baseline;justify-content:space-between;gap:1em;} .pbar .pbt b{font-size:var(--fs-stat);font-weight:900;color:var(--primary);line-height:1;letter-spacing:-.03em;} .pbar .pbt span{font-size:var(--fs-small);color:var(--text-mid);}
+.pbar .trk{height:.75em;border-radius:999px;background:var(--bg-soft);overflow:hidden;} .pbar .trk i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--primary-2));}
+.pbar .pbf{border-top:1px solid var(--border);padding-top:.55em;text-align:center;font-size:var(--fs-label);font-weight:700;color:var(--primary);}
 /* kv: small table + highlight box side by side (성과 요약 카드) */
 .kv{display:flex;gap:1.2em;align-items:stretch;flex:1;min-height:0;}
 .kv .tbl{flex:1.4;min-height:0;display:flex;flex-direction:column;justify-content:center;}
@@ -450,6 +565,11 @@ function imgOrPh(src, alt, ratio) {
 export { isNumCell } from './lib/common.mjs';
 /** 합계·평균 같은 마무리 행인가 (첫 칸으로 판단) */
 export function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
+/** 카드 안 진행 막대: bar{value(0~100), label?, foot?, text?(큰 글자, 기본 value%)} */
+function barFrag(bar) {
+  const v = Math.max(0, Math.min(100, Number(bar.value) || 0));
+  return `<div class="pbar"><div class="pbt"><b>${esc(bar.text ?? v + '%')}</b>${bar.label ? `<span>${rich(bar.label)}</span>` : ''}</div><div class="trk"><i style="width:${v}%"></i></div>${bar.foot ? `<div class="pbf">${rich(bar.foot)}</div>` : ''}</div>`;
+}
 function badgeCell(txt) {
   const t = String(txt).replace(/\*\*/g, '');
   if (/^(달성|완료|충족)$/.test(t)) return `<span class="badge ok">${esc(t)}</span>`;
@@ -473,8 +593,17 @@ const BLOCKS = {
     const n = (b.cards || []).length; const cols = b.cols || (n <= 4 ? n : Math.ceil(n / 2));
     return `<div class="grid" style="grid-template-columns:repeat(${cols},1fr)">${(b.cards || []).map(c => `
       ${cardOpen(c.primary ? 'tint' : c.dark ? 'dark' : '', c.num !== undefined ? `${esc(c.num)}. ${c.title || ''}` : c.title)}
-        <div class="fill">${c.tag ? `<div class="sh2">${esc(c.tag)}</div>` : ''}${c.stat ? statFrag(c.stat) : ''}${c.rows ? `<div class="kv">${kvTable(c.rows)}${c.highlight ? `<div class="hbox"><div class="hl">${rich(c.highlight.label || '')}</div><div class="hv">${rich(c.highlight.value || '')}</div></div>` : ''}</div>` : ''}${c.sections ? subSections(c.sections) : ''}${c.desc ? `<div class="cd">${rich(c.desc)}</div>` : ''}${c.items ? listItems(c.items) : ''}${c.chart ? chartPanel(c.chart) : ''}</div>
+        <div class="fill">${c.tag ? `<div class="sh2">${esc(c.tag)}</div>` : ''}${c.stat ? statFrag(c.stat) : ''}${c.rows ? `<div class="kv">${kvTable(c.rows)}${c.highlight ? `<div class="hbox"><div class="hl">${rich(c.highlight.label || '')}</div><div class="hv">${rich(c.highlight.value || '')}</div></div>` : ''}</div>` : ''}${c.sections ? subSections(c.sections) : ''}${c.desc ? `<div class="cd">${rich(c.desc)}</div>` : ''}${c.items ? listItems(c.items) : ''}${c.chart ? chartPanel(c.chart) : ''}${c.bar ? barFrag(c.bar) : ''}</div>
       ${CARD_CLOSE}`).join('')}</div>`;
+  },
+  /** 큰 숫자 영웅 패널 + 지표 목록 + 옆 사양 카드: hero{title, value, sub, note}, items[{value, desc, note}], side?{heading, items[{k, v}]} */
+  bigstat(b) {
+    const val = v => { const m = String(v ?? '').match(/^([<>≤≥~+]?[\d.,]+[+]?)\s*(.*)$/); return m && m[2] && m[2].length <= 4 ? `${esc(m[1])}<small>${esc(m[2])}</small>` : rich(v ?? ''); };
+    const h = b.hero || {};
+    const hero = `<div class="hero">${h.title ? `<div class="ht">${rich(h.title)}</div>` : ''}<div class="hv">${val(h.value)}</div>${h.sub ? `<div class="hs">${rich(h.sub)}</div>` : ''}${h.note ? `<div class="hn">${rich(h.note)}</div>` : ''}</div>`;
+    const lst = `<div class="lst">${(b.items || []).map(it => `<div class="li"><div class="lv">${val(it.value)}</div>${it.desc ? `<div class="ld">${rich(it.desc)}</div>` : ''}${it.note ? `<div class="ln">${rich(it.note)}</div>` : ''}</div>`).join('')}</div>`;
+    const sd = b.side ? `<div class="sd">${b.side.heading ? `<div class="sh3">${rich(b.side.heading)}</div>` : ''}${(b.side.items || []).map(it => `<div class="sc"><b>${esc(it.k || '')}</b>${it.v ? `<span>${rich(it.v)}</span>` : ''}</div>`).join('')}</div>` : '';
+    return `<div class="bgs"${b.side ? '' : ' style="grid-template-columns:1fr 1.2fr"'}>${hero}${lst}${sd}</div>`;
   },
   stats(b) {
     const st = b.stats || [];
@@ -486,6 +615,14 @@ const BLOCKS = {
   },
   process(b) {
     const steps = b.steps || []; const n = steps.length;
+    if (b.style === 'circle') return `<div class="rmc" style="--n:${n}">${steps.map((s, i) => `${i ? '<i class="ca"></i>' : ''}<div class="cc${s.highlight ? ' hl' : ''}">${s.period ? `<div class="cn">${esc(s.period)}</div>` : ''}<div class="ctt">${rich(s.title || '')}</div>${s.desc ? `<div class="cds">${rich(s.desc)}</div>` : ''}</div>`).join('')}</div>`;
+    if (b.style === 'chevron') {
+      const tone = i => n === 1 ? 't1' : i === 0 ? 't0' : i === n - 1 ? 't2' : 't1';
+      const cols = `grid-template-columns:repeat(${n},minmax(0,1fr))`;
+      return `<div class="chv" style="${cols}">${steps.map((s, i) => `<div class="ch ${tone(i)}${i === 0 ? ' cf' : ''}${i === n - 1 ? ' cl' : ''}"><span class="cnum">${i + 1}</span><span>${rich(s.title || '')}</span>${s.period ? `<small>${esc(s.period)}</small>` : ''}</div>`).join('')}
+        ${steps.map(s => `<div class="cb">${s.heading ? `<div class="cbh">${rich(s.heading)}</div>` : ''}${s.items ? listItems(s.items) : ''}${s.desc ? `<div class="cd">${rich(s.desc)}</div>` : ''}</div>`).join('')}
+        ${steps.some(s => s.done) ? steps.map(s => `<div class="cd2">${s.done ? `완료 기준 : <b>${rich(s.done)}</b>` : ''}</div>`).join('') : ''}</div>`;
+    }
     return `<div class="rm"><div class="line"></div>
       <div class="nums" style="grid-template-columns:repeat(${n},1fr)">${steps.map((s, i) => `<div class="num${i === n - 1 ? ' last' : ''}">${i + 1}</div>`).join('')}</div>
       <div class="steps" style="grid-template-columns:repeat(${n},1fr)">${steps.map((s, i) => `
@@ -549,6 +686,12 @@ const BLOCKS = {
   },
   compare(b) {
     const side = (s, cls, tag) => `<div class="side ${cls}"><div class="cap">${esc(s.tag || tag)}</div><div class="bd">${s.heading ? `<div class="sh">${rich(s.heading)}</div>` : ''}<div class="fill">${s.sections ? subSections(s.sections) : ''}${listItems(s.items)}</div></div></div>`;
+    if (b.result) {
+      // 비교 → 결과: 두 편을 붙여 놓고, 화살표 뒤에 번호 목록 결과판
+      const r = b.result;
+      const res = `<div class="rsl">${r.heading ? `<div class="rh">${rich(r.heading)}</div>` : ''}${(r.items || []).map((it, i) => { const o = typeof it === 'object' ? it : { k: it }; return `<div class="ri"><span class="rn">${String(i + 1).padStart(2, '0')}</span><div><div class="rt2">${rich(o.k || '')}</div>${o.v ? `<div class="rd">${rich(o.v)}</div>` : ''}</div></div>`; }).join('')}</div>`;
+      return `<div class="cmp res">${side(b.left || {}, 'from', 'AS-IS')}${side(b.right || {}, 'to', 'TO-BE')}<div class="arr"><i>▶</i></div>${res}</div>`;
+    }
     return `<div class="cmp">${side(b.left || {}, 'from', 'AS-IS')}<div class="arr"><i>▶</i></div>${side(b.right || {}, 'to', 'TO-BE')}</div>`;
   },
   image(b) {
@@ -559,6 +702,54 @@ const BLOCKS = {
   },
   bullets(b) {
     return `${cardOpen('', b.heading)}<div class="fill">${listItems(b.items)}</div>${CARD_CLOSE}`;
+  },
+  /** 그림 카드: cards[{head?:{no,text}, eyebrow?, title, desc?, items?, note?, foot?:{label,text}, image, alt?}], layout "side"(글 왼쪽·그림 오른쪽 아래) | "top"(그림 위), cols?, arrows?(카드 사이 ›) */
+  figcards(b) {
+    const cs = b.cards || [], n = cs.length, side = b.layout !== 'top';
+    const cols = b.cols || (side ? (n === 4 ? 2 : Math.min(n, 3)) : Math.min(n, 4));
+    const arrows = !!b.arrows && !side && cols === n;
+    const pic = c => {
+      const ok = c.image && (/^(https?:)?\/\//.test(c.image) || fs.existsSync(path.resolve(outdir, c.image)));
+      return ok ? `<img src="${esc(c.image)}" alt="${esc(c.alt || '')}">` : `<div class="ph">[ ${esc(c.alt || '그림 자리')} ]</div>`;
+    };
+    const card = c => {
+      const head = c.head ? `<div class="fhd">${esc(c.head.no ?? '')}${c.head.text ? `<span>${esc(c.head.text)}</span>` : ''}</div>` : '';
+      const words = `${c.eyebrow ? `<div class="fey">${rich(c.eyebrow)}</div>` : ''}<div class="ftl">${rich(c.title || '')}</div>${c.desc ? `<div class="fds">${rich(c.desc)}</div>` : ''}${c.items ? listItems(c.items) : ''}${c.note ? `<div class="fnt">${rich(c.note)}</div>` : ''}`;
+      const foot = c.foot ? `<div class="ffo"><b>${esc(c.foot.label || '')}</b><span>${rich(c.foot.text || '')}</span></div>` : '';
+      return side
+        ? `<div class="fc fside"><div class="ftx">${head}${words}${foot}</div><div class="fim">${pic(c)}</div></div>`
+        : `<div class="fc ftop${b.align === 'left' ? '' : ' ctr'}">${head}<div class="fim">${pic(c)}</div>${words}${foot}</div>`;
+    };
+    if (arrows) return `<div class="fcg arw" style="grid-template-columns:${cs.map(() => '1fr').join(' 2em ')}">${cs.map((c, i) => (i ? '<div class="fca">›</div>' : '') + card(c)).join('')}</div>`;
+    return `<div class="fcg" style="grid-template-columns:repeat(${cols},1fr)">${cs.map(card).join('')}</div>`;
+  },
+  /** 제품 해부도: text?{eyebrow, title, accent?, items}, images[{src, alt, caption, ratio?, pins[{x, y, label, lx?, ly?}]}] — x·y·lx·ly 는 그림 상자 안 % */
+  annotate(b) {
+    const t = b.text;
+    const txt = t ? `<div class="atx">${t.eyebrow ? `<div class="aey">${rich(t.eyebrow)}</div>` : ''}<div class="atl">${rich(t.title || '')}${t.accent ? `<br><em>${esc(t.accent)}</em>` : ''}</div>${t.items ? listItems(t.items) : ''}</div>` : '';
+    const one = im => {
+      const [rw, rh] = IMAGE_RATIOS[im.ratio] || IMAGE_RATIOS['4:3'];
+      const ok = im.src && (/^(https?:)?\/\//.test(im.src) || fs.existsSync(path.resolve(outdir, im.src)));
+      const pins = (im.pins || []).map(annotPin);
+      const lines = pins.map(p => `<line x1="${p.x}" y1="${p.y}" x2="${p.lx}" y2="${p.ly}" stroke="${P.primary}" stroke-width="1.2" vector-effect="non-scaling-stroke"/>`).join('');
+      return `<div class="aim">${im.caption ? `<div class="acp">${esc(im.caption)}</div>` : ''}<div class="afr"><div class="abox" style="--arw:${rw};--arh:${rh}">${ok ? `<img src="${esc(im.src)}" alt="${esc(im.alt || '')}">` : `<div class="ph">[ ${esc(im.alt || '제품 사진 자리')} ]</div>`}
+        <svg class="lns" viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${pins.map(p => `<i class="pin" style="left:${p.x}%;top:${p.y}%"></i><span class="plb" style="left:${p.lx}%;top:${p.ly}%">${esc(p.label)}</span>`).join('')}</div></div></div>`;
+    };
+    return `<div class="an">${txt}<div class="aims">${(b.images || []).map(one).join('')}</div></div>`;
+  },
+  /** 흐름 띠: label?, steps[{no?, title, desc?}] — 상자를 › 로 잇는 한 줄. no 를 안 주면 STEP 01… */
+  flow(b) {
+    const st = b.steps || [];
+    return `<div class="flow">${b.label ? `<div class="flb">${rich(b.label)}</div>` : ''}${st.map((s, i) => `${i ? '<div class="far">›</div>' : ''}<div class="fst"><span class="fno">${esc(s.no ?? `STEP ${String(i + 1).padStart(2, '0')}`)}</span><div class="fti">${rich(s.title || '')}</div>${s.desc ? `<div class="fde">${rich(s.desc)}</div>` : ''}</div>`).join('')}</div>`;
+  },
+  /** 라벨 띠: label?, items["항목" | {k, v}] — 세로 줄로 나눈 한 줄 */
+  strip(b) {
+    return `<div class="strip">${b.label ? `<div class="slb">${rich(b.label)}</div>` : ''}${(b.items || []).map(it => typeof it === 'object' && it ? `<div class="sit kv"><b>${esc(it.k || '')}</b><span>${rich(it.v || '')}</span></div>` : `<div class="sit">${rich(it)}</div>`).join('')}</div>`;
+  },
+  /** 질문·답: items[{q, a}], cols?(기본 2) */
+  qa(b) {
+    const it = b.items || [], cols = b.cols || (it.length <= 3 ? it.length : 2);
+    return `<div class="qa" style="grid-template-columns:repeat(${cols},1fr)">${it.map(x => `<div class="qi"><div class="qq"><i>Q.</i>${rich(x.q || '')}</div><div class="qa2">${rich(x.a || '')}</div></div>`).join('')}</div>`;
   },
   chart(b) {
     return `${cardOpen('', b.heading || '')}${chartPanel(b)}${CARD_CLOSE}`;
@@ -574,8 +765,8 @@ const BLOCKS = {
 function renderBlocks(blocks) {
   return (blocks || []).map(b => {
     const fn = BLOCKS[b.type];
-    const flex = b.type === 'callout' ? '0 0 auto' : `${b.flex ?? 1} 1 0`;
-    const label = b.label && b.type !== 'callout' ? `<div class="pl slabel">${rich(b.label)}</div>` : '';
+    const flex = AUTO_H_BLOCKS.has(b.type) ? '0 0 auto' : `${b.flex ?? 1} 1 0`;
+    const label = b.label && !AUTO_H_BLOCKS.has(b.type) ? `<div class="pl slabel">${rich(b.label)}</div>` : '';   // 띠 블록의 label 은 띠 안 왼쪽 라벨
     const body = fn ? fn(b) : `<div class="ph">[ 알 수 없는 블록: ${esc(b.type)} ]</div>`;
     return `<div class="blk" style="flex:${flex}">${label}<div class="inner">${body}</div></div>`;
   }).join('');

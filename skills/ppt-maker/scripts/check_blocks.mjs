@@ -6,7 +6,7 @@
 //   block-run       같은 주 블록이 3장 연속
 //   block-share     한 블록이 본문 장의 40% 초과
 //   block-variety   본문 6장 이상인데 블록 종류 4가지 미만
-//   numbers-as-text 숫자가 많은데 stats·chart 가 한 장도 없음
+//   numbers-as-text 숫자가 많은데 stats·chart·bigstat 이 한 장도 없음
 //   bullets-overuse bullets 가 주 블록인 장이 2장 이상
 //
 // 사용: node check_blocks.mjs <outline.json> [--strict] [--json out.json]
@@ -28,8 +28,9 @@ for (const s of outline.sections || []) {
   }
 }
 
-// 주 블록 = callout 이 아닌 첫 블록 (callout 만 있으면 callout)
-const mainOf = sl => (sl.blocks.find(b => b.type !== 'callout') || sl.blocks[0]).type;
+// 주 블록 = 띠(callout·flow·strip)가 아닌 첫 블록 (띠만 있으면 첫 블록)
+const BANDS = new Set(['callout', 'flow', 'strip']);
+const mainOf = sl => (sl.blocks.find(b => !BANDS.has(b.type)) || sl.blocks[0]).type;
 const strip = t => String(t || '').replace(/\*\*|<br>/g, '').trim();
 const findings = [];
 const add = (rule, msg, sl) => findings.push({ level: 'warn', rule, msg, slide: sl ? sl.no : null, title: sl ? strip(sl.title) : null });
@@ -59,8 +60,8 @@ if (n >= 6 && kinds < 4) add('block-variety', `본문 ${n}장에 블록 ${kinds}
 
 // 숫자가 글로만 나열됐나: 블록 글 안의 "숫자+단위" 개수
 const used = new Set(slides.flatMap(sl => sl.blocks.map(b => b.type)));
-const hasNumberViz = used.has('stats') || used.has('chart') ||
-  slides.some(sl => sl.blocks.some(b => (b.cards || b.columns || []).some(c => c.stat || c.chart || c.rows || c.highlight)));
+const hasNumberViz = used.has('stats') || used.has('chart') || used.has('bigstat') ||
+  slides.some(sl => sl.blocks.some(b => (b.cards || b.columns || []).some(c => c.stat || c.chart || c.rows || c.highlight || c.bar)));
 if (!hasNumberViz) {
   const text = JSON.stringify(slides.map(sl => sl.blocks));
   const nums = text.match(/\d[\d,.]*\s?(%|만|억|천|명|건|원|배|회|개|점|시간|분)/g) || [];
