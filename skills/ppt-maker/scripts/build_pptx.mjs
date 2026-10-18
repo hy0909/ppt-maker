@@ -624,23 +624,16 @@ const B = {
     const rowsY = inner.y + hdrH + 8, rowsH = Math.max(1, inner.h - hdrH - 8), rowH = rowsH / Math.max(1, tasks.length);   // 띠 아래 8px
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
     const tone = t => t.tone === 'muted' ? P.textMid : t.tone === 'accent' ? P.pillGlow : t.tone === 'second' ? P.primary2 : P.primary;
-    const autoName = tasks.some(t => t.label) && tasks.some(t => !t.label);   // 섞이면 빈 막대에 항목 이름(HTML fitGantt 와 같은 규칙)
     tasks.forEach((t, i) => {
       const y = rowsY + rowH * i, cy = y + rowH / 2;
       text(slide, String(t.name || '').replace(/\*\*/g, ''), inner.x, y, nameW - em * 0.5, rowH, { size: D.small, k, color: P.text, bold: true, valign: 'middle' });
       const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
       const bx = gx + gw * (s - 1) / n, bw = Math.max(3, gw * (e - s + 1) / n), bh = Math.min(rowH * 0.55, fs * 1.45);
-      // 빈 막대에 넣을 항목 이름 자리: in(막대 안) · right(막대 오른쪽) · left(막대 왼쪽, 안내선을 그 앞에서 끊는다)
-      const nm = autoName && !t.label ? String(t.name || '').replace(/\*\*/g, '') : '', lf = D.label * k, nmW = nm ? estW(nm, lf) : 0, gap = em * 0.5;
-      const place = !nm ? '' : nmW + lf * 0.8 <= bw ? 'in' : (bx + bw + gap + nmW <= gx + gw + toW || bx - gx < nmW + gap) ? 'right' : 'left';
-      const fromW = t.from ? estW(String(t.from), fs * 0.85) + em * 0.5 : place === 'left' ? nmW + lf + gap : 0;
+      const fromW = t.from ? estW(String(t.from), fs * 0.85) + em * 0.5 : 0;
       if (bx - fromW - gx > 2) rect(slide, gx, cy, bx - fromW - gx, 1, { fill: P.borderStrong });   // 안내선
       if (t.from) text(slide, String(t.from), bx - fromW, y, fromW - em * 0.25, rowH, { size: D.label, k, color: P.textMid, align: 'right', valign: 'middle' });
       rect(slide, bx, cy - bh / 2, bw, bh, { fill: tone(t), radius: 3 });
       if (t.label) text(slide, String(t.label), bx, cy - bh / 2, bw, bh, { size: D.label, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
-      else if (place === 'in') text(slide, nm, bx, cy - bh / 2, bw, bh, { size: D.label, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
-      else if (place === 'right') text(slide, nm, bx + bw + gap, y, nmW + lf, rowH, { size: D.label, k, color: P.textMid, bold: true, valign: 'middle' });
-      else if (place === 'left') text(slide, nm, bx - gap - nmW - lf, y, nmW + lf, rowH, { size: D.label, k, color: P.textMid, bold: true, align: 'right', valign: 'middle' });
       if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.label, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
     });
   },

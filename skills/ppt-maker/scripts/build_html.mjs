@@ -245,9 +245,6 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .gantt .gtrack{position:relative;min-height:1.9em;margin-right:var(--gto,3.4em);}   /* 오른쪽은 to 라벨 자리 */
 .gantt .glead{position:absolute;left:0;top:50%;height:1px;background:var(--border-strong);}   /* 이름 끝 → 막대 시작 안내선 */
 .gantt .gbar{position:absolute;top:50%;height:1.45em;font-style:normal;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:var(--fs-label);white-space:nowrap;overflow:hidden;padding:0 .4em;}
-.gantt .gbar b{font-weight:inherit;}
-.gantt .gbar.out{overflow:visible;} .gantt .gbar.out b{position:absolute;top:50%;transform:translateY(-50%);left:calc(100% + .3em);padding:0 .2em;background:#fff;color:var(--text-mid);}   /* 흰 바탕: 안내선이 글자를 지나가지 않게 */   /* 막대가 좁으면 이름을 막대 오른쪽에 */
-.gantt .gbar.out.l b{left:auto;right:calc(100% + .3em);}   /* 오른쪽 자리가 없으면 왼쪽에 */
 .gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--pill-glow);} .gantt .gbar.muted{background:var(--text-mid);}
 .gantt .gfrom,.gantt .gto{position:absolute;top:50%;transform:translateY(-50%);font-size:var(--fs-label);color:var(--text-mid);white-space:nowrap;}
 .gantt .gfrom{transform:translate(-100%,-50%);padding-right:.5em;} .gantt .gto{padding-left:.5em;} .gantt .gto.end{left:auto!important;right:calc(-1 * var(--gto,3.4em));text-align:right;padding-left:0;}
@@ -499,16 +496,12 @@ const BLOCKS = {
   gantt(b) {
     const cols = b.cols || [], n = Math.max(1, cols.length), tasks = b.tasks || [];
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
-    // 글자 있는 막대와 빈 막대가 섞이면 빈 막대에 항목 이름을 넣는다(2026-10-18). 막대 안에 안 들어가면 브라우저가 막대 옆으로 뺀다(아래 fitGantt)
-    const autoName = tasks.some(t => t.label) && tasks.some(t => !t.label);
     const rows = tasks.map(t => {
       const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
-      const auto = autoName && !t.label;
-      const barText = t.label ? esc(t.label) : auto ? `<b>${esc(String(t.name || '').replace(/\*\*/g, ''))}</b>` : '';
       const left = ((s - 1) / n * 100).toFixed(2), width = ((e - s + 1) / n * 100).toFixed(2);
       // 안내선은 이름 끝에서 막대(또는 from 글자) 앞까지. from·to 는 막대 앞뒤 작은 글자, label 은 막대 안
       const fromW = t.from ? `calc(${left}% - ${String(t.from).length * 0.55 + 1}em)` : `${left}%`;
-      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="glead" style="width:${fromW}"></i>${t.from ? `<span class="gfrom" style="left:${left}%">${esc(t.from)}</span>` : ''}<i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}${auto ? ' auto' : ''}" style="left:${left}%;width:${width}%">${barText}</i>${t.to ? `<span class="gto${e >= n ? ' end' : ''}" style="left:${(+left + +width).toFixed(2)}%">${esc(t.to)}</span>` : ''}</div></div>`;
+      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="glead" style="width:${fromW}"></i>${t.from ? `<span class="gfrom" style="left:${left}%">${esc(t.from)}</span>` : ''}<i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}" style="left:${left}%;width:${width}%">${t.label ? esc(t.label) : ''}</i>${t.to ? `<span class="gto${e >= n ? ' end' : ''}" style="left:${(+left + +width).toFixed(2)}%">${esc(t.to)}</span>` : ''}</div></div>`;
     }).join('');
     return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div class="gnh">${esc(b.nameHeader || '')}</div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
   },
@@ -706,19 +699,7 @@ ${sectionsHtml}
 (function () {
   var draw = ${CHART_DRAW_SRC};
   var C = ${JSON.stringify(chartColors())};
-  function fitGantt() {   // 이름을 넣은 빈 막대: 막대 안에 안 들어가면 옆으로 뺀다
-    document.querySelectorAll('.gantt .gbar.auto').forEach(function (bar) {
-      var t = bar.querySelector('b'); if (!t) return;
-      bar.classList.remove('out', 'l');
-      var tw = t.getBoundingClientRect().width, bw = bar.getBoundingClientRect().width, pad = parseFloat(getComputedStyle(bar).fontSize) * 0.8;
-      if (tw + pad <= bw) return;
-      bar.classList.add('out');
-      var tr = bar.parentNode.getBoundingClientRect(), br = bar.getBoundingClientRect();
-      if (br.right + tw + pad > tr.right + 4 && br.left - tr.left > br.right - tr.right + tw) bar.classList.add('l');
-    });
-  }
   function redraw() {
-    fitGantt();
     document.querySelectorAll('.chart[data-chart]').forEach(function (el) {
       var plot = el.querySelector('.cplot'); if (!plot) return;
       var w = plot.clientWidth, h = plot.clientHeight; if (w < 20 || h < 20) return;
