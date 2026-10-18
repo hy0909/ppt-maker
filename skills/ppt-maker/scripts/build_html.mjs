@@ -390,10 +390,39 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
       out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc(v) + '</text>';
     }); });
   } else {
+    // 값 라벨 자리(2026-10-18) — 같은 달에 선끼리 높이가 비슷하면 숫자가 겹쳐 안 보였다. 달마다 점을 위→아래로 줄 세우고,
+    // 가까운 점(1.9글자 이내)끼리 묶어 위쪽 절반은 맨 위 점 위로 쌓고 아래쪽 절반은 맨 아래 점 밑으로 쌓는다(줄 순서 = 선 순서).
+    // 그래도 남는 겹침은 줄 간격(1.05글자)만큼 밀어내고, 그림 위·축 라벨 칸을 넘지 않게 전체를 당긴다.
+    var ly = series.map(function() { return []; }), gap = fs * 1.05, near = fs * 1.9, topY = fs * 0.95, botY = H - padB - fs * 0.15;
+    for (var ci = 0; ci < n; ci++) {
+      var col = [];
+      series.forEach(function(sr, si) { var v = (sr.values || [])[ci]; if (typeof v === 'number') col.push({ si: si, py: y(v) }); });
+      col.sort(function(a, c) { return a.py - c.py; });
+      var cut = [0];   // 묶음 시작 위치들
+      for (var c0 = 1; c0 < col.length; c0++) if (col[c0].py - col[c0 - 1].py >= near) cut.push(c0);
+      var place = function() {
+        for (var q = 0; q < cut.length; q++) {
+          var s0 = cut[q], e0 = q + 1 < cut.length ? cut[q + 1] : col.length;
+          var k = e0 - s0, up = Math.ceil(k / 2), tp = col[s0].py, bp = col[e0 - 1].py;
+          for (var j = 0; j < k; j++) col[s0 + j].ly = k === 1 ? tp - fs * 0.85 : j < up ? tp - fs * 0.85 - (up - 1 - j) * gap : bp + fs * 1.6 + (j - up) * gap;
+        }
+      };
+      place();
+      // 위 묶음의 아래 숫자와 아래 묶음의 위 숫자가 부딪히면 두 묶음을 하나로 합쳐 다시 놓는다(숫자 순서가 뒤집히지 않게)
+      for (var q2 = 1; q2 < cut.length;) { if (col[cut[q2] - 1].ly + gap > col[cut[q2]].ly) { cut.splice(q2, 1); place(); q2 = 1; } else q2++; }
+      col.sort(function(a, c) { return a.ly - c.ly; });
+      for (var j2 = 1; j2 < col.length; j2++) if (col[j2].ly - col[j2 - 1].ly < gap) col[j2].ly = col[j2 - 1].ly + gap;
+      for (var j3 = col.length - 1; j3 >= 0; j3--) { var lim = j3 === col.length - 1 ? botY : col[j3 + 1].ly - gap; if (col[j3].ly > lim) col[j3].ly = lim; }
+      for (var j4 = 0; j4 < col.length; j4++) { var lo = j4 === 0 ? topY : col[j4 - 1].ly + gap; if (col[j4].ly < lo) col[j4].ly = lo; }
+      col.forEach(function(c) { ly[c.si][ci] = c.ly; });
+    }
     series.forEach(function(sr, si) {
       var pts = (sr.values || []).map(function(v, i) { return [x(i), y(v)]; });
       out += '<path d="' + smooth(pts) + '" fill="none" stroke="' + cols[si] + '" stroke-width="' + (fs * 0.18) + '" stroke-linejoin="round" stroke-linecap="round"/>';
-      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; out += '<text x="' + pt[0] + '" y="' + (pt[1] - fs * 0.85) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc((sr.values || [])[i]) + '</text>'; });
+      pts.forEach(function(pt, i) { out += '<circle cx="' + pt[0] + '" cy="' + pt[1] + '" r="' + dot + '" fill="' + cols[si] + '"/>'; });
+    });
+    series.forEach(function(sr, si) {   // 숫자는 선·점을 다 그린 뒤에 — 다른 선에 가려지지 않게
+      (sr.values || []).forEach(function(v, i) { if (ly[si][i] == null) return; out += '<text x="' + x(i) + '" y="' + ly[si][i].toFixed(1) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc(v) + '</text>'; });
     });
   }
   return out + '</svg>';
