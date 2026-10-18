@@ -389,7 +389,7 @@ details[open]>summary::before{content:'▾ '}
 </section>
 
 <section id="right">
-  <div class="bar"><span id="previewTitle" style="font-weight:600;color:hsl(var(--foreground))">미리보기</span><span class="sp" style="flex:1"></span><span id="previewLinks"></span></div>
+  <div class="bar"><span id="previewTitle" style="font-weight:600;color:hsl(var(--foreground))">미리보기</span><span class="sp" style="flex:1"></span><span id="tplBox" style="display:none;align-items:center;gap:6px">이 장 템플릿 <select id="tplSel" onchange="applyTpl(this.value)" style="height:30px;font-size:12.5px;width:auto;padding-left:10px"></select><button class="mini" id="tplNext" onclick="nextTpl()" title="이 장의 글을 다음 템플릿으로 다시 배치">다른 템플릿 ↻</button></span><span id="previewLinks"></span></div>
   <div class="empty" id="previewEmpty">PPT를 만들면 여기에 슬라이드가 표시됩니다.<br><small>표지 · 목차 · 본문 · 마무리가 자동 구성됩니다</small></div>
   <iframe id="preview" style="display:none"></iframe>
 </section>
@@ -785,7 +785,7 @@ function resetOutline(){ if(confirm('장표 구성을 비울까요?')){ S.outlin
 
 // ─── build ───────────────────────────────────────────────────────
 // targets: ['html'] 미리보기만(빠름) · ['pdf'] · ['pptx'] 파일은 필요할 때. 파일 변환은 로컬에서 하므로 AI 토큰을 쓰지 않는다.
-async function build(targets=['html']){
+async function build(targets=['html'], at){
   if(!S.outline) return;
   const label = targets.includes('html') ? '미리보기 만드는 중… 슬라이드 그리기 → 글자 크기 맞춤 → 넘침 검사 (5~15초)' : `${targets.map(t=>t.toUpperCase()).join('·')} 파일 만드는 중… (10~20초, AI 토큰 소모 없음)`;
   S.outline.meta = Object.assign({}, S.outline.meta||{}, metaFromForm(), S.outline.meta?.title?{title:S.outline.meta.title}:{});
@@ -793,9 +793,9 @@ async function build(targets=['html']){
   for (const b of [$('#buildBtn'),$('#rebuildBtn'),$('#mkPptx'),$('#mkPdf')]) if(b){ b.classList.add('busy'); b.disabled=true; }
   go(4); if(targets.includes('html')) $('#resultBox').innerHTML=`<div class="note">${label}</div>`; else $('#fileMsg').textContent=label;
   try{
-    const r = await (await fetch('/api/build',{method:'POST',body:JSON.stringify({project:project(),outline:S.outline,targets})})).json();
+    const r = await (await fetch('/api/build',{method:'POST',body:JSON.stringify({project:project(),outline:tagSrc(S.outline),targets})})).json();
     if(r.ok && !targets.includes('html') && S.result && S.result.ok) r.preview = S.result.preview; // 미리보기는 그대로
-    S.result=r; save(); renderResult(); if(r.ok) showPreview();
+    S.result=r; save(); renderResult(); if(r.ok) showPreview(at);
   }catch(e){ $('#resultBox').innerHTML=`<div class="note bad">${e.message}</div>`; }
   finally{ for (const b of [$('#buildBtn'),$('#rebuildBtn'),$('#mkPptx'),$('#mkPdf')]) if(b){ b.classList.remove('busy'); b.disabled=false; } }
 }
@@ -827,7 +827,96 @@ function renderResult(){
     <div class="hint" id="fileMsg"></div></div>
     <details style="margin-top:10px"><summary style="cursor:pointer;font-size:12.5px;color:hsl(var(--muted-foreground))">작업 기록 (문제 있을 때 확인)</summary><pre class="log">${esc(r.log||'')}</pre></details>`;
 }
-function showPreview(){ const r=S.result; if(!r||!r.ok) return; $('#previewEmpty').style.display='none'; const f=$('#preview'); f.style.display=''; f.src=r.preview; $('#previewTitle').textContent='미리보기 · '+project(); $('#previewLinks').innerHTML=[r.pptx?`<a href="${r.pptx}">PPTX</a>`:'', r.pdf?`<a href="${r.pdf}">PDF</a>`:''].filter(Boolean).join(' · '); }
+// ─── 장표 템플릿 바꾸기 ──────────────────────────────────────────
+// 미리보기에서 지금 보는 장의 글 블록(카드·컬럼·단계 …)을 다른 템플릿으로 바꿔 다시 그린다.
+// 글(제목·설명·항목)은 그대로 두고 담는 그릇만 바꾼다. 장 위치는 data-src="섹션.장"(build_html 이 찍음)으로 찾는다.
+const TPLS = [
+  ['cards','카드', n=>n>=2&&n<=6],
+  ['columns','컬럼', n=>n>=2&&n<=4],
+  ['process','단계 (번호 원)', n=>n>=2&&n<=6],
+  ['process:circle','원형 단계', n=>n>=2&&n<=5],
+  ['process:chevron','화살표 단계', n=>n>=2&&n<=5],
+  ['timeline','타임라인', n=>n>=2&&n<=6],
+  ['flow','흐름 띠', n=>n>=2&&n<=6],
+  ['compare','좌우 비교', n=>n===2],
+  ['qa','질문·답', n=>n>=2&&n<=6],
+  ['bullets','목록', n=>n>=1&&n<=8],
+];
+const TPL_SRC = ['cards','columns','process','timeline','flow','figcards','qa','bullets','strip','compare'];
+function tagSrc(o){
+  const c=JSON.parse(JSON.stringify(o));
+  (c.sections||[]).forEach((sec,si)=>(sec.slides||[]).forEach((sl,i)=>{ sl._src=si+'.'+i; }));
+  (c.appendix||[]).forEach((sl,i)=>{ sl._src='a.'+i; });
+  return c;
+}
+function srcSlide(src){ const [a,b]=String(src||'').split('.'); const o=S.outline; if(!o) return null; return a==='a' ? (o.appendix||[])[+b] : ((o.sections||[])[+a]||{slides:[]}).slides[+b]; }
+function tplBlockIdx(sl){ return (sl&&sl.blocks||[]).findIndex(b=>TPL_SRC.includes(b.type)); }
+// 수치·그래프·표·그림이 든 카드는 글만 옮기면 내용이 빠지므로 바꾸지 않는다
+function tplRich(b){ return [].concat(b.cards||[],b.columns||[],b.steps||[],b.phases||[]).some(c=>c&&(c.stat||c.chart||c.rows||c.highlight||c.bar||c.image)); }
+function tplOf(b){ return b.type==='process'&&b.style ? 'process:'+b.style : b.type; }
+const itemText = x => typeof x==='string' ? x : [x.k,x.v].filter(Boolean).join(' ');
+// 블록 → 공통 항목 [{title, desc, items, period}]
+function tplEntries(b){
+  const E=(title,desc,items,period)=>({title:title||'',desc:desc||'',items:(items||[]).filter(Boolean),period:period||''});
+  const fromItem=x=> typeof x==='string' ? E('',x) : E(x.k,x.v);
+  switch(b.type){
+    case 'cards': case 'figcards': return (b.cards||[]).map(c=>E(c.title,c.desc,c.items,c.tag||c.eyebrow));
+    case 'columns': return (b.columns||[]).map(c=>E(c.heading,c.text,(c.items||[]).concat(...(c.sections||[]).map(x=>x.heading?[{k:x.heading,v:(x.items||[]).map(itemText).join(' · ')}]:(x.items||[])))));
+    case 'process': return (b.steps||[]).map(c=>E(c.title||c.heading,c.desc,c.items,c.period));
+    case 'timeline': return (b.phases||[]).map(c=>E(c.title,c.desc,c.items,c.period));
+    case 'flow': return (b.steps||[]).map(c=>E(c.title,c.desc,null,c.no));
+    case 'qa': return (b.items||[]).map(c=>E(c.q,c.a));
+    case 'bullets': case 'strip': return (b.items||[]).map(fromItem);
+    case 'compare': return [b.left,b.right].filter(Boolean).map(c=>E(c.heading,'',c.items,c.tag));
+  }
+  return [];
+}
+// 공통 항목 → 새 블록. 제목이 없는 항목은 번호를 제목으로 쓴다.
+function tplBlock(tpl, es, old){
+  const [type,style]=tpl.split(':'), keep={}; if(old.flex) keep.flex=old.flex; if(old.label) keep.label=old.label; if(old.heading) keep.heading=old.heading;
+  const T=(e,i)=>e.title||String(i+1).padStart(2,'0');
+  const body=e=>(e.desc?[e.desc]:[]).concat(e.items);
+  const line=e=>e.desc||e.items.map(itemText).join(' · ');
+  switch(type){
+    case 'cards': return {type,...keep,cards:es.map((e,i)=>({title:T(e,i),...(e.desc?{desc:e.desc}:{}),...(e.items.length?{items:e.items}:{})}))};
+    case 'columns': return {type,...keep,columns:es.map((e,i)=>({heading:T(e,i),items:body(e)}))};
+    case 'process':
+      if(style==='circle') return {type,style,...keep,steps:es.map((e,i)=>({period:e.period||'STEP '+String(i+1).padStart(2,'0'),title:T(e,i),desc:line(e)}))};
+      if(style==='chevron') return {type,style,...keep,steps:es.map((e,i)=>({title:T(e,i),...(e.period?{period:e.period}:{}),items:body(e)}))};
+      return {type,...keep,steps:es.map((e,i)=>({title:T(e,i),...(e.period?{period:e.period}:{}),...(e.desc?{desc:e.desc}:{}),...(e.items.length?{items:e.items}:{})}))};
+    case 'timeline': return {type,...keep,phases:es.map((e,i)=>({period:e.period||(i+1)+'단계',title:T(e,i),...(e.desc?{desc:e.desc}:{}),...(e.items.length?{items:e.items}:{})}))};
+    case 'flow': return {type,...keep,steps:es.map((e,i)=>({title:T(e,i),...(line(e)?{desc:line(e)}:{})}))};
+    case 'compare': return {type,...keep,left:{...(es[0].period?{tag:es[0].period}:{}),heading:T(es[0],0),items:body(es[0])},right:{...(es[1].period?{tag:es[1].period}:{}),heading:T(es[1],1),items:body(es[1])}};
+    case 'qa': return {type,...keep,items:es.map((e,i)=>({q:T(e,i),a:line(e)}))};
+    case 'bullets': return {type,...keep,items:es.map(e=>e.title&&line(e)?{k:e.title,v:line(e)}:(e.title||line(e)))};
+  }
+}
+let CUR = { src:null, at:1 };
+function hookPreview(){
+  const f=$('#preview'); let w, d; try{ w=f.contentWindow; d=f.contentDocument; d.body; }catch{ return; }   // 다른 주소(로컬 서버 프록시)면 장을 읽을 수 없다
+  const slides=()=>Array.from(d.querySelectorAll('section.slide'));
+  const sync=i=>{ const sec=slides()[i]; CUR={src:sec&&sec.getAttribute('data-src'),at:i+1}; renderTplBox(); };
+  w.addEventListener('message',e=>{ if(e.data&&typeof e.data.slideIndexChanged==='number') sync(e.data.slideIndexChanged); });
+  const m=(w.location.hash||'').match(/^#(\d+)$/); sync(m?+m[1]-1:0);
+}
+function renderTplBox(){
+  const sl=srcSlide(CUR.src), bi=tplBlockIdx(sl), box=$('#tplBox');
+  if(!sl||bi<0){ box.style.display='none'; return; }
+  const b=sl.blocks[bi], es=tplEntries(b), n=es.length, cur=tplOf(b), rich=tplRich(b), isQ=es.every(e=>/\?$/.test(e.title.trim()));   // 질문·답은 제목이 질문일 때만
+  $('#tplSel').disabled=$('#tplNext').disabled=rich; $('#tplBox').title=rich?'이 장은 수치·그래프·표가 든 카드라 템플릿을 바꾸지 않습니다(3단계 블록 JSON 에서 직접 수정)':'';
+  const opts=TPLS.filter(([k,,ok])=>k===cur||(ok(n)&&(k!=='qa'||isQ)));
+  $('#tplSel').innerHTML=(opts.some(([k])=>k===cur)?'':`<option value="${cur}" selected>${esc(b.type)}</option>`)+opts.map(([k,l])=>`<option value="${k}"${k===cur?' selected':''}>${esc(l)}</option>`).join('');
+  box.style.display='inline-flex';
+}
+async function applyTpl(tpl){
+  const sl=srcSlide(CUR.src), bi=tplBlockIdx(sl); if(!sl||bi<0) return;
+  const old=sl.blocks[bi]; if(tplOf(old)===tpl||tplRich(old)) return;
+  const es=tplEntries(old); if(!es.length) return;
+  sl.blocks[bi]=tplBlock(tpl,es,old); save(); renderEditor();
+  await build(['html'], CUR.at);
+}
+function nextTpl(){ const o=Array.from($('#tplSel').options).map(x=>x.value), i=o.indexOf($('#tplSel').value); if(o.length>1) applyTpl(o[(i+1)%o.length]); }
+function showPreview(at){ const r=S.result; if(!r||!r.ok) return; $('#previewEmpty').style.display='none'; const f=$('#preview'); f.style.display=''; $('#tplBox').style.display='none'; f.onload=hookPreview; f.src=at ? r.preview+(r.preview.includes('?')?'&':'?')+'at='+Date.now()+'#'+at : r.preview; /* 같은 주소에 #번호만 바꾸면 다시 읽지 않아서, 장 위치를 줄 때는 새로 읽게 한다 */ $('#previewTitle').textContent='미리보기 · '+project(); $('#previewLinks').innerHTML=[r.pptx?`<a href="${r.pptx}">PPTX</a>`:'', r.pdf?`<a href="${r.pdf}">PDF</a>`:''].filter(Boolean).join(' · '); }
 if (S.result && S.result.ok) { showPreview(); }
 if (S.outline) { /* editor renders on step 3 */ }
 </script>

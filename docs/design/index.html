@@ -55,6 +55,7 @@ a{color:inherit}
 .gbtn:hover{border-color:var(--ink3);color:var(--ink)}
 .gbtn[disabled]{opacity:.42;cursor:default}
 #save{border-color:var(--acc);color:var(--acc);font-weight:700}
+#toApp{display:inline-flex;align-items:center;text-decoration:none;background:var(--acc);border-color:var(--acc);color:#fff;font-weight:700} #toApp:hover{opacity:.9;color:#fff}   /* PPT 만드는 화면으로 — Pages 는 /ppt-maker/, 로컬 서버는 / (둘 다 ../ ) */
 #save[disabled]{border-color:var(--line2);color:var(--ink3);font-weight:600}
 .svmsg{font-size:11.5px;color:var(--ink3);white-space:nowrap}
 .svmsg.ok{color:var(--ok)}
@@ -363,6 +364,7 @@ tr.dirty .val input{border-color:var(--acc);color:var(--acc)}
 <header class="hd">
   <div class="nm">장표 디자인 시스템</div>
   <div class="sub">1280 × 720 · ppt-maker</div>
+  <a class="gbtn" id="toApp" href="../">PPT 만들러 가기 →</a>
   <div class="sp"></div>
   <div class="seg" role="group" aria-label="읽는 방식">
     <button id="dDense" aria-pressed="true">dense 제출·열람용</button>

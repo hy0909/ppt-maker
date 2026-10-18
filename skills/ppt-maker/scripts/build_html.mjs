@@ -651,7 +651,7 @@ function renderContent(s) {
   const bodyTop = titleExtra + (headline ? (sl.lead ? FRAME.bodyTop + Math.max(0, leadLines - 1) * HEAD.lead * 1.5 : FRAME.bodyTop - 30) : 96);
   const foot = footLines(sl);
   const safeBottom = footSafeBottom(foot);
-  return `<section class="slide" data-label="${esc(slideLabel(s))}" id="s${s.order}" data-fit="1"${fitStyle(s.order)}>
+  return `<section class="slide" data-label="${esc(slideLabel(s))}" id="s${s.order}" data-fit="1"${fitStyle(s.order)}${s.slide && s.slide._src ? ` data-src="${esc(s.slide._src)}"` : ''}>
     ${top(eyebrow, headline, sl.lead, meta.pageNumbers && s.pageNo ? String(parseInt(s.pageNo, 10)) : '')}
     <div class="body" style="--body-top:${bodyTop}px;--safe-bottom:${safeBottom}px">${renderBlocks(sl.blocks)}</div>
     ${foot.length ? `<div class="foot">${foot.map(t => `<div>${rich(t)}</div>`).join('')}</div>` : ''}
