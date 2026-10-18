@@ -256,7 +256,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .chart .cplot{flex:1;min-height:0;margin-top:.5em;display:flex;} .chart .cplot svg{width:100%;height:100%;display:block;}
 .chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--body);font-weight:500;margin-top:.35em;}   /* 범례 = 작은 라벨 톤 */ .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
 /* cover / toc / divider / closing */
-/* 표지 배경 — meta.coverBg 로 고른 이미지. 마무리 장표는 브랜드 그라디언트로 따로 간다 */
+/* 표지 배경 — meta.coverBg 로 고른 이미지. 마무리 장표도 같은 그림을 깐다(2026-10-18) */
 .cover{position:absolute;inset:0;overflow:hidden;color:#fff;}
 .cbg{position:absolute;inset:0;overflow:hidden;z-index:0;background:#000 center center / cover no-repeat;}
 .cv .cbg{background-image:url('${coverBgFile(meta.coverBg)}');}
@@ -292,7 +292,7 @@ ${DIVIDER_BG ? `.dv .dbg{position:absolute;inset:0;background:#000 url('${DIVIDE
 .dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:20px;max-width:1000px;word-break:keep-all;}
 .dv .s{font-size:24px;color:rgba(255,255,255,.72);margin-top:18px;max-width:1000px;line-height:1.45;word-break:keep-all;}
 .dv .ft{position:absolute;left:var(--pad);right:var(--pad);bottom:42px;text-align:center;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
-.closing .cbg{background:${P.primaryDeep};}   /* 2026-10-09 마무리: 진한 메인 단색, 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
+/* 마무리(2026-10-18): 표지와 같은 배경 그림 + 같은 scrim(.cv). 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
 .closing .cin{display:block;padding:0;}
 .closing .big{position:absolute;left:66px;top:70px;width:760px;font-family:var(--font-title-b);font-size:40px;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.35;}
 .closing .ty{position:absolute;left:66px;top:300px;width:600px;font-size:18px;color:rgba(255,255,255,.8);line-height:1.5;}
@@ -666,7 +666,7 @@ function renderClosing() {
   if (ct.email) rows.push(['E-mail', `<span class="v">${esc(ct.email)}</span>`]);
   if (ct.phone) rows.push(['Tel', `<span class="v">${esc(ct.phone)}</span>`]);
   return `<section class="slide closing" data-label="마무리">
-    <div class="cover"><div class="cbg" data-deco></div>
+    <div class="cover cv"><div class="cbg" data-deco></div><div class="scrim" data-deco></div>
       <div class="cin">
         <div class="big">${rich(c.message)}</div>
         ${c.sub ? `<div class="ty">${rich(c.sub)}</div>` : ''}

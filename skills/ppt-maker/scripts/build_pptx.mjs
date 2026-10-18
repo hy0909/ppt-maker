@@ -1039,9 +1039,9 @@ function content(sl) {
 }
 
 function closing() {
-  // 2026-10-09 레이아웃: 진한 메인 단색 바탕 · 왼쪽 위 메시지 · 왼쪽 아래 로고 + Web/E-mail · 오른쪽 그림(closing.image)
+  // 2026-10-18: 표지와 같은 배경 그림(scrim 포함) · 왼쪽 위 메시지 · 왼쪽 아래 로고 + Web/E-mail · 오른쪽 그림(closing.image)
   const s = pres.addSlide();
-  s.background = { color: colorToHex(P.primaryDeep) };
+  coverBgImg(s);
   const c = outline.closing, ct = meta.contact || {};
   const L = 66;
   const msgLines = Math.max(1, lines(String(c.message || ''), 40, 760));
