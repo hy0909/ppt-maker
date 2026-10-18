@@ -12,7 +12,7 @@
     "pill": "기술개발",           // 마무리 장표의 골드 라벨 (짧게, 선택)
     "event": "행사·공고명",       // 표지 오른쪽 아래 상자 (선택, 없으면 docType)
     "docType": "기술 개발 방향 검토", // event 가 없을 때 상자에 들어갈 말 (선택)
-    "title": "문서 제목<br>둘째 줄",  // 표지 제목(h0). <br> 로 줄바꿈
+    "title": "문서 제목<br>둘째 줄",  // 표지 제목(h0). <br> 로 줄바꿈. 오른쪽에 그림이 있는 배경(retail·cctv·cube-mono·wave)은 그림 앞에서 자동으로 줄이 바뀐다(index.json titleW)
     "subtitle": "부제 한 문장",   // 표지에서 제목 위에 오는 설명줄(body2)
     "company": "주식회사 아크미",
     "fileCompany": "acme",       // 전달 파일명 앞부분(영문). 파일명 = fileCompany_YYMMDD (예 acme_260821.pptx)
@@ -33,7 +33,7 @@
   },
   "sections": [
     {
-      "no": 1, "title": "섹션명", "subtitle": "간지에 한 줄로 붙는 설명 (선택)", "en": "간지 왼쪽 위 표기 (선택, 없으면 CHAPTER 0N)",
+      "no": 1, "title": "섹션명", "subtitle": "간지에 한 줄로 붙는 설명 (선택)", "en": "(더 쓰지 않음 — 간지는 큰 번호 1·2·3 만 쓴다)",
       "slides": [
         {
           // header·subtitle 은 쓰지 않는다 — 장표 위 작은 글씨에는 목차(섹션) 이름만 나온다
@@ -71,14 +71,14 @@
 | `org` | `head:{role, name, title?, items?[]}, teams:[{name, count?, leader, leaderRole?, desc?}]`, `heading?` | **인력 배치·조직도.** 위 대표 카드(진한 머리띠·이름·사진 빈 칸·이력 두 열) → 연결선 → 팀 카드 2~5개(팀명(인원)·팀장 + 역할 배지·이력 한 줄). 사진은 넣지 않는다 | 팀 2~5 |
 | `history` | `groups:[{period, items:[{year, month?, text}]}]`, `layout?:"columns"\|"list"`, `heading?` | **연혁.** `columns`(기본·발표용): 위 진한 머리띠에 기간 2~4칸, 칸마다 세로 점선 + 연도·내용. `list`(제출용): 왼쪽 기간, 오른쪽 연·월·내용 줄. 연혁은 timeline 이 아니라 이 블록 | 기간 2~4 · 항목 3~6/칸 |
 | `timeline` | `phases:[{period, title, items?, desc?, highlight?}]`, `darkLast?` | process 와 같은 모양, 기간 중심 | 3~5 |
-| `gantt` | `cols:["1월",…], nameHeader?, tasks:[{name, start, end, tone?:"primary"\|"second"\|"accent"\|"muted", label?(막대 안), from?·to?(막대 앞뒤 시작·끝 표시)}], heading?` | **여러 일이 겹치는 일정표.** 왼쪽 항목 이름, 위 기간 라벨, 세로 격자선, 가로 막대. `start`·`end` 는 1부터 세는 칸 번호(끝 포함, 2.5 처럼 반 칸 가능). 막대 색은 tone(기본 포인트 컬러, muted 회색). 겹치지 않는 단계 나열은 timeline | 행 3~8 · 칸 4~12 |
+| `gantt` | `cols:["1월",…], nameHeader?, tasks:[{name, start, end, tone?:"primary"\|"second"\|"accent"\|"muted", label?(막대 안), from?·to?(막대 앞뒤 시작·끝 표시)}], heading?` | **여러 일이 겹치는 일정표.** label 을 준 막대와 안 준 막대가 섞이면 빈 막대에는 항목 이름이 자동으로 들어간다(막대가 좁으면 막대 옆). label 은 전부 주거나 전부 빼는 게 가장 깔끔하다. 왼쪽 항목 이름, 위 기간 라벨, 세로 격자선, 가로 막대. `start`·`end` 는 1부터 세는 칸 번호(끝 포함, 2.5 처럼 반 칸 가능). 막대 색은 tone(기본 포인트 컬러, muted 회색). 겹치지 않는 단계 나열은 timeline | 행 3~8 · 칸 4~12 |
 | `table` | `headers, rows, emphasize?(열 index), leftAlign?([열 index]), widths?(["20%",…]), rowHeader?(true)` | 비교표, 평가지표 대응표, 예산. 강조 열은 글자색만 포인트 컬러(바탕·굵기는 그대로). `widths` 를 안 주면 열 너비는 칸 글자 양에 맞춰 자동으로 나뉜다. 한 장에 다 안 들어가는 표는 빌드할 때 행을 고르게 나눠 여러 장으로 편다(머리글 반복, 제목 뒤 "(계속)"). 첫 열이 각 행의 항목 이름(세로 타이틀)이면 `rowHeader: true` → 첫 열도 머리글처럼 연회색 바탕·회색 글자. 셀에 `**굵게**` 가능. "달성/조기달성/진행중" 은 배지로 표시 | 행 3~7 |
 | `stats` | `stats:[{label, sub?, value, desc?}]` | 핵심 수치 카드(`label` = 라벨 칩, `sub` = 작은 지표명, `value` 큰 숫자+단위, `desc` 파란 보조 문장 "전월 31만 회 · 35% 성장") | 2~4 |
 | `chart` | `kind:"line"\|"bar", title, unit?, labels:[…], series:[{name, values:[…], emphasis?:1\|2\|3}], ranked?:true, heading?` | **월별 추이 등 수치는 표로 나열하지 말고 그래프로**. 시리즈 1~3개. **색은 강조로 정한다**: `emphasis` 1~3 을 준 시리즈만 색을 받고 나머지는 연한 회색. 강조끼리 위계(1위>2위>3위)가 있으면 `ranked: true` → primary 600→350→200, 대등하면 primary→teal→gold. 아무것도 안 적으면 첫 시리즈만 강조. 채널별 추이 그래프는 형식을 통일 | 1 |
 | `compare` | `left:{tag?, heading, items}, right:{tag?, heading, items}` | AS-IS→TO-BE, 난제→해법. `tag` 기본 AS-IS/TO-BE, 오른쪽이 연파랑 강조 | 항목 3~4 |
 | `image` | `src, alt?, caption?, heading?, side:"left"\|"right"\|"full", ratio?:"16:9"\|"4:3"\|"1:1"\|"9:16"\|"3:4"\|"original", text?:{heading, items}, flex?` | 구성도·화면·사진. `src`가 비어 있으면 `[ alt ]` 점선 자리표시자. **`ratio` 기본 16:9** — 원본이 다르면 사용자에게 묻고, 고른 비율 상자에 맞춰 가장자리를 잘라 채운다(`original` 만 안 자름) | 1 |
 | `bullets` | `heading?, items` | 최후의 수단. 항목이 4개 넘으면 columns/cards 로 | 3~5 |
-| `callout` | `items?:[…] 또는 text, label?("핵심 요약"·"특이사항"), tone?:"warn"\|"strong"\|"light"` | 장표 맨 아래 둥근 배너. **위계 셋** — 기본(연한 메인 컬러, tone 없음) · `warn` 주의(빨간 바탕: 위험·미달·주의사항) · `strong` 강조(검정 바탕: 결론 한 줄). 왼쪽 라벨은 본문 첫 줄과 같은 높이. **불릿 2~3개(`items`) 권장** | 1 |
+| `callout` | `items?:[…] 또는 text, label?("핵심 요약"·"특이사항"), tone?:"warn"\|"strong"\|"light"` | 장표 맨 아래 둥근 배너. **위계 셋** — 기본(연한 메인 컬러, tone 없음) · `warn` 주의(진보라 바탕: 위험·미달·주의사항) · `strong` 강조(검정 바탕: 결론 한 줄). 왼쪽 라벨은 본문 첫 줄과 같은 높이. **불릿 2~3개(`items`) 권장** | 1 |
 
 ## 자동으로 처리되는 것
 
@@ -86,7 +86,7 @@
 - **글자 크기**: `fit_slides.mjs`가 장표마다 본문 배율 `--k`를 계산해 빈 공간을 채운다(최대 1.3, dense·airy 같음 — 내용이 적으면 남는 공간은 여백으로 둔다). 헤더 바·제목·리드는 고정 크기. 내용이 넘치면 0.75까지 줄이고, 그래도 넘치면 경고 → 장표를 나눈다.
 - **상단**: 헤더 바 없음. 아이브로우(목차 이름만), 오른쪽 위 장 번호, 헤드라인, 바로 아래 lead(구분선은 2026-10-09 없앰). (구 헤더 바 설명: 왼쪽 태그(`i · 2` 형식, 부록은 `APPENDIX`, 목차는 `CONTENTS`) + `header`(없으면 섹션명) + `subtitle` + 오른쪽 흰 로고. 표지·간지·마무리에는 없음.
 - **표지**: `coverBg` 로 고른 그림 하나. 짝이 되는 간지 그림이 있는 배경(`haze`)을 고르면 간지 배경도 같이 바뀐다. 마무리는 늘 그라데이션. 표지는 `subtitle`(설명줄) → `title`(제목) → 왼쪽 아래 로고 → 오른쪽 아래 상자(`event`) 네 덩어리다. pill·docType 박스·기관 칸·기간/날짜는 표지에 넣지 않는다.
-- **목차**: 연회색 배경에 왼쪽 위 `목차`, 오른쪽에 번호(1·2·3) + 섹션명 2열. 쪽수·설명은 적지 않는다. **간지**: 포인트 컬러 그라디언트 배경 + CHAPTER 0N + 섹션명 60px + 로고 워터마크.
+- **목차**: 연회색 배경에 왼쪽 위 `목차`, 오른쪽에 번호(1·2·3) + 섹션명 2열. 쪽수·설명은 적지 않는다. **간지**: 포인트 컬러 그라디언트 배경, 가운데 정렬로 큰 번호(2, 140px) → 섹션명 60px → subtitle 36px. 로고·장 번호 없음.
 - **표지·목차 글자 규격**(크기·줄 간격·자간·좌표): `design-system.md` 의 "표지·목차 글자 규격" 표. 값은 `scripts/lib/common.mjs` 의 `TYPE`·`COVER_BOX`·`AGENDA_BOX` 한 곳에만 둔다.
 - **페이지 번호**: 표지=1로 세고 본문/부록에만 표기. 표지·목차·간지·마무리에는 없음.
 - **이미지**: 경로는 출력 폴더 기준(`assets/xxx.png`). 없는 파일은 점선 자리표시자로 렌더링되고 납품 전 교체 대상.

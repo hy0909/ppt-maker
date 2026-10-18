@@ -389,7 +389,7 @@ details[open]>summary::before{content:'▾ '}
 </section>
 
 <section id="right">
-  <div class="bar"><span id="previewTitle" style="font-weight:600;color:hsl(var(--foreground))">미리보기</span><span class="sp" style="flex:1"></span><span id="tplBox" style="display:none;align-items:center;gap:6px">이 장 템플릿 <select id="tplSel" onchange="applyTpl(this.value)" style="height:30px;font-size:12.5px;width:auto;padding-left:10px"></select><button class="mini" id="tplNext" onclick="nextTpl()" title="이 장의 글을 다음 템플릿으로 다시 배치">다른 템플릿 ↻</button></span><span id="previewLinks"></span></div>
+  <div class="bar"><span id="previewTitle" style="font-weight:600;color:hsl(var(--foreground))">미리보기</span><span class="sp" style="flex:1"></span><span id="tplBox" style="display:none;align-items:center;gap:6px">이 장 템플릿 <select id="tplSel" onchange="applyTpl(this.value)" style="height:30px;font-size:12.5px;width:auto;padding-left:10px"></select><button class="mini" id="tplNext" onclick="nextTpl()" title="이 장의 글을 다음 템플릿으로 다시 배치">다른 템플릿 ↻</button><span id="tplNote" style="font-size:12px;color:hsl(var(--muted-foreground))"></span></span><span id="previewLinks"></span></div>
   <div class="empty" id="previewEmpty">PPT를 만들면 여기에 슬라이드가 표시됩니다.<br><small>표지 · 목차 · 본문 · 마무리가 자동 구성됩니다</small></div>
   <iframe id="preview" style="display:none"></iframe>
 </section>
@@ -564,7 +564,7 @@ function drawCover(){
 
   const ttl = st.querySelector('.ttl');
   // 제목은 길어지면 아래로 자라야 하므로 높이를 고정하지 않는다
-  ttl.style.cssText = `left:${C.title.x}px;top:${C.title.y}px;width:${C.title.w}px;` + faceCss(T.h0);
+  ttl.style.cssText = `left:${C.title.x}px;top:${C.title.y}px;width:${bg.titleW || C.title.w}px;` + faceCss(T.h0);   // 배경마다 제목 최대 너비가 다르다
   ttl.textContent = ($('#title') && $('#title').value) || '문서 제목이 여기에 들어갑니다';
 
   const logo = st.querySelector('.logo');
@@ -899,11 +899,19 @@ function hookPreview(){
   w.addEventListener('message',e=>{ if(e.data&&typeof e.data.slideIndexChanged==='number') sync(e.data.slideIndexChanged); });
   const m=(w.location.hash||'').match(/^#(\d+)$/); sync(m?+m[1]-1:0);
 }
+const BLOCK_KO={gantt:'간트',table:'표',chart:'그래프',callout:'배너',stats:'수치',bigstat:'큰 수치',image:'그림',history:'연혁',org:'조직도',annotate:'해부도',figcards:'그림 카드',strip:'라벨 띠'};
+// 버튼은 숨기지 않는다(2026-10-18) — 바꿀 수 없는 장(표지·간지·표·간트·그래프 …)에서는 꺼 두고 이유를 옆에 적는다
 function renderTplBox(){
-  const sl=srcSlide(CUR.src), bi=tplBlockIdx(sl), box=$('#tplBox');
-  if(!sl||bi<0){ box.style.display='none'; return; }
+  const sl=srcSlide(CUR.src), bi=tplBlockIdx(sl), box=$('#tplBox'), note=$('#tplNote');
+  box.style.display='inline-flex'; note.textContent='';
+  if(!sl||bi<0){
+    const why = !sl ? '표지·목차·간지·마무리는 템플릿이 없습니다'
+      : '이 장(' + (sl.blocks||[]).map(b=>BLOCK_KO[b.type]||b.type).filter((v,i,a)=>a.indexOf(v)===i).join('·') + ')은 바꿀 수 있는 블록이 없습니다';
+    $('#tplSel').innerHTML='<option>—</option>'; $('#tplSel').disabled=$('#tplNext').disabled=true; note.textContent=why; box.title=why;
+    return;
+  }
   const b=sl.blocks[bi], es=tplEntries(b), n=es.length, cur=tplOf(b), rich=tplRich(b), isQ=es.every(e=>/\?$/.test(e.title.trim()));   // 질문·답은 제목이 질문일 때만
-  $('#tplSel').disabled=$('#tplNext').disabled=rich; $('#tplBox').title=rich?'이 장은 수치·그래프·표가 든 카드라 템플릿을 바꾸지 않습니다(3단계 블록 JSON 에서 직접 수정)':'';
+  $('#tplSel').disabled=$('#tplNext').disabled=rich; $('#tplBox').title=rich?'이 장은 수치·그래프·표가 든 카드라 템플릿을 바꾸지 않습니다(3단계 블록 JSON 에서 직접 수정)':''; if(rich) note.textContent='수치·그래프가 든 카드라 바꾸지 않습니다';
   const opts=TPLS.filter(([k,,ok])=>k===cur||(ok(n)&&(k!=='qa'||isQ)));
   $('#tplSel').innerHTML=(opts.some(([k])=>k===cur)?'':`<option value="${cur}" selected>${esc(b.type)}</option>`)+opts.map(([k,l])=>`<option value="${k}"${k===cur?' selected':''}>${esc(l)}</option>`).join('');
   box.style.display='inline-flex';

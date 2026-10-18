@@ -17,7 +17,7 @@ import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { parseOutlineText } from './outline_parse.mjs';
-import { TYPE, COVER_BOX, COVER_SCRIM, coverScrim, COVER_BG_KEYS, COVER_BG_LABEL, coverBgFile, dividerBgFile, derivePalette } from '../scripts/lib/common.mjs';
+import { TYPE, COVER_BOX, COVER_SCRIM, coverScrim, coverTitleW, COVER_BG_KEYS, COVER_BG_LABEL, coverBgFile, dividerBgFile, derivePalette } from '../scripts/lib/common.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const TOKEN_FILE = path.join(here, '..', 'design-tokens.json');
@@ -102,6 +102,7 @@ function systemPrompt() {
 - 장표 위쪽 작은 글씨에는 그 장표가 속한 목차(섹션) 이름이 자동으로 들어간다. **header·subtitle 필드는 쓰지 않는다.**
 - meta.numbering 은 넣지 않는다(목차·간지 번호는 1·2·3 숫자로 표기된다).
 - **글은 아래 "장표 글 규칙"을 따른다.** 제목·카드 제목·표 칸·라벨은 명사형 종결이 최우선이고, 리드·항목·배너 글은 쉬운 말로 결론부터 쓴다. 번역투·빈 수식어·상투구는 금지.
+- 금액 단위는 붙여 쓴다: "480만원", "1억 2,000만원" ("만 원" 처럼 띄우지 않는다).
 - 카드·컬럼의 소제목(heading·tag·sections.heading)은 내용을 가리키는 이름으로 쓴다. "화면", "내용", "항목", "개요"처럼 껍데기뿐인 소제목은 넣지 말고 생략한다. 카드 제목과 같은 말을 소제목으로 반복하지 않는다.
 - 원문에 없는 수치·시장규모·고객명·성과는 만들지 않는다. 필요한 자리는 "[입력 필요: …]" 텍스트로 남긴다. **이미지 경로(src·image)는 지어내지 말고 빈 문자열로 두고** alt/caption 에 무엇이 들어갈 자리인지 적는다(자리표시자가 그려진다).
 - image 블록의 ratio 는 사용자가 정하지 않았으면 넣지 않는다(기본 16:9). 이미지 원본 비율이 다르면 사용자에게 정사각형(1:1)/가로형 1(16:9)/가로형 2(4:3)/세로형 1(9:16)/세로형 2(3:4)/원본 중 고르게 하고 그 값을 ratio 에 적는다.
@@ -582,7 +583,8 @@ const server = http.createServer(async (req, res) => {
           const div = dividerBgFile(k);
           return { key: k, label: COVER_BG_LABEL[k], src: '/asset/' + coverBgFile(k).replace(/^assets\//, ''),
                    divider: div ? '/asset/' + div.replace(/^assets\//, '') : null,
-                   scrim: coverScrim(k) };   // 배경마다 다르다 — 덮지 않는 배경은 'none'
+                   scrim: coverScrim(k),     // 배경마다 다르다 — 덮지 않는 배경은 'none'
+                   titleW: coverTitleW(k) };  // 제목 최대 너비 — 오른쪽 그림 앞에서 줄이 바뀌게
         }),
         logo: '/asset/logo_h_white.png',
       });

@@ -11,7 +11,7 @@ import * as _imageSize from 'image-size';
 const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // 그림 파일 가로·세로 읽기 (v1: 경로를 주면 동기)
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
-         TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
+         TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, coverTitleW, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -181,14 +181,10 @@ async function renderBackgrounds() {
   // 마무리 장표: build_html.mjs 의 .closing .cbg 와 같은 그라디언트
   const cover = `<!doctype html><style>${base}
 .cbg{position:relative;width:1280px;height:720px;overflow:hidden;background:${closingBgCss(P)}}</style><div class="cbg"></div>`;
-  // 간지: 포인트 컬러 그라데이션 + 오른쪽 아래 로고 워터마크 (build_html.mjs 의 .dv 와 동일)
-  // setContent 로 띄운 about:blank 문서는 file:// 을 못 읽는다 → 로고를 data URI 로 심는다.
-  const wm = asset(meta.logo.dark);
-  const wmSrc = fs.existsSync(wm) ? `data:image/png;base64,${fs.readFileSync(wm).toString('base64')}` : '';
+  // 간지: 포인트 컬러 그라데이션만 (build_html.mjs 의 .dv 와 동일). 로고 워터마크는 2026-10-18 뺐다
   const divider = `<!doctype html><style>${base}
-.dv{position:relative;width:1280px;height:720px;overflow:hidden;background:linear-gradient(118deg,${P.primaryDeep} 0%,${P.primary} 54%,${P.primary2} 100%)}
-.wm{position:absolute;right:${PAD}px;bottom:86px;width:620px;opacity:.12}</style>
-<div class="dv">${wmSrc ? `<img class="wm" src="${wmSrc}">` : ''}</div>`;
+.dv{position:relative;width:1280px;height:720px;overflow:hidden;background:linear-gradient(118deg,${P.primaryDeep} 0%,${P.primary} 54%,${P.primary2} 100%)}</style>
+<div class="dv"></div>`;
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 2 });
   const jobs = [[cover, BG_PATH]];
@@ -628,16 +624,23 @@ const B = {
     const rowsY = inner.y + hdrH + 8, rowsH = Math.max(1, inner.h - hdrH - 8), rowH = rowsH / Math.max(1, tasks.length);   // 띠 아래 8px
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
     const tone = t => t.tone === 'muted' ? P.textMid : t.tone === 'accent' ? P.pillGlow : t.tone === 'second' ? P.primary2 : P.primary;
+    const autoName = tasks.some(t => t.label) && tasks.some(t => !t.label);   // 섞이면 빈 막대에 항목 이름(HTML fitGantt 와 같은 규칙)
     tasks.forEach((t, i) => {
       const y = rowsY + rowH * i, cy = y + rowH / 2;
       text(slide, String(t.name || '').replace(/\*\*/g, ''), inner.x, y, nameW - em * 0.5, rowH, { size: D.small, k, color: P.text, bold: true, valign: 'middle' });
       const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
       const bx = gx + gw * (s - 1) / n, bw = Math.max(3, gw * (e - s + 1) / n), bh = Math.min(rowH * 0.55, fs * 1.45);
-      const fromW = t.from ? estW(String(t.from), fs * 0.85) + em * 0.5 : 0;
+      // 빈 막대에 넣을 항목 이름 자리: in(막대 안) · right(막대 오른쪽) · left(막대 왼쪽, 안내선을 그 앞에서 끊는다)
+      const nm = autoName && !t.label ? String(t.name || '').replace(/\*\*/g, '') : '', lf = D.label * k, nmW = nm ? estW(nm, lf) : 0, gap = em * 0.5;
+      const place = !nm ? '' : nmW + lf * 0.8 <= bw ? 'in' : (bx + bw + gap + nmW <= gx + gw + toW || bx - gx < nmW + gap) ? 'right' : 'left';
+      const fromW = t.from ? estW(String(t.from), fs * 0.85) + em * 0.5 : place === 'left' ? nmW + lf + gap : 0;
       if (bx - fromW - gx > 2) rect(slide, gx, cy, bx - fromW - gx, 1, { fill: P.borderStrong });   // 안내선
       if (t.from) text(slide, String(t.from), bx - fromW, y, fromW - em * 0.25, rowH, { size: D.label, k, color: P.textMid, align: 'right', valign: 'middle' });
       rect(slide, bx, cy - bh / 2, bw, bh, { fill: tone(t), radius: 3 });
       if (t.label) text(slide, String(t.label), bx, cy - bh / 2, bw, bh, { size: D.label, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
+      else if (place === 'in') text(slide, nm, bx, cy - bh / 2, bw, bh, { size: D.label, k, color: P.white, bold: true, align: 'center', valign: 'middle' });
+      else if (place === 'right') text(slide, nm, bx + bw + gap, y, nmW + lf, rowH, { size: D.label, k, color: P.textMid, bold: true, valign: 'middle' });
+      else if (place === 'left') text(slide, nm, bx - gap - nmW - lf, y, nmW + lf, rowH, { size: D.label, k, color: P.textMid, bold: true, align: 'right', valign: 'middle' });
       if (t.to) text(slide, String(t.to), bx + bw + em * 0.25, y, Math.max(1, inner.x + inner.w - bx - bw - em * 0.25), rowH, { size: D.label, k, color: P.textMid, align: e >= n ? 'right' : 'left', valign: 'middle' });   // 마지막 칸이면 오른쪽 끝에 맞춤
     });
   },
@@ -923,9 +926,11 @@ function cover() {
     rr[rr.length - 1].options.breakLine = i < titleLines.length - 1;
     titleRuns.push(...rr);
   });
-  const nl = Math.max(titleLines.length, lines(titleLines.join(' '), PXL(TYPE.h0.size), C.title.w));
+  // 제목 너비는 배경마다 다르다(그림 앞에서 줄이 바뀌게). 줄 수는 <br> 로 나눈 줄마다 따로 세어 더한다
+  const titleW = coverTitleW(meta.coverBg);
+  const nl = titleLines.reduce((n, line) => n + lines(line, PXL(TYPE.h0.size), titleW), 0);
   s.addText(titleRuns, {
-    x: IN(C.title.x), y: IN(C.title.y), w: IN(C.title.w), h: IN(Math.max(C.title.h, nl * PXL(TYPE.h0.line))),
+    x: IN(C.title.x), y: IN(C.title.y), w: IN(titleW), h: IN(Math.max(C.title.h, nl * PXL(TYPE.h0.line))),
     align: 'left', valign: 'top', margin: 0, lineSpacing: TYPE.h0.line, fit: 'none', autoFit: false,
   });
   image(s, meta.logo.dark, C.logo.x, C.logo.y, C.logo.w, C.logo.h);
@@ -981,22 +986,21 @@ function agenda() {
 }
 
 function divider(sl) {
-  // 간지: 포인트 컬러 배경 + 왼쪽 위 챕터 표기 + 큰 제목, 로고는 배경에 워터마크로 들어가 있다.
+  // 간지(2026-10-18): 가운데 정렬 · 챕터 번호가 가장 크게(140px) → 장 제목(60px) → 보조 글(36px). 로고·장 번호 없음. HTML .dv 와 같은 값
   const s = pres.addSlide();
   dividerBg(s);
   const sec = sl.section;
-  const x = PAD, w = SLIDE_W - PAD * 2;
-  const eyebrow = sec.en || `CHAPTER ${String(sec.no).padStart(2, '0')}`;
-  let y = 56;
-  text(s, eyebrow, x, y, w, 22, { size: 15, color: 'rgba(255,255,255,.62)', bold: true, valign: 'middle', letterSpacing: 2.1 });
-  y += 22 + 26;
-  const tl = Math.max(1, lines(sec.title, 60, 1000)), th = tl * 68;
-  text(s, sec.title, x, y, Math.min(w, 1000), th, { size: 60, color: P.white, face: FONT_TITLE_B, valign: 'top', lineSpacing: 1.12, letterSpacing: -2.4 });
-  y += th + 18;
-  if (sec.subtitle) text(s, sec.subtitle, x, y, Math.min(w, 820), 28 * lines(sec.subtitle, 18, 820), { size: 18, color: 'rgba(255,255,255,.72)', valign: 'top', lineSpacing: 1.55 });
-  const fy = SLIDE_H - 42 - 18;
-  text(s, plainTitle, x, fy, w * 0.7, 18, { size: 13, color: 'rgba(255,255,255,.52)', valign: 'middle' });
-  text(s, `${sl.order}/${TOTAL}p`, x + w * 0.7, fy, w * 0.3, 18, { size: 13, color: 'rgba(255,255,255,.52)', align: 'right', valign: 'middle' });
+  const w = 1000, x = (SLIDE_W - w) / 2;
+  const nh = 140, tl = Math.max(1, lines(sec.title, 60, w)), th = tl * 67.2;
+  const sl2 = sec.subtitle ? lines(sec.subtitle, 36, w) : 0, sh = sl2 * 50.4;
+  const total = nh + 20 + th + (sl2 ? 22 + sh : 0);
+  let y = (SLIDE_H - total) / 2;
+  text(s, NUM(sec.no), x, y, w, nh, { size: 140, color: P.white, face: FONT_TITLE_B, align: 'center', valign: 'middle', lineSpacing: 1, letterSpacing: -2.8 });
+  y += nh + 20;
+  text(s, sec.title, x, y, w, th, { size: 60, color: P.white, face: FONT_TITLE_B, align: 'center', valign: 'top', lineSpacing: 1.12, letterSpacing: -2.4 });
+  y += th + 22;
+  if (sl2) text(s, sec.subtitle, x, y, w, sh, { size: 36, color: 'rgba(255,255,255,.72)', align: 'center', valign: 'top', lineSpacing: 1.4 });
+  text(s, plainTitle, PAD, SLIDE_H - 42 - 18, SLIDE_W - PAD * 2, 18, { size: 13, color: 'rgba(255,255,255,.52)', align: 'center', valign: 'middle' });
 }
 
 function content(sl) {

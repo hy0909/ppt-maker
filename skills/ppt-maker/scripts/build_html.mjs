@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors,
-         TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, closingBgCss, coverScrim,
+         TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, coverTitleW, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE } from './lib/common.mjs';
 
@@ -245,6 +245,9 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .gantt .gtrack{position:relative;min-height:1.9em;margin-right:var(--gto,3.4em);}   /* 오른쪽은 to 라벨 자리 */
 .gantt .glead{position:absolute;left:0;top:50%;height:1px;background:var(--border-strong);}   /* 이름 끝 → 막대 시작 안내선 */
 .gantt .gbar{position:absolute;top:50%;height:1.45em;font-style:normal;transform:translateY(-50%);background:var(--primary);border-radius:3px;min-width:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:var(--fs-label);white-space:nowrap;overflow:hidden;padding:0 .4em;}
+.gantt .gbar b{font-weight:inherit;}
+.gantt .gbar.out{overflow:visible;} .gantt .gbar.out b{position:absolute;top:50%;transform:translateY(-50%);left:calc(100% + .3em);padding:0 .2em;background:#fff;color:var(--text-mid);}   /* 흰 바탕: 안내선이 글자를 지나가지 않게 */   /* 막대가 좁으면 이름을 막대 오른쪽에 */
+.gantt .gbar.out.l b{left:auto;right:calc(100% + .3em);}   /* 오른쪽 자리가 없으면 왼쪽에 */
 .gantt .gbar.second{background:var(--primary-2);} .gantt .gbar.accent{background:var(--pill-glow);} .gantt .gbar.muted{background:var(--text-mid);}
 .gantt .gfrom,.gantt .gto{position:absolute;top:50%;transform:translateY(-50%);font-size:var(--fs-label);color:var(--text-mid);white-space:nowrap;}
 .gantt .gfrom{transform:translate(-100%,-50%);padding-right:.5em;} .gantt .gto{padding-left:.5em;} .gantt .gto.end{left:auto!important;right:calc(-1 * var(--gto,3.4em));text-align:right;padding-left:0;}
@@ -264,7 +267,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .cv .scrim{position:absolute;inset:0;z-index:1;background:${coverScrim(meta.coverBg)};}
 /* 표지 본문 — 원본 PPTX 좌표·여백 그대로 */
 .cover .clead{position:absolute;left:${C.lead.x}px;top:${C.lead.y}px;width:${C.lead.w}px;height:${C.lead.h}px;${typeCss(TYPE.body2)}color:#E7E6E6;z-index:2;word-break:keep-all;}
-.cover .ctitle{position:absolute;left:${C.title.x}px;top:${C.title.y}px;width:${C.title.w}px;height:${C.title.h}px;${typeCss(TYPE.h0)}color:#fff;z-index:2;word-break:keep-all;}
+.cover .ctitle{position:absolute;left:${C.title.x}px;top:${C.title.y}px;width:${coverTitleW(meta.coverBg)}px;height:${C.title.h}px;${typeCss(TYPE.h0)}color:#fff;z-index:2;word-break:keep-all;}
 .cover .clogo{position:absolute;left:${C.logo.x}px;top:${C.logo.y}px;width:${C.logo.w}px;height:${C.logo.h}px;object-fit:contain;object-position:left center;z-index:2;}
 .cover .cbadge{position:absolute;right:${1280 - C.badge.x - C.badge.w}px;bottom:${720 - C.badge.y - C.badge.h}px;height:${C.badge.h}px;min-width:${C.badge.w}px;display:flex;align-items:center;justify-content:flex-end;padding:0 ${+(C.badge.x + C.badge.w - C.badgeText.x - C.badgeText.w).toFixed(1)}px;background:var(--cover-badge);font-size:${px(C.badgeText.size)}px;font-weight:700;letter-spacing:${C.badgeText.spc}pt;color:#fff;white-space:nowrap;z-index:2;}
 .cover .logo{position:absolute;top:30px;right:53px;height:22px;z-index:3;}   /* 마무리 장표의 오른쪽 위 로고 */
@@ -284,14 +287,14 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .tocp .pn{position:absolute;left:${A.pageNo.x}px;top:${A.pageNo.y}px;width:${A.pageNo.w}px;height:${A.pageNo.h}px;text-align:right;font-size:${px(A.foot.size)}px;line-height:${A.pageNo.h}px;letter-spacing:${A.foot.spc}pt;color:var(--text-light);}
 /* 간지: 포인트 컬러 한 면 + 좌상단 라벨·큰 제목 + 우하단 로고 워터마크 + 하단 정보줄 */
 .dv{position:absolute;inset:0;overflow:hidden;background:linear-gradient(118deg,var(--primary-deep) 0%,var(--primary) 54%,var(--primary-2) 100%);color:#fff;}
-.dv .wm{position:absolute;right:var(--pad);bottom:86px;width:620px;opacity:.12;pointer-events:none;}
 ${DIVIDER_BG ? `.dv .dbg{position:absolute;inset:0;background:#000 url('${DIVIDER_BG}') center center / cover no-repeat;}
 .dv .dsc{position:absolute;inset:0;background:${DIVIDER_SCRIM};}` : ''}
-.dv .in{position:absolute;inset:0;padding:56px var(--pad) 42px;display:flex;flex-direction:column;z-index:2;}
-.dv .eb{font-size:15px;font-weight:700;letter-spacing:.14em;color:rgba(255,255,255,.62);text-transform:uppercase;}
-.dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:26px;max-width:1000px;word-break:keep-all;}
-.dv .s{font-size:18px;color:rgba(255,255,255,.72);margin-top:18px;max-width:820px;line-height:1.55;}
-.dv .ft{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
+/* 간지(2026-10-18): 가운데 정렬 · 챕터 번호(2, 140px)가 가장 크게 → 장 제목 → 보조 글(36px). 로고 워터마크·장 번호 없음 */
+.dv .in{position:absolute;inset:0;padding:56px var(--pad) 42px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:2;}
+.dv .dn{font-family:var(--font-title-b);font-size:140px;font-weight:400;line-height:1;letter-spacing:-.02em;color:#fff;}
+.dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:20px;max-width:1000px;word-break:keep-all;}
+.dv .s{font-size:36px;color:rgba(255,255,255,.72);margin-top:22px;max-width:1000px;line-height:1.4;word-break:keep-all;}
+.dv .ft{position:absolute;left:var(--pad);right:var(--pad);bottom:42px;text-align:center;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
 .closing .cbg{background:${P.primaryDeep};}   /* 2026-10-09 마무리: 진한 메인 단색, 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
 .closing .cin{display:block;padding:0;}
 .closing .big{position:absolute;left:66px;top:70px;width:760px;font-family:var(--font-title-b);font-size:40px;font-weight:400;color:#fff;letter-spacing:-.02em;line-height:1.35;}
@@ -496,12 +499,16 @@ const BLOCKS = {
   gantt(b) {
     const cols = b.cols || [], n = Math.max(1, cols.length), tasks = b.tasks || [];
     const pos = v => { const x = typeof v === 'string' ? cols.indexOf(v) + 1 : Number(v); return Number.isFinite(x) && x > 0 ? x : 1; };
+    // 글자 있는 막대와 빈 막대가 섞이면 빈 막대에 항목 이름을 넣는다(2026-10-18). 막대 안에 안 들어가면 브라우저가 막대 옆으로 뺀다(아래 fitGantt)
+    const autoName = tasks.some(t => t.label) && tasks.some(t => !t.label);
     const rows = tasks.map(t => {
       const s = Math.min(n, pos(t.start)), e = Math.max(s, Math.min(n, pos(t.end ?? t.start)));
+      const auto = autoName && !t.label;
+      const barText = t.label ? esc(t.label) : auto ? `<b>${esc(String(t.name || '').replace(/\*\*/g, ''))}</b>` : '';
       const left = ((s - 1) / n * 100).toFixed(2), width = ((e - s + 1) / n * 100).toFixed(2);
       // 안내선은 이름 끝에서 막대(또는 from 글자) 앞까지. from·to 는 막대 앞뒤 작은 글자, label 은 막대 안
       const fromW = t.from ? `calc(${left}% - ${String(t.from).length * 0.55 + 1}em)` : `${left}%`;
-      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="glead" style="width:${fromW}"></i>${t.from ? `<span class="gfrom" style="left:${left}%">${esc(t.from)}</span>` : ''}<i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}" style="left:${left}%;width:${width}%">${t.label ? esc(t.label) : ''}</i>${t.to ? `<span class="gto${e >= n ? ' end' : ''}" style="left:${(+left + +width).toFixed(2)}%">${esc(t.to)}</span>` : ''}</div></div>`;
+      return `<div class="gr"><div class="gname">${rich(t.name || '')}</div><div class="gtrack"><i class="glead" style="width:${fromW}"></i>${t.from ? `<span class="gfrom" style="left:${left}%">${esc(t.from)}</span>` : ''}<i class="gbar${t.tone ? ' ' + esc(t.tone) : ''}${auto ? ' auto' : ''}" style="left:${left}%;width:${width}%">${barText}</i>${t.to ? `<span class="gto${e >= n ? ' end' : ''}" style="left:${(+left + +width).toFixed(2)}%">${esc(t.to)}</span>` : ''}</div></div>`;
     }).join('');
     return `${cardOpen('grow', b.heading)}<div class="gantt" style="--n:${n}"><div class="gh"><div class="gnh">${esc(b.nameHeader || '')}</div><div class="gcols">${cols.map(c => `<span>${esc(c)}</span>`).join('')}</div></div>${rows}</div>${CARD_CLOSE}`;
   },
@@ -626,17 +633,15 @@ function renderAgenda() {
 }
 function renderDivider(s) {
   const sec = s.section;
-  const eyebrow = sec.en || `CHAPTER ${String(sec.no).padStart(2, '0')}`;
   return `<section class="slide" data-label="${esc(slideLabel(s))}">
     <div class="dv">
-      ${DIVIDER_BG ? '<div class="dbg" data-deco></div><div class="dsc" data-deco></div>'
-                   : meta.logo.dark ? `<img class="wm" src="${esc(meta.logo.dark)}" alt="">` : ''}
+      ${DIVIDER_BG ? '<div class="dbg" data-deco></div><div class="dsc" data-deco></div>' : ''}
       <div class="in">
-        <div class="eb">${esc(eyebrow)}</div>
+        <div class="dn">${NUM(sec.no)}</div>
         <h1>${esc(sec.title)}</h1>
         ${sec.subtitle ? `<div class="s">${esc(sec.subtitle)}</div>` : ''}
-        <div class="ft"><span>${esc(plainTitle)}</span><span>${s.order}/${TOTAL}p</span></div>
       </div>
+      <div class="ft">${esc(plainTitle)}</div>
     </div>
   </section>`;
 }
@@ -701,7 +706,19 @@ ${sectionsHtml}
 (function () {
   var draw = ${CHART_DRAW_SRC};
   var C = ${JSON.stringify(chartColors())};
+  function fitGantt() {   // 이름을 넣은 빈 막대: 막대 안에 안 들어가면 옆으로 뺀다
+    document.querySelectorAll('.gantt .gbar.auto').forEach(function (bar) {
+      var t = bar.querySelector('b'); if (!t) return;
+      bar.classList.remove('out', 'l');
+      var tw = t.getBoundingClientRect().width, bw = bar.getBoundingClientRect().width, pad = parseFloat(getComputedStyle(bar).fontSize) * 0.8;
+      if (tw + pad <= bw) return;
+      bar.classList.add('out');
+      var tr = bar.parentNode.getBoundingClientRect(), br = bar.getBoundingClientRect();
+      if (br.right + tw + pad > tr.right + 4 && br.left - tr.left > br.right - tr.right + tw) bar.classList.add('l');
+    });
+  }
   function redraw() {
+    fitGantt();
     document.querySelectorAll('.chart[data-chart]').forEach(function (el) {
       var plot = el.querySelector('.cplot'); if (!plot) return;
       var w = plot.clientWidth, h = plot.clientHeight; if (w < 20 || h < 20) return;

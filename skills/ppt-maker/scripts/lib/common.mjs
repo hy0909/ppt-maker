@@ -72,8 +72,9 @@ export function derivePalette(brand = {}) {
     bannerBorder: mix(primary, '#FFFFFF', 0.68),       // 그 배너의 테두리(메인 컬러 32%) — 연회색 장표 바탕과 구분
     bannerLabel: primary,                              // 배너 라벨 글자(포인트 컬러, 굵게)
     bannerText: G.body,                                // 배너 본문 글자(카드 본문과 같은 회색)
-    // 배너 위계 — 주의(warn): 빨간 바탕(--danger)·흰 라벨·연분홍 본문 / 강조(strong): 검정 바탕·흰 라벨·연회색 본문
-    bannerWarn: ST.danger, bannerWarnLabel: G.white, bannerWarnText: mix('#FFFFFF', ST.danger, 0.12),
+    // 배너 위계 — 주의(warn): 진보라 바탕(primary 800 에 검정 30%, 메인 컬러를 바꾸면 같이 바뀐다)·흰 라벨·연보라 본문 / 강조(strong): 검정 바탕·흰 라벨·연회색 본문
+    bannerWarn: mix(scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.28), '#000000', 0.30), bannerWarnLabel: G.white,
+    bannerWarnText: mix('#FFFFFF', mix(scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.28), '#000000', 0.30), 0.12),
     bannerStrong: G.title, bannerStrongText: G.border,
     coverBadge: mix(mix(primary, '#000000', 0.28), '#FFFFFF', 0.17),  // 표지 오른쪽 아래 상자(원본 #3C34A1)
     primaryDark: scale ? scale[COLORS.role.deep] : mix(primary, '#000000', 0.22),
@@ -166,8 +167,18 @@ SHAPE.shadowCss = `0 ${SHAPE.shadowY}px ${SHAPE.shadowBlur}px rgba(20,40,80,${SH
 export const DENSITY = TOKENS.density;
 
 // ─── outline loading & normalisation ───────────────────────────
+/** 금액 단위는 붙여 쓴다: "480만 원" → "480만원", "2억 7,500만 원" → "2억 7,500만원" (2026-10-18 사용자 요청).
+ *  숫자(또는 수·몇)에 붙은 천·만·억·조 뒤의 "원"만 붙인다 — "이것만 원래대로" 같은 글은 건드리지 않는다. */
+const MONEY_SPACE = /((?:\d[\d,.]*|[수몇][십백천]?)\s*[십백]?[천만억조])\s+원/g;
+export const tightMoney = s => String(s).replace(MONEY_SPACE, '$1원');
+function tightMoneyDeep(v) {
+  if (typeof v === 'string') return tightMoney(v);
+  if (Array.isArray(v)) return v.map(tightMoneyDeep);
+  if (v && typeof v === 'object') { for (const k of Object.keys(v)) v[k] = tightMoneyDeep(v[k]); return v; }
+  return v;
+}
 export function loadOutline(file) {
-  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const raw = tightMoneyDeep(JSON.parse(fs.readFileSync(file, 'utf8')));
   const meta = Object.assign({
     type: 'gov-proposal', density: 'dense', lang: 'ko', title: '제목', subtitle: '', event: '',
     company: '', presenter: '', date: '', version: '',
@@ -425,7 +436,7 @@ export const typeCss = t =>
 // 원본에서 작은 글씨를 시각적으로 맞춰 둔 것이라 그대로 옮긴다.
 export const COVER_BOX = {
   lead:      { x: 61.5,  y: 56,    w: 530.2, h: 83.6 },   // body2 — 제목 위 설명 한 줄
-  title:     { x: 59.4,  y: 117,   w: 720,   h: 172.1 },  // h0
+  title:     { x: 59.4,  y: 117,   w: 720,   h: 172.1 },  // h0 — 너비는 배경마다 index.json 의 titleW 가 줄일 수 있다(coverTitleW)
   logo:      { x: 60.4,  y: 613.4, w: 202.5, h: 50.6 },   // 왼쪽 아래 흰 로고
   badge:     { x: 986.1, y: 636.9, w: 246.6, h: 39.6 },   // 오른쪽 아래 상자
   badgeText: { x: 947.6, y: 641.6, w: 266.7, h: 26,   size: 14, spc: -0.8 },
@@ -458,6 +469,13 @@ export const COVER_BG_LABEL = Object.fromEntries(BG_LIST.map(b => [b.key, b.labe
 export function coverBgFile(design) {
   const b = BG_LIST.find(x => x.key === design) || BG_LIST[0];
   return `assets/cover-bg/${b.file}`;
+}
+/** 표지 제목(h0)의 최대 너비 px. 오른쪽에 그림이 있는 배경은 index.json 의 titleW 로 줄여 두어
+ *  제목이 그림을 덮기 전에 줄이 바뀐다. 없으면 COVER_BOX.title.w. HTML·PPTX·웹 미리보기가 같이 쓴다. */
+export function coverTitleW(design) {
+  const b = BG_LIST.find(x => x.key === design) || BG_LIST[0];
+  const w = Number(b && b.titleW);
+  return w > 0 ? Math.min(w, COVER_BOX.title.w) : COVER_BOX.title.w;
 }
 /** 본문 장표 맨 아래 출처·각주 줄. 근거 표기를 요구하는 문서가 있어 자리를 잡아 뒀다.
  *  safe 는 출처가 없을 때 본문 아래로 비워 두는 여백(px). 출처가 길어지면 그만큼 본문을 위로 올린다. */

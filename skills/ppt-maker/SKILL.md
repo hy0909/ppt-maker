@@ -39,7 +39,7 @@ Paperlogy 는 HTML·PDF 에서 `@font-face`(`lib/common.mjs` 의 `PAPERLOGY_FONT
 `./install_fonts.sh` 가 공식 배포처에서 받아 깐다. 둘 다 SIL OFL 1.1 이라 누구나 공짜로 쓴다.
 굵기마다 패밀리가 따로라 `Paperlogy 7 Bold`·`Pretendard Light` 처럼 이름을 그대로 쓴다. 본문 글꼴만 바꾸려면 `meta.font`.
 표지·목차의 글자 크기·줄 간격(pt 고정)·자간·좌표는 `references/design-system.md` 의 "표지·목차 글자 규격" 표에 있고, 값은 `scripts/lib/common.mjs` 의 `TYPE`·`COVER_BOX`·`AGENDA_BOX` 한 곳에만 둔다.
-표지 배경 그림은 `meta.coverBg` 로 고른다(기본 `cube`). 목록은 `assets/cover-bg/index.json`.
+표지 배경 그림은 `meta.coverBg` 로 고른다(기본 `cube`). 목록은 `assets/cover-bg/index.json`. 오른쪽에 그림이 있는 배경은 그 파일의 `titleW` 가 제목 최대 너비라서 제목이 그림 앞에서 자동으로 줄이 바뀐다 — `<br>` 로 억지로 맞추지 않아도 된다.
 배경에 짝이 되는 간지 그림이 달려 있으면 간지 배경도 같이 바뀐다(지금은 `haze`). 마무리 장표는 늘 브랜드 그라데이션이다.
 표지 그림 위 왼쪽을 눌러 주는 그라데이션은 배경마다 다르다. `cube`·`stripe` 는 켜 두었고 나머지는 덮지 않는다. 새 배경에서 제목이 안 읽히면 그 배경만 `--scrim` 으로 켠다.
 배경을 새로 넣거나 바꿀 때는 원본을 그대로 쓰지 말고 `scripts/prepare_cover_bg.py` 로 2560×1440 고화질 처리를 거친다.
