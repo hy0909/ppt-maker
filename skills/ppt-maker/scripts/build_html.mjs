@@ -289,11 +289,11 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .dv{position:absolute;inset:0;overflow:hidden;background:linear-gradient(118deg,var(--primary-deep) 0%,var(--primary) 54%,var(--primary-2) 100%);color:#fff;}
 ${DIVIDER_BG ? `.dv .dbg{position:absolute;inset:0;background:#000 url('${DIVIDER_BG}') center center / cover no-repeat;}
 .dv .dsc{position:absolute;inset:0;background:${DIVIDER_SCRIM};}` : ''}
-/* 간지(2026-10-18): 가운데 정렬 · 챕터 번호(2, 140px)가 가장 크게 → 장 제목 → 보조 글(36px). 로고 워터마크·장 번호 없음 */
+/* 간지(2026-10-18): 가운데 정렬 · 챕터 번호(2, 140px)가 가장 크게 → 장 제목 → 보조 글(24px). 로고 워터마크·장 번호 없음 */
 .dv .in{position:absolute;inset:0;padding:56px var(--pad) 42px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:2;}
 .dv .dn{font-family:var(--font-title-b);font-size:140px;font-weight:400;line-height:1;letter-spacing:-.02em;color:#fff;}
 .dv h1{font-family:var(--font-title-b);font-size:60px;font-weight:400;letter-spacing:-.04em;line-height:1.12;margin-top:20px;max-width:1000px;word-break:keep-all;}
-.dv .s{font-size:36px;color:rgba(255,255,255,.72);margin-top:22px;max-width:1000px;line-height:1.4;word-break:keep-all;}
+.dv .s{font-size:24px;color:rgba(255,255,255,.72);margin-top:18px;max-width:1000px;line-height:1.45;word-break:keep-all;}
 .dv .ft{position:absolute;left:var(--pad);right:var(--pad);bottom:42px;text-align:center;font-size:13px;color:rgba(255,255,255,.52);letter-spacing:-.01em;}
 .closing .cbg{background:${P.primaryDeep};}   /* 2026-10-09 마무리: 진한 메인 단색, 왼쪽 위 메시지 · 왼쪽 아래 로고 + 연락처 · 오른쪽 그림 */
 .closing .cin{display:block;padding:0;}

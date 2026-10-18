@@ -986,20 +986,20 @@ function agenda() {
 }
 
 function divider(sl) {
-  // 간지(2026-10-18): 가운데 정렬 · 챕터 번호가 가장 크게(140px) → 장 제목(60px) → 보조 글(36px). 로고·장 번호 없음. HTML .dv 와 같은 값
+  // 간지(2026-10-18): 가운데 정렬 · 챕터 번호가 가장 크게(140px) → 장 제목(60px) → 보조 글(24px). 로고·장 번호 없음. HTML .dv 와 같은 값
   const s = pres.addSlide();
   dividerBg(s);
   const sec = sl.section;
   const w = 1000, x = (SLIDE_W - w) / 2;
   const nh = 140, tl = Math.max(1, lines(sec.title, 60, w)), th = tl * 67.2;
-  const sl2 = sec.subtitle ? lines(sec.subtitle, 36, w) : 0, sh = sl2 * 50.4;
-  const total = nh + 20 + th + (sl2 ? 22 + sh : 0);
+  const sl2 = sec.subtitle ? lines(sec.subtitle, 24, w) : 0, sh = sl2 * 34.8;
+  const total = nh + 20 + th + (sl2 ? 18 + sh : 0);
   let y = (SLIDE_H - total) / 2;
   text(s, NUM(sec.no), x, y, w, nh, { size: 140, color: P.white, face: FONT_TITLE_B, align: 'center', valign: 'middle', lineSpacing: 1, letterSpacing: -2.8 });
   y += nh + 20;
   text(s, sec.title, x, y, w, th, { size: 60, color: P.white, face: FONT_TITLE_B, align: 'center', valign: 'top', lineSpacing: 1.12, letterSpacing: -2.4 });
-  y += th + 22;
-  if (sl2) text(s, sec.subtitle, x, y, w, sh, { size: 36, color: 'rgba(255,255,255,.72)', align: 'center', valign: 'top', lineSpacing: 1.4 });
+  y += th + 18;
+  if (sl2) text(s, sec.subtitle, x, y, w, sh, { size: 24, color: 'rgba(255,255,255,.72)', align: 'center', valign: 'top', lineSpacing: 1.45 });
   text(s, plainTitle, PAD, SLIDE_H - 42 - 18, SLIDE_W - PAD * 2, 18, { size: 13, color: 'rgba(255,255,255,.52)', align: 'center', valign: 'middle' });
 }
 
