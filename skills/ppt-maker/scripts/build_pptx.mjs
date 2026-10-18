@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pptxgen from 'pptxgenjs';
+import JSZip from 'jszip';
 import * as _imageSize from 'image-size';
 const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // 그림 파일 가로·세로 읽기 (v1: 경로를 주면 동기)
 import { chromium } from 'playwright';
@@ -251,6 +252,52 @@ const dividerBg = (slide) => {
 // dir/blurRad 가 규격을 벗어나고 PowerPoint 가 '복구' 대화상자를 띄운다. 반드시 매번 새 객체를 만든다.
 const shadow = () => ({ type: 'outer', blur: 6, offset: 1.5, angle: 90, color: '14285A', opacity: 0.08 });
 const SERIES = (c) => chartSeriesColors(c || {});   // 규칙은 common.mjs chartSeriesColors
+/** 선 그래프 값 숫자 자리(2026-10-18) — build_html.mjs CHART_DRAW_SRC 와 같은 규칙. 같은 달에 점끼리 1.9글자 이내면 묶어서
+ *  위쪽 절반은 맨 위 점 위로, 아래쪽 절반은 맨 아래 점 밑으로 1.05글자 간격으로 쌓는다(줄 순서 = 선 순서). 부딪히는 묶음은 합치고,
+ *  차트 위·그림 아래 끝을 넘지 않게 당긴다. 돌려주는 값 = 시리즈별·점별로 기본 자리('t', 점 위 0.85글자)에서 옮길 거리(px). */
+function lineLabelShift(series, n, yOf, fs, topY, botY) {
+  const shift = series.map(() => []), gap = fs * 1.05, near = fs * 1.9;
+  for (let ci = 0; ci < n; ci++) {
+    const col = [];
+    series.forEach((sr, si) => { const v = (sr.values || [])[ci]; if (typeof v === 'number') col.push({ si, py: yOf(v) }); });
+    col.sort((a, b) => a.py - b.py);
+    const cut = [0];
+    for (let i = 1; i < col.length; i++) if (col[i].py - col[i - 1].py >= near) cut.push(i);
+    const place = () => cut.forEach((s0, q) => {
+      const e0 = q + 1 < cut.length ? cut[q + 1] : col.length, kk = e0 - s0, up = Math.ceil(kk / 2), tp = col[s0].py, bp = col[e0 - 1].py;
+      for (let j = 0; j < kk; j++) col[s0 + j].ly = kk === 1 ? tp - fs * 0.85 : j < up ? tp - fs * 0.85 - (up - 1 - j) * gap : bp + fs * 1.6 + (j - up) * gap;
+    });
+    place();
+    for (let q = 1; q < cut.length;) { if (col[cut[q] - 1].ly + gap > col[cut[q]].ly) { cut.splice(q, 1); place(); q = 1; } else q++; }
+    col.sort((a, b) => a.ly - b.ly);
+    for (let j = 1; j < col.length; j++) if (col[j].ly - col[j - 1].ly < gap) col[j].ly = col[j - 1].ly + gap;
+    for (let j = col.length - 1; j >= 0; j--) { const lim = j === col.length - 1 ? botY : col[j + 1].ly - gap; if (col[j].ly > lim) col[j].ly = lim; }
+    for (let j = 0; j < col.length; j++) { const lo = j === 0 ? topY : col[j - 1].ly + gap; if (col[j].ly < lo) col[j].ly = lo; }
+    col.forEach(c => { shift[c.si][ci] = c.ly - (c.py - fs * 0.85); });
+  }
+  return shift;
+}
+let chartNo = 0;   // pptxgenjs 는 차트를 만든 순서대로 ppt/charts/chart{N}.xml 로 저장한다
+const LINE_LABEL_FIX = [];   // { no, shift(차트 높이 대비 비율) } — 저장한 뒤 점별 라벨 자리로 넣는다
+/** 저장된 pptx 의 선 그래프에 점별 라벨(c:dLbl) 을 넣는다. 서식은 그 시리즈 라벨 묶음(c:dLbls)을 그대로 따르고 자리만 옮긴다. */
+async function applyLineLabelFix(buf) {
+  if (!LINE_LABEL_FIX.length) return buf;
+  const zip = await JSZip.loadAsync(buf);
+  for (const { no, shift } of LINE_LABEL_FIX) {
+    const name = `ppt/charts/chart${no}.xml`, f = zip.file(name);
+    if (!f) continue;
+    const parts = (await f.async('string')).split('<c:ser>');
+    for (let si = 0; si < shift.length && si + 1 < parts.length; si++) {
+      parts[si + 1] = parts[si + 1].replace(/<c:dLbls>([\s\S]*?)<\/c:dLbls>/, (all, inner) => {
+        const fmt = inner.replace(/<c:showLeaderLines[^>]*\/>/, '');   // c:dLbl 에는 지시선 항목이 없다
+        const pts = shift[si].map((d, i) => (d && Math.abs(d) > 1e-4 ? `<c:dLbl><c:idx val="${i}"/><c:layout><c:manualLayout><c:x val="0"/><c:y val="${d.toFixed(4)}"/></c:manualLayout></c:layout>${fmt}</c:dLbl>` : '')).join('');
+        return `<c:dLbls>${pts}${inner}</c:dLbls>`;
+      });
+    }
+    zip.file(name, parts.join('<c:ser>'));
+  }
+  return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
+}
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** rounded card (white by default) with soft shadow */
@@ -437,14 +484,26 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const max = Math.max(1, ...all);
   const common = {
     x: IN(x + padX * 0.4), y: IN(y + padY + hh), w: IN(w - padX * 0.8), h: IN(ch),
-    chartColors: SERIES(c).map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: '#,##0.##',
+    chartColors: SERIES(c).map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: all.every(Number.isInteger) ? '#,##0' : 'General',   // '#,##0.##' 는 PowerPoint 에서 정수 뒤에 점이 붙는다(8.)
+   
     catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(D.label, k), catAxisLabelColor: colorToHex(P.body), catAxisLineShow: false, catGridLine: { style: 'none' },
     valAxisHidden: true, valGridLine: { color: colorToHex(P.border), style: 'solid', size: 0.75 }, valAxisMinVal: Math.min(0, ...all), valAxisMaxVal: Math.ceil(max * 1.3), valAxisLineShow: false, valAxisMajorUnit: Math.ceil(max * 1.3 / 4),
     showLegend: series.length > 1, legendPos: 'b', legendFontFace: FONT, legendFontSize: PT(D.small, k), legendColor: colorToHex(P.body),
     plotArea: { fill: { color: colorToHex(P.white) } }, chartArea: { fill: { color: colorToHex(P.white) } },
   };
-  if (c.kind === 'bar') slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
-  else slide.addChart(pres.charts.LINE, data, { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 6, lineDataSymbolLineSize: 1, dataLabelPosition: 't', lineSmooth: true });
+  const no = ++chartNo;
+  if (c.kind === 'bar') { slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' }); return; }
+  const line = { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 6, lineDataSymbolLineSize: 1, dataLabelPosition: 't', lineSmooth: true };
+  if (series.length > 1) {
+    // 시리즈가 둘 이상이면 값 숫자가 서로 겹칠 수 있어, 그림 칸을 고정해(값 → 높이를 알 수 있게) 숫자 자리를 옮긴다
+    const fz = D.small * k, top = fz * 0.5, bot = D.label * k * 1.9 + fz * 2.6;   // 아래 = 축 라벨 + 범례
+    const lay = { x: 0.03, y: top / ch, w: 0.94, h: Math.max(0.3, (ch - top - bot) / ch) };
+    const lo = common.valAxisMinVal, hi = common.valAxisMaxVal, plotTop = lay.y * ch, plotH = lay.h * ch;
+    const shift = lineLabelShift(series, labels.length, v => plotTop + plotH * (1 - (v - lo) / ((hi - lo) || 1)), fz, fz * 0.95, plotTop + plotH - fz * 0.15);
+    line.layout = lay;
+    LINE_LABEL_FIX.push({ no, shift: shift.map(r => r.map(d => d / ch)) });
+  }
+  slide.addChart(pres.charts.LINE, data, line);
 }
 /** 합계 행인가 — build_html.mjs 와 같은 규칙. 수치 칸·정렬은 common.mjs 의 numColumns */
 function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
@@ -1024,7 +1083,7 @@ for (const sl of slides) {
 }
 
 const outFile = path.join(outdir, 'deck.pptx');
-await pres.writeFile({ fileName: outFile });
+fs.writeFileSync(outFile, await applyLineLabelFix(await pres.write({ outputType: 'nodebuffer' })));   // 선 그래프 값 숫자 자리 보정 후 저장
 console.log(`deck.pptx written → ${outFile}`);
 console.log(`slides: ${slides.length}  (type ${meta.type}, ${meta.density}, primary ${P.primary}, style minimal)`);
 slides.forEach(sl => console.log(`  ${String(sl.order).padStart(2, '0')}  ${sl.pageNo ? '#' + sl.pageNo : '   '}  ${slideLabel(sl)}`));
