@@ -312,13 +312,14 @@ export function isNumCell(c) {
 }
 /** 빈 칸·대시는 정렬을 정할 때 세지 않는다. */
 export const isBlankCell = c => /^(?:|[-–—]|없음|해당 없음|N\/A)$/i.test(String(c ?? '').replace(/\*\*/g, '').trim());
-/** 열마다 오른쪽 정렬 여부 — 첫 열은 늘 왼쪽, 나머지는 빈 칸을 뺀 모든 칸이 수치일 때만 오른쪽. HTML·PPTX 가 같은 값을 쓴다. */
+/** 열마다 오른쪽 정렬 여부 — 첫 열은 늘 왼쪽, 나머지는 빈 칸을 뺀 칸의 60% 이상이 수치면 오른쪽. HTML·PPTX 가 같은 값을 쓴다.
+ *  (2026-10-18: "총점 | — | 우수" 같은 글 한 칸 때문에 수치 열 전체가 왼쪽으로 가던 것을 막는다) */
 export function numColumns(headers = [], rows = [], leftCols = new Set([0])) {
   const n = Math.max(headers.length, ...rows.map(r => (r || []).length), 1);
   return Array.from({ length: n }, (_, i) => {
     if (leftCols.has(i)) return false;
     const cells = rows.map(r => (r || [])[i]).filter(c => !isBlankCell(c));
-    return cells.length > 0 && cells.every(isNumCell);
+    return cells.length > 0 && cells.filter(isNumCell).length >= cells.length * 0.6;
   });
 }
 
