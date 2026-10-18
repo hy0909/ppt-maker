@@ -905,6 +905,15 @@ ${sectionsHtml}
   window.addEventListener('resize', redraw);
 })();
 </script>
+<script>
+/* 미리보기 화면이 다른 주소(웹 판 → 내 컴퓨터 서버)에서 이 덱을 띄우면 장을 직접 읽을 수 없다.
+   장이 바뀔 때마다 바깥 창에 "몇 번째 장 · 어느 섹션의 몇 번째 장(data-src)" 을 알려 준다 — 템플릿 바꾸기 단추가 쓴다(2026-10-18) */
+(function () {
+  if (window.parent === window) return;
+  function send(i) { var s = document.querySelectorAll('deck-stage > section')[i]; try { window.parent.postMessage({ pptDeckSlide: i, src: s ? s.getAttribute('data-src') : null }, '*'); } catch (e) {} }
+  window.addEventListener('message', function (e) { if (e.source === window && e.data && typeof e.data.slideIndexChanged === 'number') send(e.data.slideIndexChanged); });
+})();
+</script>
 <script src="deck-stage.js"></script>
 <script src="deck-editor.js"></script>
 <script>

@@ -892,6 +892,8 @@ function tplBlock(tpl, es, old){
   }
 }
 let CUR = { src:null, at:1 };
+// 미리보기가 다른 주소에서 열려 장을 직접 못 읽을 때(웹 판 → 내 컴퓨터 서버): 덱이 보내 주는 장 번호로 템플릿 단추를 맞춘다(2026-10-18)
+window.addEventListener('message', e=>{ const f=$('#preview'); if(!f||e.source!==f.contentWindow||!e.data||typeof e.data.pptDeckSlide!=='number') return; CUR={src:e.data.src||null,at:e.data.pptDeckSlide+1}; renderTplBox(); });
 function hookPreview(){
   const f=$('#preview'); let w, d; try{ w=f.contentWindow; d=f.contentDocument; d.body; }catch{ return; }   // 다른 주소(로컬 서버 프록시)면 장을 읽을 수 없다
   const slides=()=>Array.from(d.querySelectorAll('section.slide'));
