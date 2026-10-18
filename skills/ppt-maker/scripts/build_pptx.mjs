@@ -419,27 +419,39 @@ function fragStat(st, k, w) {
     if (st.desc) text(slide, st.desc, x, y + em * 0.45, w, descH - em * 0.45, { size: D.small, k, color: P.primary2, bold: true, lineSpacing: 1.4 });
   } };
 }
-/** kv: small 2-col table (flex 1.4) + tinted highlight box (flex 1) */
+/** kv: 카드 안 지표 비교 — HTML kvBlock 과 같은 배치(2026-10-18). 행 3개 이하면 좌우 칸(라벨 위·값 아래), 넘으면 표. 강조 상자는 아래 가로 한 줄 */
 function fragKv(rows, hl, k, w) {
-  const fs = D.table * k, em = D.body * k;
-  const rowH = fs * 1.45 + fs * 1.2;
-  const h = rows.length * rowH;
+  rows = rows || [];
+  const fs = D.table * k, em = D.body * k, sm = D.small * k, gap = em * 0.8;
+  const cols = rows.length > 0 && rows.length <= 3, cw = cols ? w / rows.length : w;
+  const valH = r => lines(String(r[1] ?? ''), fs, cw - em) * fs * 1.25;
+  const rowsH = cols ? sm * 1.5 + em * 0.35 + Math.max(...rows.map(valH)) + em * 1.2 : rows.length * (fs * 1.45 + fs * 1.2);
+  const hbH = hl ? D.cardTitle * k * 1.25 + em * 1.2 : 0;
+  const h = rowsH + (hl ? gap + hbH : 0);
   return { h, draw: (slide, x, y) => {
-    const gap = em * 1.2, tw = hl ? (w - gap) * 1.4 / 2.4 : w, hw = w - gap - tw;
-    const lw = tw * 0.38;
-    // 카드 안 작은 표 = shadcn 카드의 값 목록(HTML 의 .rt.kvt): 라벨 회색, 값 오른쪽·굵게, 행 사이 1px 선, 띠 없음
-    rows.forEach((r, i) => {
-      const ry = y + i * rowH, last = i === rows.length - 1;
-      text(slide, r[0] ?? '', x + fs * 0.4, ry, lw - fs * 0.8, rowH, { size: D.table, k, color: P.textMid, valign: 'middle' });
-      text(slide, r[1] ?? '', x + lw, ry, tw - lw - fs * 0.4, rowH, { size: D.table, k, bold: true, color: P.text, align: 'right', valign: 'middle' });
-      if (!last) rect(slide, x, ry + rowH - 1, tw, 1, { fill: P.border });
-    });
+    if (cols) {
+      rows.forEach((r, i) => {
+        const cx = x + i * cw, vh = valH(r), lh = sm * 1.5, top = y + (rowsH - lh - em * 0.35 - Math.max(...rows.map(valH))) / 2;   // 라벨은 칸마다 같은 높이
+        if (i) rect(slide, cx, y + em * 0.6, 1, rowsH - em * 1.2, { fill: P.border });
+        text(slide, r[0] ?? '', cx, top, cw, lh, { size: D.small, k, color: P.textMid, align: 'center', valign: 'middle' });
+        text(slide, r[1] ?? '', cx + em * 0.5, top + lh + em * 0.35, cw - em, vh, { size: D.table, k, bold: true, color: P.text, align: 'center', valign: 'top', lineSpacing: 1.25 });
+      });
+    } else {
+      // 행이 많으면 카드 안 작은 표(HTML 의 .rt.kvt): 라벨 회색, 값 오른쪽·굵게, 행 사이 1px 선
+      const rowH = fs * 1.45 + fs * 1.2, lw = w * 0.38;
+      rows.forEach((r, i) => {
+        const ry = y + i * rowH;
+        text(slide, r[0] ?? '', x + fs * 0.4, ry, lw - fs * 0.8, rowH, { size: D.table, k, color: P.textMid, valign: 'middle' });
+        text(slide, r[1] ?? '', x + lw, ry, w - lw - fs * 0.4, rowH, { size: D.table, k, bold: true, color: P.text, align: 'right', valign: 'middle' });
+        if (i < rows.length - 1) rect(slide, x, ry + rowH - 1, w, 1, { fill: P.border });
+      });
+    }
     if (hl) {
-      const hx = x + tw + gap;
-      rect(slide, hx, y, hw, h, { fill: P.softerBlue, radius: 10 });
-      const lh = D.small * k * 1.5, vh = D.stat * k * 0.62 * 1.15, top = y + (h - lh - vh) / 2;
-      text(slide, hl.label || '', hx, top, hw, lh, { size: D.small, k, color: P.text, align: 'center', valign: 'middle' });
-      text(slide, hl.value || '', hx, top + lh, hw, vh, { size: D.cardTitle, k, color: P.text, bold: true, align: 'center', valign: 'middle' });
+      const hy = y + rowsH + gap, cs = D.cardTitle * k, g = em * 0.5;
+      rect(slide, x, hy, w, hbH, { fill: P.softerBlue, radius: 10 });
+      const lw = estW(hl.label || '', sm), vw = estW(hl.value || '', cs), sx = x + (w - lw - g - vw) / 2;
+      text(slide, hl.label || '', sx, hy, lw + sm * 0.5, hbH, { size: D.small, k, color: P.text, valign: 'middle' });
+      text(slide, hl.value || '', sx + lw + g, hy, vw + cs * 0.5, hbH, { size: D.cardTitle, k, bold: true, color: P.text, valign: 'middle' });
     }
   } };
 }

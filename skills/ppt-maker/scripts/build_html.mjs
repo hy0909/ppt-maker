@@ -302,9 +302,15 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .pbar .trk{height:.75em;border-radius:999px;background:var(--bg-soft);overflow:hidden;} .pbar .trk i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--primary),var(--primary-2));}
 .pbar .pbf{border-top:1px solid var(--border);padding-top:.55em;text-align:center;font-size:var(--fs-label);font-weight:700;color:var(--primary);}
 /* kv: small table + highlight box side by side (성과 요약 카드) */
-.kv{display:flex;gap:1.2em;align-items:stretch;flex:1;min-height:0;}
-.kv .tbl{flex:1.4;min-height:0;display:flex;flex-direction:column;justify-content:center;}
-.kv .hbox{flex:1;}
+/* 카드 안 지표 비교(rows + highlight, 2026-10-18): 행 3개 이하면 좌우 칸(라벨 위·값 아래), 넘으면 표. 강조 상자는 그 아래 가로 한 줄 */
+.kv{display:flex;flex-direction:column;gap:.8em;flex:1;min-height:0;}
+.kv .tbl{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;}
+.kv .kvh{flex:1;min-height:0;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));align-content:center;align-items:stretch;}   /* 라벨은 칸마다 같은 높이에서 시작 */
+.kv .kc{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:.35em;padding:0 .5em;}
+.kv .kc+.kc{border-left:1px solid var(--border);}
+.kv .kl{font-size:var(--fs-small);color:var(--text-mid);}
+.kv .kvv{font-size:var(--fs-table);font-weight:700;color:var(--text);line-height:1.25;word-break:keep-all;}
+.kv .hbox{flex:0 0 auto;flex-direction:row;align-items:baseline;gap:.5em;padding:.6em 1em;}
 .card .sl{font-size:var(--fs-small);color:var(--text-mid);font-weight:500;}
 .card .sv{font-size:var(--fs-stat);font-weight:800;color:var(--text);line-height:1.05;margin-top:.1em;letter-spacing:-.04em;font-variant-numeric:tabular-nums;}
 .card .sv small{font-size:.5em;margin-left:.05em;font-weight:700;}
@@ -453,6 +459,14 @@ function subSections(secs) {
 function kvTable(rows) {
   return `<div class="tbl"><table class="rt kvt"><tbody>${(rows || []).map(r => `<tr>${r.map((c, i) => `<td${i ? '' : ' style="width:38%"'}>${rich(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
+/** 카드 안 지표 비교 — 행이 3개 이하면 좌우 칸, 넘으면 표. 강조 상자는 아래 (2026-10-18) */
+function kvBlock(rows, hl) {
+  rows = rows || [];
+  const body = rows.length && rows.length <= 3
+    ? `<div class="kvh" style="--n:${rows.length}">${rows.map(r => `<div class="kc"><div class="kl">${rich(r[0] ?? '')}</div><div class="kvv">${rich(r[1] ?? '')}</div></div>`).join('')}</div>`
+    : kvTable(rows);
+  return `<div class="kv">${body}${hl ? `<div class="hbox"><div class="hl">${rich(hl.label || '')}</div><div class="hv">${rich(hl.value || '')}</div></div>` : ''}</div>`;
+}
 function statFrag(st) {
   const m = String(st.value ?? '').match(/^([\d.,~\-–]+)\s*(.*)$/);
   const val = m && m[2] && m[2].length <= 4 ? `${esc(m[1])}<small>${esc(m[2])}</small>` : rich(st.value);
@@ -585,7 +599,7 @@ const BLOCKS = {
     const cols = b.columns || [];
     return `<div class="grid" style="grid-template-columns:${cols.map(c => `${c.flex || 1}fr`).join(' ')}">${cols.map((c, i) => `
       ${cardOpen(c.tint || (b.tintLast && i === cols.length - 1) ? 'tint' : '', c.heading)}
-        <div class="fill">${c.stat ? statFrag(c.stat) : ''}${c.rows ? `<div class="kv">${kvTable(c.rows)}${c.highlight ? `<div class="hbox"><div class="hl">${rich(c.highlight.label || '')}</div><div class="hv">${rich(c.highlight.value || '')}</div></div>` : ''}</div>` : ''}${c.sections ? subSections(c.sections) : ''}${c.items ? listItems(c.items, { row: b.rowItems }) : ''}${c.text ? `<div class="cd">${rich(c.text)}</div>` : ''}${c.chart ? chartPanel(c.chart) : ''}
+        <div class="fill">${c.stat ? statFrag(c.stat) : ''}${c.rows ? `${kvBlock(c.rows, c.highlight)}` : ''}${c.sections ? subSections(c.sections) : ''}${c.items ? listItems(c.items, { row: b.rowItems }) : ''}${c.text ? `<div class="cd">${rich(c.text)}</div>` : ''}${c.chart ? chartPanel(c.chart) : ''}
         ${c.image !== undefined ? `<div class="imgblk" style="flex:1"><div class="pic" style="border:0;padding:0;box-shadow:none"><div class="fr">${imgOrPh(c.image, c.caption, c.ratio)}</div>${c.caption && c.image ? `<div class="cp">${esc(c.caption)}</div>` : ''}</div></div>` : ''}</div>
       ${CARD_CLOSE}`).join('')}</div>`;
   },
@@ -593,7 +607,7 @@ const BLOCKS = {
     const n = (b.cards || []).length; const cols = b.cols || (n <= 4 ? n : Math.ceil(n / 2));
     return `<div class="grid" style="grid-template-columns:repeat(${cols},1fr)">${(b.cards || []).map(c => `
       ${cardOpen(c.primary ? 'tint' : c.dark ? 'dark' : '', c.num !== undefined ? `${esc(c.num)}. ${c.title || ''}` : c.title)}
-        <div class="fill">${c.tag ? `<div class="sh2">${esc(c.tag)}</div>` : ''}${c.stat ? statFrag(c.stat) : ''}${c.rows ? `<div class="kv">${kvTable(c.rows)}${c.highlight ? `<div class="hbox"><div class="hl">${rich(c.highlight.label || '')}</div><div class="hv">${rich(c.highlight.value || '')}</div></div>` : ''}</div>` : ''}${c.sections ? subSections(c.sections) : ''}${c.desc ? `<div class="cd">${rich(c.desc)}</div>` : ''}${c.items ? listItems(c.items) : ''}${c.chart ? chartPanel(c.chart) : ''}${c.bar ? barFrag(c.bar) : ''}</div>
+        <div class="fill">${c.tag ? `<div class="sh2">${esc(c.tag)}</div>` : ''}${c.stat ? statFrag(c.stat) : ''}${c.rows ? `${kvBlock(c.rows, c.highlight)}` : ''}${c.sections ? subSections(c.sections) : ''}${c.desc ? `<div class="cd">${rich(c.desc)}</div>` : ''}${c.items ? listItems(c.items) : ''}${c.chart ? chartPanel(c.chart) : ''}${c.bar ? barFrag(c.bar) : ''}</div>
       ${CARD_CLOSE}`).join('')}</div>`;
   },
   /** 큰 숫자 영웅 패널 + 지표 목록 + 옆 사양 카드: hero{title, value, sub, note}, items[{value, desc, note}], side?{heading, items[{k, v}]} */
