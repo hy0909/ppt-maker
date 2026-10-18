@@ -104,7 +104,8 @@ export const COLORS = readJson('colors.json', {
   gray: { 50: '#F5F7FA', 100: '#E9ECF0', 200: '#D9DEE6', 300: '#CFD4DC', 400: '#B9C3D2', 500: '#8B95A7', 600: '#515B75', 700: '#4A5568', 800: '#1A2438', 900: '#10141C',
           role: { bgSoft: '50', page: '100', border: '200', rule: '300', borderStrong: '400', textLight: '500', body: '600', textMid: '700', text: '800', title: '900' }, white: '#FFFFFF' },
   accent: { glow: '#19E68C', glowMix: 0.6, teal: '#00A89D', gold: '#C8A24B' },
-  chart: { flat: ['primary.600', 'accent.teal', 'accent.gold'], ranked: ['primary.600', 'primary.350', 'primary.200'], other: 'gray.400' },
+  chart: { flat: ['primary.600', 'accent.teal', 'accent.gold'], ranked: ['primary.600', 'primary.350', 'primary.200'], other: 'gray.400',
+           pie: ['primary.600', 'primary.350', 'primary.200', 'gray.500', 'gray.400', 'gray.300', 'gray.200'] },
   status: { success: '#138A4E', warning: '#C97A1F', danger: '#C9302C' },
 });
 // gray.role(이름 → 단계)을 풀어 COLORS.gray.text 처럼 이름으로도 읽히게 한다(옛 형식의 colors.json 도 그대로 동작)
@@ -113,8 +114,9 @@ if (COLORS.gray && COLORS.gray.role) for (const [name, step] of Object.entries(C
 export const colorAt = (path, fallback = '#888888') => { const [g, k] = String(path).split('.'); const v = COLORS[g] && COLORS[g][k]; return typeof v === 'string' ? v : fallback; };
 /** 그래프 시리즈 색 — emphasis(1~3)를 준 시리즈만 색을 받고 나머지는 연한 회색. ranked 면 primary 600→350→200, 아니면 primary→teal→gold.
  *  emphasis 를 아무도 안 적었으면 첫 시리즈만 강조(1). */
+export const CHART_MAX_SERIES = 12;   // 그래프 시리즈는 12개까지 그린다(권장 1~3). 넘으면 잘라낸다
 export function chartSeriesColors(chart) {
-  const series = (chart.series || []).slice(0, 4);
+  const series = (chart.series || []).slice(0, CHART_MAX_SERIES);
   const spec = COLORS.chart || {};
   const ladder = (chart.ranked ? spec.ranked : spec.flat) || ['primary.600', 'accent.teal', 'accent.gold'];
   const other = colorAt(spec.other || 'gray.400');
@@ -123,6 +125,16 @@ export function chartSeriesColors(chart) {
     const e = anyEm ? s.emphasis : (i === 0 ? 1 : 0);
     return e >= 1 && e <= ladder.length ? colorAt(ladder[e - 1]) : other;
   });
+}
+/** 강조(색을 받은) 시리즈인가 — chartSeriesColors 와 같은 판단. 시리즈가 4개 이상이면 강조한 시리즈에만 값 숫자를 단다 */
+export function chartSeriesEmph(chart) {
+  const other = colorAt((COLORS.chart || {}).other || 'gray.400');
+  return chartSeriesColors(chart).map(c => c !== other);
+}
+/** 원그래프 조각 색 — 메인 컬러 위계(600→350→200) 다음 회색(500→200). 조각이 더 많으면 마지막 색을 이어 쓴다(6개 이하 권장, 나머지는 "기타"로 묶기) */
+export function chartPieColors(n) {
+  const list = ((COLORS.chart || {}).pie || ['primary.600', 'primary.350', 'primary.200', 'gray.500', 'gray.400', 'gray.300', 'gray.200']).map(c => colorAt(c));
+  return Array.from({ length: n }, (_, i) => list[Math.min(i, list.length - 1)]);
 }
 export const FONTS = readJson('fonts.json', {
   face: { coverTitle: 'Paperlogy 7 Bold', agendaTitle: 'Paperlogy 7 Bold', h2: 'Paperlogy 5 Medium', body2: 'Pretendard Light',

@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors,
+import { loadOutline, flattenSlides, derivePalette, DENSITY, esc, rich, normItem, slideLabel, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors, chartSeriesEmph, chartPieColors, CHART_MAX_SERIES,
          TYPE, typeCss, px, FALLBACK_FACES, COVER_BOX, AGENDA_BOX, coverBgFile, coverTitleW, closingBgCss, coverScrim,
          dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom,
          tieTail, SHAPE, HEAD, FRAME, PAPERLOGY_FONT_FACE, AUTO_H_BLOCKS, annotPin } from './lib/common.mjs';
@@ -375,7 +375,7 @@ table.rt{width:100%;border-collapse:collapse;font-size:calc(var(--fs-table) * va
 .chart .chh b{color:var(--body);font-weight:700;font-size:var(--fs-small);}   /* 그래프 제목 = 카드 안 소제목(.sh2)과 같은 글자 */
 .chart .chh span{color:var(--text-light);font-size:var(--fs-caption);}   /* 단위 = 캡션 글자 */
 .chart .cplot{flex:1;min-height:0;margin-top:.5em;display:flex;} .chart .cplot svg{width:100%;height:100%;display:block;}
-.chart .lg{display:flex;justify-content:center;gap:1.4em;font-size:var(--fs-small);color:var(--body);font-weight:500;margin-top:.35em;}   /* 범례 = 작은 라벨 톤 */ .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
+.chart .lg{display:flex;flex-wrap:wrap;justify-content:center;gap:.3em 1.4em;font-size:var(--fs-small);color:var(--body);font-weight:500;margin-top:.35em;}   /* 범례 = 작은 라벨 톤 */ .chart .lg i{display:inline-block;width:.6em;height:.6em;border-radius:2px;margin-right:.4em;vertical-align:0;}
 /* cover / toc / divider / closing */
 /* 표지 배경 — meta.coverBg 로 고른 이미지. 마무리 장표도 같은 그림을 깐다(2026-10-18) */
 .cover{position:absolute;inset:0;overflow:hidden;color:#fff;}
@@ -473,17 +473,50 @@ function statFrag(st) {
   return `${st.sub ? `<div class="sl">${rich(st.sub)}</div>` : ''}<div class="sv">${val}</div>${st.desc ? `<div class="sn">${rich(st.desc)}</div>` : ''}`;
 }
 function chartPanel(b) {
-  const data = esc(JSON.stringify({ kind: b.kind, labels: b.labels || [], colors: SERIES_COLORS(b), series: (b.series || []).slice(0, 4).map(sr => ({ values: sr.values || [] })) }));
-  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span class="aux">${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${(b.series || []).length > 1 ? `<div class="lg">${(b.series || []).map((sr, i) => `<span><i style="background:${SERIES_COLORS(b)[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : ''}</div>`;
+  const series = (b.series || []).slice(0, CHART_MAX_SERIES), cols = chartColorsOf(b), em = chartSeriesEmph(b);
+  const data = esc(JSON.stringify({ kind: b.kind, labels: b.labels || [], colors: cols, series: series.map((sr, i) => ({ name: sr.name || '', values: sr.values || [], em: em[i] })) }));
+  const legend = b.kind !== 'pie' && series.length > 1 ? `<div class="lg">${series.map((sr, i) => `<span><i style="background:${cols[i]}"></i>${esc(sr.name || '')}</span>`).join('')}</div>` : '';   // 원그래프는 그림 안 오른쪽에 범례
+  return `<div class="chart" data-chart="${data}"><div class="chh"><b>${rich(b.title || '')}</b><span class="aux">${b.unit ? `단위 : ${esc(b.unit)}` : ''}</span></div><div class="cplot">${chartSvg(b)}</div>${legend}</div>`;
 }
 const SERIES_COLORS = (b) => chartSeriesColors(b || {});   // 규칙은 common.mjs chartSeriesColors(강조 개수·위계)
+const chartColorsOf = (b) => b.kind === 'pie' ? chartPieColors(((b.series || [])[0] || {}).values ? b.series[0].values.length : 0) : SERIES_COLORS(b);   // 원그래프는 조각마다 색
 /** 그래프 — shadcn/ui Charts(recharts) 모양을 따른다: 가로 격자선만, 축선·눈금선 없음, 막대는 위 모서리만 둥글게, 선은 부드러운 곡선 + 점, 값 라벨은 위.
  *  그리는 코드는 CHART_DRAW_SRC 하나다. 서버는 기본 높이로 먼저 그려 두고(스크립트 없이도 보이게), 브라우저는 그래프 칸의 실제 가로세로 비율에 맞춰
  *  같은 함수로 다시 그린다(2026-10-10 — 그래야 가로를 꽉 채운다. viewBox 비율이 칸과 다르면 meet 때문에 좌우가 비었다). */
 const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
   fs = fs || 21;   // 글자 기준 크기(px) = 장표의 작은 글(--fs-small × 배율). 그림 좌표 1 = 화면 1px
   var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); };
-  var labels = b.labels || [], series = (b.series || []).slice(0, 4), cols = b.colors || C.series;
+  var labels = b.labels || [], series = (b.series || []).slice(0, 12), cols = b.colors || C.series;
+  var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
+  var lum = function(hex) { var m = String(hex).replace('#', ''); if (m.length !== 6) return 0; var r = parseInt(m.slice(0, 2), 16), g = parseInt(m.slice(2, 4), 16), bb = parseInt(m.slice(4, 6), 16); return (0.299 * r + 0.587 * g + 0.114 * bb) / 255; };
+  if (b.kind === 'pie') {
+    // 원그래프(2026-10-18) — 첫 시리즈 값만 쓴다. 12시 방향에서 시계 방향, 조각 사이 흰 선. 조각 안에는 비율(%), 오른쪽 범례에 이름 · 값 · 비율.
+    // 6% 미만 조각은 안에 글자를 넣지 않는다(범례에서 읽음). 진한 조각은 흰 글자, 연한 조각은 진한 글자
+    var pv = ((series[0] || {}).values || []).map(function(v) { return typeof v === 'number' && v > 0 ? v : 0; });
+    var tot = pv.reduce(function(a, v) { return a + v; }, 0) || 1;
+    var fsl = fs * (C.labelRatio || 0.875), rowH = fs * 1.75, lgW = Math.min(W * 0.46, fs * 11);
+    var R = Math.max(10, Math.min((H - fs) / 2, (W - lgW - fs * 3) / 2)), grpW = R * 2 + fs * 2.5 + lgW, gx = Math.max(0, (W - grpW) / 2), cx = gx + R, cy = H / 2;   // 원 + 범례를 한 덩어리로 가운데
+    var pct = function(v) { var p = v / tot * 100; return (p >= 10 || p === 0 ? Math.round(p) : Math.round(p * 10) / 10) + '%'; };
+    var a0 = -Math.PI / 2;
+    pv.forEach(function(v, i) {
+      if (!v) return;
+      var a1 = a0 + v / tot * Math.PI * 2, col = cols[i];
+      if (v >= tot) out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="' + col + '"/>';
+      else out += '<path d="M' + cx + ',' + cy + ' L' + (cx + R * Math.cos(a0)).toFixed(1) + ',' + (cy + R * Math.sin(a0)).toFixed(1) + ' A' + R + ',' + R + ' 0 ' + (a1 - a0 > Math.PI ? 1 : 0) + ' 1 ' + (cx + R * Math.cos(a1)).toFixed(1) + ',' + (cy + R * Math.sin(a1)).toFixed(1) + ' Z" fill="' + col + '" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>';
+      if (v / tot >= 0.06) { var am = (a0 + a1) / 2, tr = v >= tot ? 0 : R * 0.64; out += '<text x="' + (cx + tr * Math.cos(am)).toFixed(1) + '" y="' + (cy + tr * Math.sin(am) + fs * 0.35).toFixed(1) + '" text-anchor="middle" font-size="' + fs + '" font-weight="700" font-variant-numeric="tabular-nums" fill="' + (lum(col) < 0.55 ? '#FFFFFF' : C.text) + '">' + pct(v) + '</text>'; }
+      a0 = a1;
+    });
+    var lx0 = gx + R * 2 + fs * 2.5, lx1 = lx0 + lgW, ly0 = cy - rowH * pv.length / 2 + rowH / 2;
+    pv.forEach(function(v, i) {
+      var yy = ly0 + rowH * i;
+      out += '<rect x="' + lx0 + '" y="' + (yy - fs * 0.32) + '" width="' + (fs * 0.6) + '" height="' + (fs * 0.6) + '" rx="2" fill="' + cols[i] + '"/>';
+      out += '<text x="' + (lx0 + fs * 1.05) + '" y="' + (yy + fs * 0.32) + '" font-size="' + fsl + '" font-weight="500" fill="' + C.body + '">' + esc(labels[i] == null ? '' : labels[i]) + '</text>';
+      out += '<text x="' + lx1 + '" y="' + (yy + fs * 0.32) + '" text-anchor="end" font-size="' + fsl + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '">' + esc((series[0].values || [])[i]) + ' <tspan fill="' + C.textMid + '" font-weight="500">(' + pct(v) + ')</tspan></text>';
+    });
+    return out + '</svg>';
+  }
+  // 값 숫자를 다는 시리즈(2026-10-18): 3개까지는 전부, 4개 이상이면 강조(색을 받은) 시리즈만 — 회색 시리즈 숫자까지 달면 읽을 수 없다
+  var showV = series.map(function(sr) { return series.length <= 3 || sr.em !== false; });
   var all = [].concat.apply([], series.map(function(sr) { return sr.values || []; })).filter(function(v) { return typeof v === 'number'; });
   var max = Math.max.apply(null, [1].concat(all)) * 1.25, min = Math.min.apply(null, [0].concat(all));
   var padL = 20, padR = 20, padT = fs * 2.2, padB = fs * 2.6;   // 좌우 여백 20px, 위는 값 라벨, 아래는 축 라벨 자리
@@ -506,18 +539,26 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
     for (i = 0; i < k - 1; i++) { var hh = dx[i] / 3; d += ' C' + (pts[i][0] + hh).toFixed(1) + ',' + (pts[i][1] + t[i] * hh).toFixed(1) + ' ' + (pts[i + 1][0] - hh).toFixed(1) + ',' + (pts[i + 1][1] - t[i + 1] * hh).toFixed(1) + ' ' + pts[i + 1][0] + ',' + pts[i + 1][1]; }
     return d;
   };
-  var out = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="inherit">';
   for (var g = 0; g <= 4; g++) { var gy = (padT + (H - padT - padB) * g / 4).toFixed(1); out += '<line x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '" stroke="' + C.border + '" stroke-opacity=".6" stroke-width="1"/>'; }
   var fl = fs * (C.labelRatio || 0.875);   // 축 라벨 = 라벨 토큰(14/16)
   labels.forEach(function(l, i) { out += '<text x="' + lx(i) + '" y="' + (H - padB + fs * 1.7) + '" text-anchor="middle" font-size="' + fl + '" font-weight="500" fill="' + C.body + '">' + esc(l) + '</text>'; });   // 축 라벨 = 작은 라벨(.stat .sl)
   if (b.kind === 'bar') {
-    var bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5;
+    var bw = Math.min(fs * 5, gw * 0.72 / series.length), r = series.length > 1 ? fs * 0.3 : fs * 0.5, gapB = Math.min(8, bw * 0.25), cand = [];
     series.forEach(function(sr, si) { (sr.values || []).forEach(function(v, i) {
-      var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + 4, w = bw - 8;
+      var bx = padL + gw * i + gw / 2 - (bw * series.length) / 2 + bw * si + gapB / 2, w = Math.max(1, bw - gapB);
       var top = y(v), bot = H - padB, rr = Math.min(r, Math.max(0, bot - top) / 2, w / 2);
       out += '<path d="M' + bx + ',' + bot + ' V' + (top + rr) + ' Q' + bx + ',' + top + ' ' + (bx + rr) + ',' + top + ' H' + (bx + w - rr) + ' Q' + (bx + w) + ',' + top + ' ' + (bx + w) + ',' + (top + rr) + ' V' + bot + ' Z" fill="' + cols[si] + '"/>';
-      out += '<text x="' + (bx + w / 2) + '" y="' + (top - fs * 0.6) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc(v) + '</text>';
+      if (showV[si] && typeof v === 'number') cand.push({ si: si, v: v, cx: bx + w / 2, by: top - fs * 0.6, tw: String(v).length * fs * 0.6 + 4 });
     }); });
+    // 막대 숫자 겹침(2026-10-18): 막대가 좁아 숫자끼리 부딪히면 강조 순서(1→2→3, 그다음 회색)대로 먼저 놓고, 이미 놓인 숫자와 겹치는 것은 뺀다
+    var rank = function(c) { var e = series[c.si].emphasis; return series[c.si].em === false ? 9 : (e || 1); };
+    cand.sort(function(a, c) { return rank(a) - rank(c) || a.si - c.si; });
+    var placed = [];
+    cand.forEach(function(c) {
+      var hit = placed.some(function(p) { return Math.abs(p.cx - c.cx) < (p.tw + c.tw) / 2 && Math.abs(p.by - c.by) < fs * 0.95; });
+      if (hit) return; placed.push(c);
+      out += '<text x="' + c.cx.toFixed(1) + '" y="' + c.by.toFixed(1) + '" text-anchor="middle" font-size="' + fs + '" font-weight="600" font-variant-numeric="tabular-nums" fill="' + C.text + '"' + halo + '>' + esc(c.v) + '</text>';
+    });
   } else {
     // 값 라벨 자리(2026-10-18) — 같은 달에 선끼리 높이가 비슷하면 숫자가 겹쳐 안 보였다. 달마다 점을 위→아래로 줄 세우고,
     // 가까운 점(1.9글자 이내)끼리 묶어 위쪽 절반은 맨 위 점 위로 쌓고 아래쪽 절반은 맨 아래 점 밑으로 쌓는다(줄 순서 = 선 순서).
@@ -525,7 +566,7 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
     var ly = series.map(function() { return []; }), gap = fs * 1.05, near = fs * 1.9, topY = fs * 0.95, botY = H - padB - fs * 0.15;
     for (var ci = 0; ci < n; ci++) {
       var col = [];
-      series.forEach(function(sr, si) { var v = (sr.values || [])[ci]; if (typeof v === 'number') col.push({ si: si, py: y(v) }); });
+      series.forEach(function(sr, si) { var v = (sr.values || [])[ci]; if (showV[si] && typeof v === 'number') col.push({ si: si, py: y(v) }); });
       col.sort(function(a, c) { return a.py - c.py; });
       var cut = [0];   // 묶음 시작 위치들
       for (var c0 = 1; c0 < col.length; c0++) if (col[c0].py - col[c0 - 1].py >= near) cut.push(c0);
@@ -558,7 +599,7 @@ const CHART_DRAW_SRC = `function(b, W, H, C, fs) {
 }`;
 const chartDraw = new Function('return (' + CHART_DRAW_SRC + ')')();
 const chartColors = () => ({ series: SERIES_COLORS({}), border: P.border, textMid: P.textMid, body: P.body, text: P.text, labelRatio: D.label / D.small });
-function chartSvg(b, H = 416) { return chartDraw({ ...b, colors: SERIES_COLORS(b) }, 1200, H, chartColors()); }
+function chartSvg(b, H = 416) { const em = chartSeriesEmph(b); return chartDraw({ ...b, colors: chartColorsOf(b), series: (b.series || []).slice(0, CHART_MAX_SERIES).map((sr, i) => ({ ...sr, em: em[i] })) }, 1200, H, chartColors()); }
 /** 파일이 실제로 있을 때만 이미지를 넣는다 — 없는 경로는 깨진 이미지 아이콘 대신 점선 자리표시자로. */
 /** 이미지 상자 비율. 기본 16:9. "original" 이면 원본 비율 그대로(contain). */
 export const IMAGE_RATIOS = { '16:9': [16, 9], '4:3': [4, 3], '1:1': [1, 1], '9:16': [9, 16], '3:4': [3, 4] };

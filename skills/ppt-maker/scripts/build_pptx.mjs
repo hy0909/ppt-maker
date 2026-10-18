@@ -12,7 +12,7 @@ const sizeOf = _imageSize.imageSize || _imageSize.default || _imageSize;   // �
 import { chromium } from 'playwright';
 import { loadOutline, flattenSlides, derivePalette, DENSITY, richRuns, normItem, slideLabel, SLIDE_W, SLIDE_H, mix,
          TYPE, COVER_BOX, AGENDA_BOX, coverBgFile, coverTitleW, closingBgCss, coverScrim,
-         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors, AUTO_H_BLOCKS, annotPin } from './lib/common.mjs';
+         dividerBgFile, DIVIDER_SCRIM, SLIDE_FOOT, footLines, footSafeBottom, SHAPE, HEAD, FRAME, tableColWidths, FONTS, COLORS, numColumns, chartSeriesColors, chartSeriesEmph, chartPieColors, CHART_MAX_SERIES, AUTO_H_BLOCKS, annotPin } from './lib/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SKILL_ASSETS = path.resolve(__dirname, '..', 'assets');
@@ -274,26 +274,55 @@ function lineLabelShift(series, n, yOf, fs, topY, botY) {
   return shift;
 }
 let chartNo = 0;   // pptxgenjs 는 차트를 만든 순서대로 ppt/charts/chart{N}.xml 로 저장한다
-const LINE_LABEL_FIX = [];   // { no, shift(차트 높이 대비 비율) } — 저장한 뒤 점별 라벨 자리로 넣는다
-/** 저장된 pptx 의 선 그래프에 점별 라벨(c:dLbl) 을 넣는다. 서식은 그 시리즈 라벨 묶음(c:dLbls)을 그대로 따르고 자리만 옮긴다. */
-async function applyLineLabelFix(buf) {
-  if (!LINE_LABEL_FIX.length) return buf;
+const CHART_LABEL_FIX = [];   // { no, shift?(시리즈×점, 차트 높이 대비 비율), hide?(시리즈×점), pie?, color?(조각별 글자색) } — 저장한 뒤 점별 라벨로 넣는다
+/** 저장된 pptx 의 그래프에 점별 라벨(c:dLbl)을 넣는다. 선: 자리 옮기기, 선·막대: 숨길 숫자 지우기(c:delete), 원: 조각별 글자색·작은 조각 숫자 지우기.
+ *  서식은 그 시리즈 라벨 묶음(c:dLbls)을 그대로 따른다. */
+async function applyChartLabelFix(buf) {
+  if (!CHART_LABEL_FIX.length) return buf;
   const zip = await JSZip.loadAsync(buf);
-  for (const { no, shift } of LINE_LABEL_FIX) {
+  const del = i => `<c:dLbl><c:idx val="${i}"/><c:delete val="1"/></c:dLbl>`;
+  for (const { no, shift, hide, pie, color } of CHART_LABEL_FIX) {
     const name = `ppt/charts/chart${no}.xml`, f = zip.file(name);
     if (!f) continue;
-    const parts = (await f.async('string')).split('<c:ser>');
-    for (let si = 0; si < shift.length && si + 1 < parts.length; si++) {
-      parts[si + 1] = parts[si + 1].replace(/<c:dLbls>([\s\S]*?)<\/c:dLbls>/, (all, inner) => {
-        const fmt = inner.replace(/<c:showLeaderLines[^>]*\/>/, '');   // c:dLbl 에는 지시선 항목이 없다
-        const pts = shift[si].map((d, i) => (d && Math.abs(d) > 1e-4 ? `<c:dLbl><c:idx val="${i}"/><c:layout><c:manualLayout><c:x val="0"/><c:y val="${d.toFixed(4)}"/></c:manualLayout></c:layout>${fmt}</c:dLbl>` : '')).join('');
-        return `<c:dLbls>${pts}${inner}</c:dLbls>`;
+    let xml = await f.async('string');
+    if (pie) {
+      xml = xml.replace(/<c:dLbl>([\s\S]*?)<\/c:dLbl>/g, (all, inner) => {
+        const i = +((inner.match(/<c:idx val="(\d+)"/) || [])[1]);
+        if (hide && hide[0] && hide[0][i]) return del(i);
+        const one = all.replace('<a:bodyPr/>', '<a:bodyPr wrap="none"/>');   // 작은 원에서 "20 %" 가 두 줄로 꺾이지 않게
+        return color && color[i] ? one.replace(/<a:srgbClr val="[0-9A-Fa-f]{6}"\/>/, `<a:srgbClr val="${color[i]}"/>`) : one;
       });
+    } else {
+      const parts = xml.split('<c:ser>'), ns = Math.max((shift || []).length, (hide || []).length);
+      for (let si = 0; si < ns && si + 1 < parts.length; si++) {
+        parts[si + 1] = parts[si + 1].replace(/<c:dLbls>([\s\S]*?)<\/c:dLbls>/, (all, inner) => {
+          const fmt = inner.replace(/<c:showLeaderLines[^>]*\/>/, '');   // c:dLbl 에는 지시선 항목이 없다
+          const n = Math.max(((shift || [])[si] || []).length, ((hide || [])[si] || []).length);
+          let pts = '';
+          for (let i = 0; i < n; i++) {
+            const d = ((shift || [])[si] || [])[i];
+            if (((hide || [])[si] || [])[i]) pts += del(i);
+            else if (d && Math.abs(d) > 1e-4) pts += `<c:dLbl><c:idx val="${i}"/><c:layout><c:manualLayout><c:x val="0"/><c:y val="${d.toFixed(4)}"/></c:manualLayout></c:layout>${fmt}</c:dLbl>`;
+          }
+          return `<c:dLbls>${pts}${inner}</c:dLbls>`;
+        });
+      }
+      xml = parts.join('<c:ser>');
     }
-    zip.file(name, parts.join('<c:ser>'));
+    zip.file(name, xml);
   }
   return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
 }
+/** 막대 숫자 겹침(build_html.mjs 와 같은 규칙) — 강조 순서(1→2→3, 그다음 회색)대로 놓고, 이미 놓인 숫자와 겹치는 것은 숨긴다. 돌려주는 값 = 숨길 점(시리즈×점) */
+function barLabelHide(cands, nSeries, nPts, fz) {
+  const hide = Array.from({ length: nSeries }, () => Array(nPts).fill(false)), placed = [];
+  cands.sort((a, b) => a.rank - b.rank || a.si - b.si).forEach(c => {
+    if (placed.some(p => Math.abs(p.cx - c.cx) < (p.tw + c.tw) / 2 && Math.abs(p.by - c.by) < fz * 0.95)) hide[c.si][c.i] = true;
+    else placed.push(c);
+  });
+  return hide;
+}
+const lum = hex => { const m = String(hex).replace('#', ''); return m.length === 6 ? (0.299 * parseInt(m.slice(0, 2), 16) + 0.587 * parseInt(m.slice(2, 4), 16) + 0.114 * parseInt(m.slice(4, 6), 16)) / 255 : 0; };
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** rounded card (white by default) with soft shadow */
@@ -495,14 +524,16 @@ function chartPanel(slide, c, x, y, w, h, k) {
   const hh = em * 1.5;
   text(slide, c.title || '', x + padX, y + padY, w * 0.6, hh, { size: D.small, k, bold: true, color: P.body, valign: 'middle' });   // 그래프 제목 = 카드 안 소제목
   if (c.unit) text(slide, `단위 : ${c.unit}`, x + w * 0.5, y + padY, w * 0.5 - padX, hh, { size: D.caption, k, color: P.textLight, align: 'right', valign: 'middle' });   // 단위 = 캡션
-  const series = (c.series || []).slice(0, 4), labels = c.labels || [];
+  const series = (c.series || []).slice(0, CHART_MAX_SERIES), labels = c.labels || [];
   const ch = h - padY - hh - em * 0.6;
   if (!series.length || ch < 30) return;
+  const cx0 = x + padX * 0.4, cw = w - padX * 0.8, cy0 = y + padY + hh, fz = D.small * k;
+  if (c.kind === 'pie') { piePanel(slide, c, labels, cx0, cy0, cw, ch, k); return; }
   const data = series.map(sr => ({ name: sr.name || '', labels, values: sr.values || [] }));
   const all = data.flatMap(d => d.values).filter(v => typeof v === 'number');
   const max = Math.max(1, ...all);
   const common = {
-    x: IN(x + padX * 0.4), y: IN(y + padY + hh), w: IN(w - padX * 0.8), h: IN(ch),
+    x: IN(cx0), y: IN(cy0), w: IN(cw), h: IN(ch),
     chartColors: SERIES(c).map(colorToHex), showValue: true, dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelColor: colorToHex(P.text), dataLabelFontBold: true, dataLabelFormatCode: all.every(Number.isInteger) ? '#,##0' : 'General',   // '#,##0.##' 는 PowerPoint 에서 정수 뒤에 점이 붙는다(8.)
    
     catAxisLabelFontFace: FONT, catAxisLabelFontSize: PT(D.label, k), catAxisLabelColor: colorToHex(P.body), catAxisLineShow: false, catGridLine: { style: 'none' },
@@ -511,18 +542,64 @@ function chartPanel(slide, c, x, y, w, h, k) {
     plotArea: { fill: { color: colorToHex(P.white) } }, chartArea: { fill: { color: colorToHex(P.white) } },
   };
   const no = ++chartNo;
-  if (c.kind === 'bar') { slide.addChart(pres.charts.BAR, data, { ...common, barDir: 'col', barGapWidthPct: 60, barGrouping: 'clustered', dataLabelPosition: 'outEnd' }); return; }
+  // 값 숫자를 다는 시리즈 — 3개까지는 전부, 4개 이상이면 강조(색을 받은) 시리즈만(build_html.mjs 와 같은 규칙)
+  const emph = chartSeriesEmph(c), showV = series.map((_, si) => series.length <= 3 || emph[si]);
+  const nPts = Math.max(labels.length, ...series.map(sr => (sr.values || []).length));
+  const hideOff = series.map((_, si) => Array.from({ length: nPts }, () => !showV[si]));
+  // 그림 칸을 고정해(값 → 높이·가로 자리를 알 수 있게) 숫자 자리를 계산한다. 아래 = 축 라벨 + 범례(시리즈가 많으면 두 줄)
+  const legRows = series.length > 1 ? Math.ceil(series.length / 8) : 0;
+  const top = fz * 0.5, bot = D.label * k * 1.9 + fz * 1.3 * legRows + fz * 1.3;
+  const lay = { x: 0.03, y: top / ch, w: 0.94, h: Math.max(0.3, (ch - top - bot) / ch) };
+  const lo = common.valAxisMinVal, hi = common.valAxisMaxVal, plotTop = lay.y * ch, plotH = lay.h * ch;
+  const yOf = v => plotTop + plotH * (1 - (v - lo) / ((hi - lo) || 1));
+  if (c.kind === 'bar') {
+    // 막대 너비는 HTML 처럼 최대 5글자 — 막대가 적으면 사이 간격(barGapWidthPct, 막대 너비 대비 %)을 넓힌다
+    const plotW = lay.w * cw, gw = plotW / Math.max(nPts, 1), bw0 = Math.min(fz * 5, gw / (series.length + 0.6)), gapPct = Math.min(500, Math.max(60, Math.round((gw / bw0 - series.length) * 100))), bw = gw / (series.length + gapPct / 100), gapB = bw * gapPct / 100, cands = [];
+    series.forEach((sr, si) => (sr.values || []).forEach((v, i) => {
+      if (!showV[si] || typeof v !== 'number') return;
+      const txt = Number.isInteger(v) ? v.toLocaleString('en-US') : String(v);
+      cands.push({ si, i, cx: lay.x * cw + gw * i + gapB / 2 + bw * (si + 0.5), by: yOf(v) - fz * 0.6, tw: txt.length * fz * 0.6 + 4, rank: !emph[si] ? 9 : (sr.emphasis || 1) });
+    }));
+    const hide = barLabelHide(cands, series.length, nPts, fz).map((r, si) => r.map((hd, i) => hd || hideOff[si][i]));
+    slide.addChart(pres.charts.BAR, data, { ...common, layout: lay, barDir: 'col', barGapWidthPct: gapPct, barGrouping: 'clustered', dataLabelPosition: 'outEnd' });
+    if (hide.some(r => r.some(Boolean))) CHART_LABEL_FIX.push({ no, hide });
+    return;
+  }
   const line = { ...common, lineSize: 2, lineDataSymbol: 'circle', lineDataSymbolSize: 6, lineDataSymbolLineSize: 1, dataLabelPosition: 't', lineSmooth: true };
+  const anyHidden = hideOff.some(r => r.some(Boolean));
   if (series.length > 1) {
-    // 시리즈가 둘 이상이면 값 숫자가 서로 겹칠 수 있어, 그림 칸을 고정해(값 → 높이를 알 수 있게) 숫자 자리를 옮긴다
-    const fz = D.small * k, top = fz * 0.5, bot = D.label * k * 1.9 + fz * 2.6;   // 아래 = 축 라벨 + 범례
-    const lay = { x: 0.03, y: top / ch, w: 0.94, h: Math.max(0.3, (ch - top - bot) / ch) };
-    const lo = common.valAxisMinVal, hi = common.valAxisMaxVal, plotTop = lay.y * ch, plotH = lay.h * ch;
-    const shift = lineLabelShift(series, labels.length, v => plotTop + plotH * (1 - (v - lo) / ((hi - lo) || 1)), fz, fz * 0.95, plotTop + plotH - fz * 0.15);
+    // 시리즈가 둘 이상이면 값 숫자가 서로 겹칠 수 있어, 숫자를 다는 시리즈끼리 자리를 옮긴다
+    const shown = series.map((sr, si) => (showV[si] ? sr : { ...sr, values: [] }));
+    const shift = lineLabelShift(shown, labels.length, yOf, fz, fz * 0.95, plotTop + plotH - fz * 0.15);
     line.layout = lay;
-    LINE_LABEL_FIX.push({ no, shift: shift.map(r => r.map(d => d / ch)) });
+    CHART_LABEL_FIX.push({ no, shift: shift.map(r => r.map(d => (d || 0) / ch)), hide: anyHidden ? hideOff : undefined });
   }
   slide.addChart(pres.charts.LINE, data, line);
+}
+/** 원그래프 — HTML 과 같은 모양: 왼쪽 원(12시 방향에서 시계 방향, 조각 사이 흰 선, 조각 안 %), 오른쪽 범례(색 · 이름 · 값 (비율)).
+ *  6% 미만 조각은 안에 숫자를 넣지 않는다. 진한 조각은 흰 글자, 연한 조각은 진한 글자 */
+function piePanel(slide, c, labels, x, y, w, h, k) {
+  const vals = (((c.series || [])[0] || {}).values || []).map(v => (typeof v === 'number' && v > 0 ? v : 0));
+  if (!vals.length) return;
+  const tot = vals.reduce((a, v) => a + v, 0) || 1, cols = chartPieColors(vals.length), fz = D.small * k;
+  const lgW = Math.min(w * 0.46, fz * 11), rowH = fz * 1.75;
+  const R = Math.max(10, Math.min((h - fz) / 2, (w - lgW - fz * 3) / 2)), gx = x + Math.max(0, (w - (R * 2 + fz * 2.5 + lgW)) / 2), cyc = y + h / 2;
+  const no = ++chartNo;
+  slide.addChart(pres.charts.PIE, [{ name: (c.series[0] || {}).name || '', labels: labels.slice(0, vals.length), values: vals }], {
+    x: IN(gx - R * 0.04), y: IN(cyc - R * 1.04), w: IN(R * 2.08), h: IN(R * 2.08), layout: { x: 0.02, y: 0.02, w: 0.96, h: 0.96 },
+    chartColors: cols.map(colorToHex), dataBorder: { pt: 1.5, color: 'FFFFFF' }, firstSliceAng: 0,
+    showLegend: false, showValue: false, showPercent: true, showLabel: false, dataLabelPosition: 'ctr', dataLabelFontFace: FONT, dataLabelFontSize: PT(D.small, k), dataLabelFontBold: true, dataLabelColor: 'FFFFFF',
+    dataLabelFormatCode: '0%', plotArea: { fill: { color: colorToHex(P.white) } }, chartArea: { fill: { color: colorToHex(P.white) } },
+  });
+  CHART_LABEL_FIX.push({ no, pie: true, hide: [vals.map(v => v / tot < 0.06)], color: cols.map(col => (lum(col) < 0.55 ? null : colorToHex(P.text))) });
+  const pct = v => { const p = v / tot * 100; return (p >= 10 || p === 0 ? Math.round(p) : Math.round(p * 10) / 10) + '%'; };
+  const lx = gx + R * 2 + fz * 2.5, ly0 = cyc - rowH * vals.length / 2;
+  vals.forEach((v, i) => {
+    const yy = ly0 + rowH * i;
+    rect(slide, lx, yy + (rowH - fz * 0.6) / 2, fz * 0.6, fz * 0.6, { fill: cols[i], radius: 2 });
+    text(slide, String(labels[i] ?? ''), lx + fz * 1.05, yy, lgW * 0.55, rowH, { size: D.label, k, color: P.body, valign: 'middle' });
+    text(slide, `${(c.series[0].values || [])[i]} (${pct(v)})`, lx + lgW * 0.45, yy, lgW * 0.55, rowH, { size: D.label, k, bold: true, color: P.text, align: 'right', valign: 'middle' });
+  });
 }
 /** 합계 행인가 — build_html.mjs 와 같은 규칙. 수치 칸·정렬은 common.mjs 의 numColumns */
 function isTotalRow(r) { return /^(합계|총계|총합|계|전체|소계|평균|Total)$/i.test(String((r || [])[0] ?? '').replace(/\*\*/g, '').trim()); }
@@ -1397,7 +1474,7 @@ for (const sl of slides) {
 }
 
 const outFile = path.join(outdir, 'deck.pptx');
-fs.writeFileSync(outFile, await applyLineLabelFix(await pres.write({ outputType: 'nodebuffer' })));   // 선 그래프 값 숫자 자리 보정 후 저장
+fs.writeFileSync(outFile, await applyChartLabelFix(await pres.write({ outputType: 'nodebuffer' })));   // 그래프 값 숫자 자리·숨김·색 보정 후 저장
 console.log(`deck.pptx written → ${outFile}`);
 console.log(`slides: ${slides.length}  (type ${meta.type}, ${meta.density}, primary ${P.primary}, style minimal)`);
 slides.forEach(sl => console.log(`  ${String(sl.order).padStart(2, '0')}  ${sl.pageNo ? '#' + sl.pageNo : '   '}  ${slideLabel(sl)}`));
