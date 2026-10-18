@@ -28,9 +28,12 @@
       return r.ok ? LOCAL_URL : null;
     } catch { return null; }
   })();
-  /* 서버가 돌려준 /ws/... 같은 주소를 내 컴퓨터 주소로 바꾼다. */
+  /* 서버가 돌려준 /ws/... · /asset/... 주소를 내 컴퓨터 주소로 바꾼다.
+     표지 배경 목록(/api/coverspec)의 그림 주소도 /asset/... 이라, 안 바꾸면 이 웹 주소에서 찾다가 깨진다(2026-10-18). */
   const absolutize = (o, base) => {
-    for (const k of ['preview', 'pdf', 'pptx']) if (typeof o?.[k] === 'string' && o[k].startsWith('/')) o[k] = base + o[k];
+    if (Array.isArray(o)) return o.map(v => absolutize(v, base));
+    if (o && typeof o === 'object') { for (const k of Object.keys(o)) o[k] = absolutize(o[k], base); return o; }
+    if (typeof o === 'string' && /^\/(ws|asset)\//.test(o)) return base + o;
     return o;
   };
   async function viaLocal(base, path, init) {
