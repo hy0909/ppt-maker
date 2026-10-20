@@ -165,7 +165,7 @@ ppt-maker/
 ├── tests/block-choice/cases.json  블록 선택 시험 세트 (원문 조각 → 정답 블록)
 ├── assets/    deck-stage.js · deck-editor.js · cover-bg/
 ├── references/ outline-schema.md · block-choice.md · layout-patterns.md · outline-templates.md · intake-questions.md · design-system.md
-│              style-data-report.md  참고 화면에서 뽑은 데이터 리포트 스타일 (아직 템플릿 없음)
+│              style-data-report.md  참고 화면 32장에서 뽑은 소개 덱 목차·레이아웃·제목 규칙 (아직 템플릿 없음)
 └── agents/openai.yaml
 ```
 예제: `../../examples/breezehome/outline.json` (마케팅 월간 보고서) → `out/`.
